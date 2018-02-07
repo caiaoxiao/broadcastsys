@@ -1,23 +1,14 @@
 <template>
   <div>
     <div class="content padding">
-      <ul class="nav nav-justified choose" data-name="title" >
-        <li class="on">文件管理</li>
-        <li>录音管理</li>
-        <li>播放记录</li>
-        <li>呼叫记录</li>
+      <ul class="nav nav-justified choose" >
+        <li @click="toggle($index, tab.view)" v-for="(tab, $index) in tabs" :class="{on: active == $index}">{{ tab.name}}</li>
       </ul>
-      <div data-name="con">
-        <file-manage></file-manage>
-        <record-manage></record-manage>
-        <play-manage></play-manage>
-        <call-manage></call-manage>
+      <div>
+        <components :is="currentView"></components>
       </div>
-
     </div>
-
   </div>
-
 </template>
 
 <script>
@@ -28,26 +19,28 @@
   export default {
     data() {
       return {
-        tabName: '文件管理',
-        tabMapOptions: [
-          {name: '文件管理'},
-          {name: '录音管理'},
-          {name: '播放记录'},
-          {name: '呼叫记录'}
+        currentView: 'fileManage',
+        active: 0,
+        tabs: [
+          {name: '文件管理',view: 'fileManage'},
+          {name: '录音管理',view: 'recordManage'},
+          {name: '播放记录',view: 'playManage'},
+          {name: '呼叫记录',view: 'callManage'}
         ]
       }
     },
     created() {
+      this.$nextTick(function() {
+        getHeight()
+        getHeights()
+      })
+    },
+    watch: {
+      'currentView': function() {
         this.$nextTick(function() {
           getHeight()
           getHeights()
         })
-    },
-    watch: {
-      'tabName': function() {
-          debugger
-        getHeight()
-        getHeights()
       }
     },
     components: {
@@ -57,6 +50,10 @@
       playManage
     },
     methods: {
+      toggle(i, v) {
+        this.active = i
+        this.currentView = v
+      },
       tabClick(e) {
         this.tabName = e.target.innerText
       }

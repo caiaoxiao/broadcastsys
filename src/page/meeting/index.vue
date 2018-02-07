@@ -196,7 +196,9 @@
       </div>
     </div>
     <rightPhone></rightPhone>
-    <!--<callDivert v-if="dialogShow"></callDivert>-->
+    <confirm-dialog v-if="dialogShow">
+      <slot name="content">确定要呼叫到</slot>
+    </confirm-dialog>
   </div>
 </template>
 
@@ -204,7 +206,7 @@
   import {getHeight} from 'utils/height'
   import {getHeights} from 'utils/page/meeting'
   import { mapGetters,mapActions } from 'vuex'
-  import {leftPhone,rightPhone,callDivert} from 'components'
+  import {leftPhone,rightPhone,confirmDialog} from 'components'
   export default {
     created() {
       this.$nextTick(function() {
@@ -225,7 +227,7 @@
     components: {
       leftPhone,
       rightPhone,
-      callDivert
+      confirmDialog
     }
   }
 </script>

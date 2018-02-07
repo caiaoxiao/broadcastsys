@@ -29,6 +29,7 @@ const user = {
       setToken('222222')
       commit('SET_TOKEN', '222222')
 
+
     },
     LogOut({ commit, state }) {
       debugger

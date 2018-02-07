@@ -6,7 +6,8 @@
         <div id="aa">
           <div class="tableTool">
             <button type="button" class="btn btn-success" @click="booking">发起预约</button>
-            <div class="operate"><span class="delate"><i class="fa fa-times" aria-hidden="true"></i>删除</span></div>
+            <div class="operate"
+                 @click="deleteItem"><span class="delate"><i class="fa fa-times" aria-hidden="true"></i>删除</span></div>
           </div>
           <div class="table">
             <table class="table">
@@ -44,9 +45,11 @@
       </div>
 
 
-      <edit v-if="dialogShow"></edit>
 
     </div>
+    <confirm-dialog v-if="dialogShow">
+      <p slot="content">确定要删除这个文件吗？</p>
+    </confirm-dialog>
   </div>
 
 </template>
@@ -55,6 +58,7 @@
   import edit from './edit.vue'
   import {getHeight} from 'utils/height'
   import {getHeights} from 'utils/page/broadOrder'
+  import { confirmDialog } from 'components'
   import { mapGetters,mapActions } from 'vuex'
   export default {
 
@@ -70,7 +74,8 @@
       }),
     },
     components: {
-      edit
+      edit,
+      confirmDialog
     },
     methods: {
       fileClick(index) {
@@ -82,7 +87,10 @@
 //        $('#ccc').show();
         $('#aa').hide();
       },
+      deleteItem() {
+        this.$store.dispatch('setDialogShow', true)
 
+      }
 
     }
   }

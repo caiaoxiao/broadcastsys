@@ -5,9 +5,17 @@
         <form class="form-inline">
           <div class="form-group">
             <label>播放时间</label>
-            <input type="text" placeholder="开始时间" class="form-control select-width" style="width:200px;" calendar="YYYY-MM-DD hh:mm:ss" id="a1" />
+            <el-date-picker
+              v-model="formData.time1"
+              type="datetime"
+              placeholder="选择日期时间">
+            </el-date-picker>
             —
-            <input type="text" placeholder="结束时间" class="form-control select-width" style="width:200px;" calendar="YYYY-MM-DD hh:mm:ss" id="a2" />
+            <el-date-picker
+              v-model="formData.time2"
+              type="datetime"
+              placeholder="选择日期时间">
+            </el-date-picker>
           </div>
 
           <button type="submit" class="btn btn-info"><i class="fa fa-search" aria-hidden="true"></i>查询</button>
@@ -27,7 +35,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr>
+        <tr  @click="TrClick(0)">
           <td>fdafewr.mp3</td>
           <td>定时</td>
           <td>2017-11-05 13:00:00</td>
@@ -51,7 +59,16 @@
 </template>
 
 <script>
-
+  export default {
+    data() {
+      return {
+        formData: {
+          time1: new Date(),
+          time2: new Date()
+        }
+      }
+    }
+  }
 </script>
 
 <style type="text/scss" rel="stylesheet/scss" lang="scss">

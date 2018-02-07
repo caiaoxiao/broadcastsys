@@ -20,14 +20,14 @@
           </div>
           <div class="form-group">
             <label>被叫号码</label>
-            <input type="text" v-model="formData.calledNumber" class="form-control" style="width:70px;">
+            <input type="text" v-model.number="formData.calledNumber" class="form-control" style="width:70px;">
           </div>
-          <div class="form-group">
+          <div class="form-group" @click="typeSwitch">
             <label>文件类型</label>
-            <span class="selected">通话录音</span>
-            <span>会议录音</span>
+            <span :class="fileType == '通话录音' ? 'selected' : ''">通话录音</span>
+            <span :class="fileType == '会议录音' ? 'selected' : ''">会议录音</span>
           </div>
-          <button type="submit" class="btn btn-info"><i class="fa fa-search" aria-hidden="true"></i>查询</button>
+          <button @click="refresh" class="btn btn-info"><i class="fa fa-search" aria-hidden="true"></i>查询</button>
         </form>
       </div>
     </div>
@@ -44,7 +44,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr @click="trClick(0)">
+        <tr @click="TrClick(0)">
           <td>2017-11-05 13:00:00</td>
           <td>700</td>
           <td>300</td>
@@ -88,6 +88,7 @@
   export default {
     data() {
       return {
+        fileType: '通话录音',           // 默认文件类型
         formData: {
           calledNumber: 2222,
           callNumber: '',
@@ -96,10 +97,13 @@
       }
     },
     methods: {
-      trClick(index) {
-          debugger
-        $(".table>tbody>tr").eq(index).toggleClass("selected")
+      refresh() {
+
       },
+      typeSwitch(e) {
+        this.fileType = e.target.innerText
+      },
+
     }
   }
 </script>

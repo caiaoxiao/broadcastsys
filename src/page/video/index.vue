@@ -7,10 +7,13 @@
         <li><i class="fa fa-user" aria-hidden="true"></i>1001</li>
         <li><i class="fa fa-user" aria-hidden="true"></i>1001</li>
       </ul>
-      <div class="screen" >
-        <span class="one">一分屏</span>
-        <span class="four active">四分屏</span>
-        <span class="nine">九分屏</span>
+      <div class="screen">
+        <span v-for="item in screenNum"
+              @click="splitScreen(item.name)"
+              :class="[currentScreen == item.name ? 'active': '', item.class]"  >
+          {{item.name}}
+        </span>
+
       </div>
     </div>
     <div class="videoRight">
@@ -35,9 +38,19 @@
 
 <script>
   import {getHeight} from 'utils/height'
+  const screenNum = [
+    {name: '一分屏',class: 'one' },
+    {name: '四分屏',class: 'four' },
+    {name: '九分屏',class: 'nine' }
+  ]
+
   export default{
+
     data() {
       return {
+        screenNum,
+        currentScreen: '四分屏',
+        device: [],
         num: 4
       }
     },
@@ -50,22 +63,25 @@
       videoClick(e) {
         $(e.target).toggleClass("screenSelected")
       },
-      off() {       // 断开
+      splitScreen(name) {// 分屏
+        this.currentScreen = name
+      },
+      off() {        // 断开
 
       },
-      gmod() {      // 录像
+      gmod() {       // 录像
 
       },
-      transpond() { // 转发
+      transpond() {  // 转发
 
       },
-      video() {     // 视频
+      video() {      // 视频
 
       },
-      mute() {      // 静音
+      mute() {       // 静音
 
       },
-      fullScreen() {// 全屏
+      fullScreen() { // 全屏
 
       }
     }

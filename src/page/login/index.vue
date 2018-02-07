@@ -19,13 +19,18 @@
           <div class="form-group">
 
             <div class="col-sm-12">
-              <input type="text" class="form-control" placeholder="请输入用户名">
+              <input type="text" class="form-control" placeholder="请输入用户名" id="login">
             </div>
           </div>
           <div class="form-group">
 
             <div class="col-sm-12">
-              <input type="password" class="form-control" placeholder="请输入密码">
+              <input type="password" class="form-control" placeholder="请输入密码" id="passwd">
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <input type="password" class="form-control" placeholder="Websocket URL" id="wsURL">
             </div>
           </div>
           <div class="form-group">
@@ -52,7 +57,7 @@
 </template>
 
 <script>
-
+  import {verto} from 'utils/verto'
   export default {
     data() {
       return {

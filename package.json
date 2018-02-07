@@ -17,11 +17,12 @@
     "axios": "^0.17.1",
     "better-scroll": "^1.7.2",
     "easyscroll": "^1.0.1",
+    "element-ui": "legacy",
     "js-cookie": "^2.2.0",
+    "nprogress": "^0.2.0",
     "vue": "^2.5.2",
     "vue-datetime-picker": "^0.2.1",
     "vue-router": "^3.0.1",
-    "element-ui": "legacy",
     "vuex": "^3.0.1"
   },
   "devDependencies": {

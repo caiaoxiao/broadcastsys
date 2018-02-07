@@ -5,18 +5,26 @@
         <form class="form-inline">
           <div class="form-group">
             <label>呼叫时间</label>
-            <input type="text" placeholder="开始时间" class="form-control select-width" style="width:200px;" calendar="YYYY-MM-DD hh:mm:ss" id="a1" />
+            <el-date-picker
+              v-model="formData.time1"
+              type="datetime"
+              placeholder="开始时间">
+            </el-date-picker>
             —
-            <input type="text" placeholder="结束时间" class="form-control select-width" style="width:200px;" calendar="YYYY-MM-DD hh:mm:ss" id="a2" />
+            <el-date-picker
+              v-model="formData.time2"
+              type="datetime"
+              placeholder="选择日期时间">
+            </el-date-picker>
           </div>
           <div class="form-group">
             <label>主叫号码</label>
-            <input type="text" class="form-control" style="width:70px;">
+            <input type="text" v-model.number="formData.callNumber"  class="form-control" style="width:70px;">
 
           </div>
           <div class="form-group">
             <label>被叫号码</label>
-            <input type="text" class="form-control" style="width:70px;">
+            <input type="text" v-model.number="formData.calledNumber" class="form-control" style="width:70px;">
           </div>
           <button type="submit" class="btn btn-info"><i class="fa fa-search" aria-hidden="true"></i>查询</button>
         </form>
@@ -35,7 +43,7 @@
         </tr>
         </thead>
         <tbody>
-        <tr>
+        <tr  @click="TrClick(0)">
           <td>2017-11-05 13:00:00</td>
           <td>700</td>
           <td>300</td>
@@ -43,7 +51,7 @@
           <td>应答</td>
           <td>11.MP3</td>
         </tr>
-        <tr>
+        <tr @click="TrClick(1)">
           <td>2017-11-05 13:00:00</td>
           <td>700</td>
           <td>300</td>
@@ -59,7 +67,23 @@
 </template>
 
 <script>
+  export default {
+    data() {
+      return {
+        formData: {
+          time1: new Date(),
+          time2: new Date(),
+          callNumber: '',
+          calledNumber: ''
+        }
+      }
+    },
+    methods: {
+      refresh() {
 
+      }
+    }
+  }
 </script>
 
 <style type="text/scss" rel="stylesheet/scss" lang="scss">

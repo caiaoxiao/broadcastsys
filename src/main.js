@@ -9,9 +9,9 @@ import ElementUI from 'element-ui'
 // 导入JQ
 import $ from 'jquery'
 // 引入 bootstrap
-import './assets/css/bootstrap.css'
+import 'assets/css/bootstrap.css'
 // 引入 font-awesome
-import 'font-awesome/css/font-awesome.css'
+import 'assets/css/font-awesome.css'
 // 引入公用 css
 import 'assets/css/default.css'
 // 引入播放条样式

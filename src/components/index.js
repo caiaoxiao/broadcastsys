@@ -4,7 +4,7 @@ import container from 'components/container/index.vue'
 import leftPhone from 'components/leftPhone/index.vue'
 import rightPhone from 'components/rightPhone/index.vue'
 import deviceList from 'components/deviceList/index.vue'
-import callDivert from 'components/callDivert/index.vue'
+import confirmDialog from 'components/confirmDialog/index.vue'
 import switchs from 'components/switchs/index.vue'
 
 
@@ -15,6 +15,6 @@ export {
   leftPhone,
   rightPhone,
   deviceList,
-  callDivert,
+  confirmDialog,
   switchs
 }

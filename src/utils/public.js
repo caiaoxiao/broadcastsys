@@ -4,12 +4,14 @@
  */
 import vue from 'vue'
 
+// 1、公用分页切换方法
 vue.prototype.tabClick = function (e) {
   $(e.target).addClass('on').siblings().removeClass('on');
   var index = $('[data-name=title]').children().index(e.target);
   $('[data-name=con]').children().eq(index).show().siblings().hide();
 }
 
+// 2、公用按钮点击方法
 vue.prototype.itemClick = function(e) {
   let target = e.currentTarget
   if ($(target).hasClass("online")) {
@@ -71,4 +73,11 @@ vue.prototype.itemClick = function(e) {
     $(target).addClass("waittingSelected");
     $(".playList").removeClass("ListShow").addClass("ListHide");
   }
+}
+
+// 3、公用表格单行点击方法
+vue.prototype.TrClick = function(index) {
+  debugger
+  console.log($(".table>tbody>tr"))
+  $(".table>tbody>tr").eq(index).toggleClass("selected")
 }

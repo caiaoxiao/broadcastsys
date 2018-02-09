@@ -124,6 +124,7 @@
                       <div class="moduleNum">600</div>
                       <div class="moduleKind">视频终端</div>
                       <div class="moduleState">在线</div>
+
                     </div>
                   </div>
                   <div class="singleM">

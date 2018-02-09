@@ -12,7 +12,7 @@
     </div>
     <div class="phoneDial">
       <div class="numDisplay">
-        <span>{{inputValue}}</span>
+        <span >{{inputValue}}</span>
         <img @click="clear" src="../../assets/img/delate.fw.png" />
       </div>
       <div class="dialDisplay">
@@ -31,7 +31,7 @@
       </div>
       <div class="dialAction">
         <div class="dial" @click="callDivert">呼叫转移</div>
-        <div class="dial ring" id="callbtn" data-inline="true"><i class="fa fa-phone fa-2x" aria-hidden="true"></i></div>
+        <div class="dial ring" @click="makeCall"><i class="fa fa-phone fa-2x" aria-hidden="true"></i></div>
         <div class="dial hangup">挂断</div>
       </div>
     </div>
@@ -41,12 +41,12 @@
 
 <script>
   import {getHeight} from 'utils/height'
-  import {verto} from 'utils/verto'
 
   export default {
     data() {
       return {
-        inputValue: ''
+        inputValue: '',
+        currentCall: null
       }
     },
     created() {
@@ -63,6 +63,15 @@
       },
       callDivert() {
         this.$store.dispatch('CallDivert', {type: true, num: this.inputValue})
+      },
+      makeCall() {
+        this.currentCall = this.vertoHandle.newCall({
+          // Extension to dial.
+          destination_number: '3500',
+          caller_id_name: 'FreeSWITCH User',
+          caller_id_number: '1008',
+          useStereo: true,
+        })
       }
     }
   }

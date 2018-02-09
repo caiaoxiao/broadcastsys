@@ -28,6 +28,11 @@ import 'assets/js/addList/requestAnimationFrame'
 import 'assets/js/addList/jquery_002'
 // 4.引入滚动条插件
 import BScroll from 'better-scroll'
+// 5.引入verto相关js
+import 'jquery-json'
+import 'verto/src/jquery.verto.js'
+import 'verto/src/jquery.FSRTC.js'
+import 'verto/src/jquery.jsonrpcclient.js'
 
 Vue.use(ElementUI)
 Vue.config.productionTip = false

@@ -6,6 +6,10 @@ import router from './router'
 //导入状态管理器
 import store from 'store'
 import ElementUI from 'element-ui'
+// 导入axios
+import axios from 'axios'
+axios.defaults.baseURL = 'https://scc.ieyeplus.com:8082'
+Vue.prototype.$ajax = axios
 // 导入JQ
 import $ from 'jquery'
 // 引入 bootstrap

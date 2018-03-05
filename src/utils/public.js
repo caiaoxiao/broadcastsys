@@ -11,7 +11,7 @@ vue.prototype.tabClick = function (e) {
   $('[data-name=con]').children().eq(index).show().siblings().hide();
 }
 
-// 2、公用按钮点击方法
+/*// 2、公用按钮点击方法
 vue.prototype.itemClick = function(e) {
   let target = e.currentTarget
   if ($(target).hasClass("online")) {
@@ -73,7 +73,7 @@ vue.prototype.itemClick = function(e) {
     $(target).addClass("waittingSelected");
     $(".playList").removeClass("ListShow").addClass("ListHide");
   }
-}
+}*/
 
 // 3、公用表格单行点击方法
 vue.prototype.TrClick = function(index) {

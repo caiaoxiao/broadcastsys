@@ -308,7 +308,6 @@
       },
       hangupCall() {
           console.log("挂断");
-        debugger
         this.currentCall.hangup();
       },
       // copy leftPhone
@@ -322,6 +321,7 @@
         this.$store.dispatch('CallDivert', {type: true, num: this.inputValue})
       },
       makeCall() {
+          debugger;
         this.currentCall = this.vertoHandle.newCall({
           // Extension to dial.
           destination_number: '3500',

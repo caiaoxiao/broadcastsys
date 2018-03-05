@@ -50,16 +50,27 @@
       return {
         screenNum,
         currentScreen: '四分屏',
-        device: [],
-        num: 4
+        deviceList: [],
+        num: 4,
+        vertoHandle: null,
+        currentCall: null
       }
     },
     created() {
       this.$nextTick(function () {
         getHeight()
+        this.refresh()
       })
     },
     methods: {
+      refresh() {
+        this.$ajax.get('api/groups/group_users',{})
+          .then(function(res)  {
+            let result = res.data
+            this.deviceList = result
+            console.log(this.deviceList);
+          }.bind(this))
+      },
       videoClick(e) {
         $(e.target).toggleClass("screenSelected")
       },

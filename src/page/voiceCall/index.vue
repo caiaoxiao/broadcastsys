@@ -208,7 +208,7 @@
       </div>
       <div class="functionMenu">
         <ul class="nav nav-justified menuList">
-          <li id="a1"><i class="fa fa-phone fa-2x" aria-hidden="true"></i><span>呼叫</span></li>
+          <li id="a1" @click="call"><i class="fa fa-phone fa-2x" aria-hidden="true"></i><span>呼叫</span></li>
           <li id="a2"><i class="fa fa-volume-control-phone fa-2x" aria-hidden="true"></i><span>强行通话</span></li>
           <li id="a3"><i class="fa fa-window-close fa-2x" aria-hidden="true" onclick="$('#eeee').show();"></i><span>强拆</span></li>
           <li id="a4"><i class="fa fa-deaf fa-2x" aria-hidden="true"></i><span>强插</span></li>
@@ -227,6 +227,7 @@
 </template>
 
 <script>
+  import { mapGetters,mapActions } from 'vuex'
   import {getHeight} from 'utils/height'
   import {getHeights,itemClick} from 'utils/page/voiceCall'
   import { leftPhone, rightPhone, deviceList, switchs} from 'components'
@@ -239,9 +240,6 @@
     },
     data() {
       return {
-        vertoHandle: null,
-        vertoCallbacks: null,
-        // copy leftPhone
         inputValue: '',
         currentCall: null
       }
@@ -250,65 +248,27 @@
       this.$nextTick(function() {
         getHeight()
         getHeights()
-        $.verto.init({}, this.bootstrap)
+
       })
     },
+    computed: {
+      ...mapGetters({
+        vertoHandle: 'vertoHandle',
+        group_users: 'group_users',
+        users: 'users',
+        currentLoginUser: 'currentLoginUser'
+      }),
+    },
     methods: {
-      bootstrap(status) {
-        this.vertoHandle = new jQuery.verto({
-          login: 1008+'@'+ window.location.hostname,
-          passwd: '1234',
-          socketUrl: 'wss://'+ window.location.hostname +':8082',
-          ringFile: 'sounds/bell_ring2.wav',
-          tag: "webcam",
-          videoParams: {
-            "minWidth": "1280",
-            "minHeight": "720",
-            "minFrameRate": 30
-          },
-          iceServers: true,
-          deviceParams: {
-            useMic: true,
-            useSpeak: true
-          },
-          audioParams: {
-            googAutoGainControl: true,
-            googNoiseSuppression: true,
-            googHighpassFilter: true
-          },
+      call() {
 
-        }, {
-          onWSLogin: function(verto, success) {
-            console.log('onWSLogin', success);
-          },
-          onWSClose: function(verto, success) {
-            console.log('onWSClose', success);
-          },
-          onDialogState: function(d) {
-            switch (d.state.name) {
-              case "trying":
-                break;
-              case "answering":
-                break;
-              case "active":
-                break;
-              case "hangup":
-                console.log("Call ended with cause: " + d.cause);
-                break;
-              case "destroy":
-                // Some kind of client side cleanup...
-                break;
-            }
-          }
-        });
+
       },
-
       play() {
         $('.playMenu').removeClass('Hide').addClass('Show');
       },
       hangupCall() {
           console.log("挂断");
-        debugger
         this.currentCall.hangup();
       },
       // copy leftPhone
@@ -322,6 +282,7 @@
         this.$store.dispatch('CallDivert', {type: true, num: this.inputValue})
       },
       makeCall() {
+          debugger;
         this.currentCall = this.vertoHandle.newCall({
           // Extension to dial.
           destination_number: '3500',

@@ -12,7 +12,7 @@
     </div>
     <div class="phoneDial">
       <div class="numDisplay">
-        <span >{{inputValue}}</span>
+        <span >{{destination_number}}</span>
         <img @click="clear" src="../../assets/img/delate.fw.png" />
       </div>
       <div class="dialDisplay">
@@ -45,29 +45,83 @@
   export default {
     data() {
       return {
-        inputValue: '',
-        currentCall: null
+        currentCall: null,
+        vertoHandle: null,
+        destination_number: ''
       }
     },
     created() {
       this.$nextTick(function () {
         getHeight()
+//        $.verto.init({}, this.bootstrap);
       })
     },
     methods: {
+      bootstrap(status) {
+        let $this = this
+        // 需要用到vuex里存储的用户信息
+        this.vertoHandle = new jQuery.verto({
+          login: 1008+'@'+ window.location.hostname,
+          passwd: '1234',
+          socketUrl: 'wss://'+ window.location.hostname +':8082',
+          ringFile: 'sounds/bell_ring2.wav',
+          tag: "webcam",
+          videoParams: {
+            "minWidth": "1280",
+            "minHeight": "720",
+            "minFrameRate": 30
+          },
+          iceServers: true,
+          deviceParams: {
+            useMic: true,
+            useSpeak: true
+          },
+          audioParams: {
+            googAutoGainControl: true,
+            googNoiseSuppression: true,
+            googHighpassFilter: true
+          },
+
+        }, {
+          onWSLogin: this.onWSLogin,
+          onWSClose: this.onWSClose,
+          onDialogState: function(d) {
+            switch (d.state.name) {
+              case "trying":
+                break;
+              case "answering":
+                break;
+              case "active":
+                break;
+              case "hangup":
+                console.log("Call ended with cause: " + d.cause);
+                break;
+              case "destroy":
+                // Some kind of client side cleanup...
+                break;
+            }
+          }
+        });
+      },
+      onWSLogin(verto, success) {
+        console.log('onWSLogin', success);
+      },
+      onWSClose(verto, success) {
+        console.log('onWSClose', success);
+      },
       clear() {
-        this.inputValue = this.inputValue.substring(0, this.inputValue.length-1)
+        this.destination_number = this.destination_number.substring(0, this.destination_number.length-1)
       },
       keypad(value) {
-        this.inputValue = this.inputValue + value
+        this.destination_number = this.destination_number + value
       },
       callDivert() {
-        this.$store.dispatch('CallDivert', {type: true, num: this.inputValue})
+        this.$store.dispatch('CallDivert', {type: true, num: this.destination_number})
       },
       makeCall() {
         this.currentCall = this.vertoHandle.newCall({
           // Extension to dial.
-          destination_number: '3500',
+          destination_number: this.destination_number,
           caller_id_name: 'FreeSWITCH User',
           caller_id_number: '1008',
           useStereo: true,

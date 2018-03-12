@@ -3,18 +3,18 @@
     <div class="leftList">
       <div class="orgTitle">成员列表[视频终端]</div>
       <ul class="orgList">
-        <li><i class="fa fa-user" aria-hidden="true"></i>1001</li>
+        <li><i class="fa fa-user" aria-hidden="true"></i>1002</li>
         <li><i class="fa fa-user" aria-hidden="true"></i>1001</li>
         <li><i class="fa fa-user" aria-hidden="true"></i>1001</li>
       </ul>
-      <div class="screen">
+      <!--  <div class="screen">
         <span v-for="item in screenNum"
-              @click="splitScreen(item.name)"
-              :class="[currentScreen == item.name ? 'active': '', item.class]"  >
-          {{item.name}}
-        </span>
+               @click="splitScreen(item.name)"
+               :class="[currentScreen == item.name ? 'active': '', item.class]"  >
+           {{item.name}}
+         </span>
 
-      </div>
+      </div>-->
     </div>
     <div class="videoRight">
       <div class="screenDisplay ">
@@ -38,28 +38,39 @@
 
 <script>
   import {getHeight} from 'utils/height'
-  const screenNum = [
-    {name: '一分屏',class: 'one' },
-    {name: '四分屏',class: 'four' },
-    {name: '九分屏',class: 'nine' }
-  ]
+//  const screenNum = [
+//    {name: '一分屏',class: 'one' },
+ //   {name: '四分屏',class: 'four' },
+//    {name: '九分屏',class: 'nine' }
+ // ]
 
   export default{
 
     data() {
       return {
         screenNum,
-        currentScreen: '四分屏',
-        device: [],
-        num: 4
+        currentScreen: '1分屏',
+        deviceList: [],
+        num: 4,
+        vertoHandle: null,
+        currentCall: null
       }
     },
     created() {
       this.$nextTick(function () {
         getHeight()
+        this.refresh()
       })
     },
     methods: {
+      refresh() {
+        this.$ajax.get('api/groups/group_users',{})
+          .then(function(res)  {
+            let result = res.data
+            this.deviceList = result
+            console.log(this.deviceList);
+          }.bind(this))
+      },
       videoClick(e) {
         $(e.target).toggleClass("screenSelected")
       },

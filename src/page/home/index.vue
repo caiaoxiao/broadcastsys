@@ -39,22 +39,17 @@
           passwd: '1234',
           socketUrl: 'wss://'+ window.location.hostname +':8082',
           ringFile: 'sounds/bell_ring2.wav',
-          tag: "webcam",
           videoParams: {
             "minWidth": "1280",
             "minHeight": "720",
             "minFrameRate": 30
           },
-          iceServers: true,
+          iceServers: [],
           deviceParams: {
-            useMic: true,
-            useSpeak: true
+            useMic: "any",
+            useSpeak: "any"
           },
-          audioParams: {
-            googAutoGainControl: true,
-            googNoiseSuppression: true,
-            googHighpassFilter: true
-          },
+
 
         }, {
           onWSLogin: function(verto, success) {
@@ -64,22 +59,43 @@
           onWSClose: function(verto, success) {
             console.log('onWSClose', success);
           },
-          onDialogState: function(d) {
+          /*onDialogState: function(d) {
+            let arr = []
+            let item = {
+                state: d.state.name,
+                num: d.params.remote_caller_id_number
+            }
+
+            console.log("dddd",d)
             switch (d.state.name) {
               case "trying":
                 break;
-              case "answering":
+              case "ringing":       // 振铃，装载进队列
+                arr.push(item)
+                $this.$store.dispatch('setCallQueue', arr)
+                break;
+              case "answering":     // 接听电话，改变状态
+
                 break;
               case "active":
                 break;
-              case "hangup":
+              case "hangup":        //  拒接，改变状态
+                arr = $this.$store.getters.callQueue
+                arr.forEach(function(a, i){
+                  if(a.num == d.params.remote_caller_id_number) {
+                    arr[i].state = d.state.name
+                  }
+                })
+                $this.$store.dispatch('setCallQueue', arr)
                 console.log("Call ended with cause: " + d.cause);
                 break;
               case "destroy":
                 // Some kind of client side cleanup...
                 break;
             }
-          }
+
+
+          }*/
         }))
       },
       // 查询所有设备 以及事件初始化

@@ -4,11 +4,24 @@
     <div class="numList">
       <div>
         <ul class="callNum">
-          <li><i class="fa fa-circle red" aria-hidden="true"></i>1005<span>00:00:01</span></li>
-          <li><i class="fa fa-circle orange" aria-hidden="true"></i>1005</li>
-          <li><i class="fa fa-clock-o" aria-hidden="true"></i>1005</li>
+          <!--<li v-for="item in callQueue">-->
+            <!--<i  class="fa fa-circle red" aria-hidden="true"></i>-->
+            <!--1005-->
+            <!--<span>00:00:01</span>-->
+          <!--</li>-->
+          <li v-for="item in callQueue" @click="answerCall(item)">
+            <!--<i  class="fa fa-circle red" aria-hidden="true"></i>-->
+            <i v-if="item.state == 'ringing'" class="fa fa-circle orange" aria-hidden="true"></i>
+            <i v-if="item.state == 'hangup'" class="fa fa-clock-o" aria-hidden="true"></i>
+            {{item.num}}
+          </li>
+          <!--<li><i class="fa fa-clock-o" aria-hidden="true"></i>1005</li>-->
         </ul>
       </div>
+    </div>
+    <div>
+      <video width="800" id="video-container" autoplay="autoplay" hidden="true"></video>
+
     </div>
     <div class="phoneDial">
       <div class="numDisplay">
@@ -32,7 +45,7 @@
       <div class="dialAction">
         <div class="dial" @click="callDivert">呼叫转移</div>
         <div class="dial ring" @click="makeCall"><i class="fa fa-phone fa-2x" aria-hidden="true"></i></div>
-        <div class="dial hangup">挂断</div>
+        <div class="dial hangup" @click="hangupCall">挂断</div>
       </div>
     </div>
   </div>
@@ -61,8 +74,15 @@
         vertoHandle: 'vertoHandle',
         group_users: 'group_users',
         users: 'users',
-        currentLoginUser: 'currentLoginUser'
+        currentLoginUser: 'currentLoginUser',
+        callQueue: 'callQueue'
       }),
+    },
+    watch: {
+      'callQueue': function() {
+          debugger
+          this.callQueue
+      }
     },
     methods: {
       clear() {
@@ -71,18 +91,33 @@
       keypad(value) {
         this.destination_number = this.destination_number + value
       },
+      answerCall(item) {
+        debugger
+        this.vertoHandle.answer();
+      },
       callDivert() {
         this.$store.dispatch('CallDivert', {type: true, num: this.destination_number})
       },
       makeCall() {
-
-        this.currentCall = this.vertoHandle.newCall({
+        this.vertoHandle.newCall({
           // Extension to dial.
           destination_number: this.destination_number,
-          caller_id_name: 'FreeSWITCH User',
+          caller_id_name: 'LegalHigh',
           caller_id_number: '1008',
+          outgoingBandwidth: 'default',
+          incomingBandwidth: 'default',
           useStereo: true,
+          dedEnc: false,
+          tag: "video-container",
+          deviceParams: {
+            useMic: "any",
+            useSpeak: "any",
+            useCamera: "any"
+          }
         })
+      },
+      hangupCall() {
+        this.vertoHandle.hangup();
       }
     }
   }

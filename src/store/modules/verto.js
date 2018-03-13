@@ -7,7 +7,8 @@ const verto = {
     vertoHandle: null,  // verto初始化
     group_users: [],
     users: [],
-    currentLoginUser: []
+    currentLoginUser: [],
+    callQueue: []
   },
   mutations: {
     SET_VERTO_INIT: (state, handle) => {
@@ -21,8 +22,10 @@ const verto = {
     },
     SET_CURRENT_LOGIN_USER: (state, data) => {
       state.currentLoginUser = data
-
     },
+    SET_CALL_QUEUE: (state, data) => {
+      state.callQueue = data
+    }
   },
   actions: {
     // 初始化verto
@@ -40,9 +43,11 @@ const verto = {
     //  设置当前用户
     setCurrentLoginUser({ commit }, data) {
       commit('SET_CURRENT_LOGIN_USER', data)
+    },
+    //  设置通话队列
+    setCallQueue({ commit }, data) {
+      commit('SET_CALL_QUEUE', data)
     }
-
-
   }
 }
 

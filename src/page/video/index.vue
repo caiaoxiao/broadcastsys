@@ -50,6 +50,7 @@
       return {
         screenNum,
         currentScreen: '1分屏',
+        currentScreen: '四分屏',
         deviceList: [],
         num: 4,
         vertoHandle: null,

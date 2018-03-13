@@ -158,7 +158,7 @@
             u.registerState = registerState;
           }
         })
-        this.users = Object.assign([], this.users);
+        this.$store.dispatch('setUser',Object.assign([], this.users))
       },
       //  获取已注册的设备状态
       syncUserRegisterStatus() {
@@ -192,7 +192,7 @@
               });
             });
 
-            if (users.length) _this.users = users
+            if (users.length) _this.$store.dispatch('setUser',users)
 
           },function(data) {
             console.log("error:"+data)
@@ -207,7 +207,6 @@
             const doc = parser.parseFromString(data.message, "text/xml");
             const msg = parseXML(doc);
             if(msg != 0) {
-              debugger
             }
           }
         )

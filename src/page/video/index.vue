@@ -49,11 +49,7 @@
     data() {
       return {
         screenNum,
-<<<<<<< HEAD
         currentScreen: '1分屏',
-=======
-        currentScreen: '四分屏',
->>>>>>> df45f34615bb2aa3b0e20af6139d38182c46cab7
         deviceList: [],
         num: 4,
         vertoHandle: null,

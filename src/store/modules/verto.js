@@ -31,7 +31,6 @@ const verto = {
     },
     //  设置分组数据
     setGroupUsers({ commit }, data) {
-      debugger
       commit('SET_GROUP_USERS', data)
     },
     //  设置所有数据

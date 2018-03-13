@@ -45,7 +45,6 @@ export function itemClick(e) {
     }
   }
 
-<<<<<<< HEAD
 }
 
 export function isArray(obj) {
@@ -62,9 +61,4 @@ export function isObject(obj) {
 
 export function isString(obj) {
   return Object.prototype.toString.call(obj) === "[object String]";
-=======
-
-
-
->>>>>>> df45f34615bb2aa3b0e20af6139d38182c46cab7
 }

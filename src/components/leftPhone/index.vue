@@ -40,13 +40,13 @@
 </template>
 
 <script>
+  import { mapGetters,mapActions } from 'vuex'
   import {getHeight} from 'utils/height'
 
   export default {
     data() {
       return {
-        currentCall: null,
-        vertoHandle: null,
+
         destination_number: ''
       }
     },
@@ -56,59 +56,15 @@
 //        $.verto.init({}, this.bootstrap);
       })
     },
+    computed: {
+      ...mapGetters({
+        vertoHandle: 'vertoHandle',
+        group_users: 'group_users',
+        users: 'users',
+        currentLoginUser: 'currentLoginUser'
+      }),
+    },
     methods: {
-      bootstrap(status) {
-        let $this = this
-        // 需要用到vuex里存储的用户信息
-        this.vertoHandle = new jQuery.verto({
-          login: 1008+'@'+ window.location.hostname,
-          passwd: '1234',
-          socketUrl: 'wss://'+ window.location.hostname +':8082',
-          ringFile: 'sounds/bell_ring2.wav',
-          tag: "webcam",
-          videoParams: {
-            "minWidth": "1280",
-            "minHeight": "720",
-            "minFrameRate": 30
-          },
-          iceServers: true,
-          deviceParams: {
-            useMic: true,
-            useSpeak: true
-          },
-          audioParams: {
-            googAutoGainControl: true,
-            googNoiseSuppression: true,
-            googHighpassFilter: true
-          },
-
-        }, {
-          onWSLogin: this.onWSLogin,
-          onWSClose: this.onWSClose,
-          onDialogState: function(d) {
-            switch (d.state.name) {
-              case "trying":
-                break;
-              case "answering":
-                break;
-              case "active":
-                break;
-              case "hangup":
-                console.log("Call ended with cause: " + d.cause);
-                break;
-              case "destroy":
-                // Some kind of client side cleanup...
-                break;
-            }
-          }
-        });
-      },
-      onWSLogin(verto, success) {
-        console.log('onWSLogin', success);
-      },
-      onWSClose(verto, success) {
-        console.log('onWSClose', success);
-      },
       clear() {
         this.destination_number = this.destination_number.substring(0, this.destination_number.length-1)
       },
@@ -119,6 +75,7 @@
         this.$store.dispatch('CallDivert', {type: true, num: this.destination_number})
       },
       makeCall() {
+
         this.currentCall = this.vertoHandle.newCall({
           // Extension to dial.
           destination_number: this.destination_number,

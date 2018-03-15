@@ -12,6 +12,7 @@ const getters = {
   group_users: state => state.verto.group_users,
   users: state => state.verto.users,
   currentLoginUser: state => state.verto.currentLoginUser,
-  callQueue: state => state.verto.callQueue
+  callQueue: state => state.verto.callQueue,
+  curCall: state=> state.verto.curCall
 }
 export default getters

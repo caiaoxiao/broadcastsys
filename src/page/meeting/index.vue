@@ -155,7 +155,7 @@
       return {
         shows: false,
         deviceAll: [],
-        name: 3800+ '-'+window.location.hostname,
+        name: 3800+ '-' + window.location.hostname,
         nowSession: [],       // 正在开会的话机
         selectNowSession: [], // 会议中选中的话机
         selectPhone: []       // 选中待会议的话机
@@ -227,32 +227,34 @@
       //  开始会议
       startMeeting() {
         const laChannelName = this.getChannelName("liveArray");
-        //  赋值到会议话机数组
-        this.nowSession = Object.assign([], this.selectPhone);
-        //  单个设备开始会议
-        this.fsAPI("conference", this.name + " " + "dial" + " " + "user/"+this.selectPhone[0].userExten,function(res){
-          console.log("邀请会议",res)
-        });
+        if(this.selectPhone.length != 0) {
+          //  赋值到会议话机数组
+          this.nowSession = Object.assign([], this.selectPhone);
+          //  单个设备开始会议
+          this.fsAPI("conference", this.name + " " + "dial" + " " + "user/"+this.selectPhone[0].userExten,function(res){
+            console.log("邀请会议",res)
+          });
 
-        //  重置勾选话机数组
-        this.selectPhone = []
-        //  重置勾选样式
-        let allPhone = $('.middleCon .memberList').eq(1).find('.moduleList').find('.moduleStyle')
-        for(let i=0;i<allPhone.length;i++) {
-          $(allPhone[i]).removeClass('onlineSelected')
-          $(allPhone[i]).removeClass('callingSelected')
-          $(allPhone[i]).removeClass('waittingSelected')
-        }
-
-
-        this.broadcast(laChannelName, {
-          liveArray: {
-            command: "bootstrap",
-            context: laChannelName,
-            name: this.name,
-            obj: {}
+          //  重置勾选话机数组
+          this.selectPhone = []
+          //  重置勾选样式
+          let allPhone = $('.middleCon .memberList').eq(1).find('.moduleList').find('.moduleStyle')
+          for(let i=0;i<allPhone.length;i++) {
+            $(allPhone[i]).removeClass('onlineSelected')
+            $(allPhone[i]).removeClass('callingSelected')
+            $(allPhone[i]).removeClass('waittingSelected')
           }
-        });
+
+
+          this.broadcast(laChannelName, {
+            liveArray: {
+              command: "bootstrap",
+              context: laChannelName,
+              name: this.name,
+              obj: {}
+            }
+          });
+        }
       },
       broadcast(channel, params) {
         var msg = {
@@ -295,11 +297,13 @@
       },
       //  结束会议
       closeMeeting() {
-        this.fsAPI("conference", this.name + " " + "hup all",function(res){
-          console.log("会议结束 ",res)
-          this.nowSession = []
-          this.selectNowSession = []
-        }.bind(this));
+        if(this.selectNowSession.length != 0) {
+          this.fsAPI("conference", this.name + " " + "hup all", function (res) {
+            console.log("会议结束 ", res)
+            this.nowSession = []
+            this.selectNowSession = []
+          }.bind(this));
+        }
       },
       publicFunction(type) {
         if(this.selectNowSession.length != 0) {
@@ -338,6 +342,9 @@
           }.bind(this))
 
         }.bind(this))
+      },
+      test() {
+
       },
       // 会议录音
       meetingRecord(type) {

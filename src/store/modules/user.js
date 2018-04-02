@@ -9,7 +9,6 @@ const user = {
 
   mutations: {
     SET_TOKEN: (state, token) => {
-      debugger
       state.token = token
     },
     SET_NAME: (state, name) => {
@@ -28,7 +27,17 @@ const user = {
     Login({ commit }, userInfo) {
       setToken('222222')
       commit('SET_TOKEN', '222222')
-
+      /*const username = userInfo.username.trim()
+      return new Promise((resolve, reject) => {
+        login(username, userInfo.password).then(response => {
+          const data = response.data
+          setToken(data.token)
+          commit('SET_TOKEN', data.token)
+          resolve()
+        }).catch(error => {
+          reject(error)
+        })
+      })*/
     },
     LogOut({ commit, state }) {
       debugger

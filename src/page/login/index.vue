@@ -75,8 +75,9 @@
       })
     },
     methods: {
+
       login() {
-        this.$store.dispatch('Login').then(() => {
+        this.$store.dispatch('Login', {username: 'admin',password: '123456'}).then(() => {
           this.loading = false
           this.$router.push({ path: '/' })
         }).catch(() => {

@@ -1,3 +1,4 @@
+<script src="../../utils/page/meeting.js"></script>
 <template>
   <div >
     <div class="phone left">

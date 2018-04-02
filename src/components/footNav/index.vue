@@ -8,7 +8,7 @@
     <div class="span_large">
       <div class="location_indicator"></div>
     </div>
-
+    <!--正在进行-->
     <div class="deviceStatus" style="display:none;">
       <div class="deviceModule">
         <table class="table">
@@ -102,15 +102,16 @@
       </div>
     </div>
     <div class="audio-box">
-      <span class="fa fa-times" aria-hidden="true"></span>
+      <audio ref="audio" ></audio>
+      <span class="fa fa-times" @click="close"></span>
       <div class="audio-container">
         <div class="audio-cover"><i class="fa fa-2x fa-music fa-spin"></i></div>
         <div class="audio-view">
-          <div class="audio-title">未知歌曲</div>
+          <div class="audio-title">{{ activeIndex == -1 ? '' : playlist[activeIndex].FileName }}</div>
           <div class="audio-body">
             <div class="audio-backs">
-              <div class="audio-this-time">00:00</div>
-              <div class="audio-count-time">00:00</div>
+              <div class="audio-this-time">{{now}}</div>
+              <div class="audio-count-time">{{ activeIndex == -1 ? '' : playlist[activeIndex].FileTime }}</div>
               <div class="audio-setbacks">
                 <i class="audio-this-setbacks">
                   <span class="audio-backs-btn"></span>
@@ -122,23 +123,25 @@
           </div>
           <div class="audio-btn">
             <div class="audio-select">
-              <div class="audio-prev"></div>
-              <div class="audio-play"></div>
-              <div class="audio-next"></div>
-              <div class="audio-menu"></div>
-              <div class="audio-volume"></div>
+              <div class="audio-prev" @click="prev"></div>
+              <div class="audio-play" @click="playToggle()"></div>
+              <div class="audio-next" @click="next"></div>
+              <div class="audio-menu" @click="openSonglist"></div>
+              <div class="audio-volume" @click="mute"></div>
             </div>
-            <div class="audio-set-volume">
+            <div class="audio-set-volume">9
               <div class="volume-box">
                 <i><span></span></i>
               </div>
             </div>
-            <div class="audio-list">
+            <div class="audio-list" v-show="songlistShow">
               <div class="audio-list-head">
                 <p>☺随心听</p>
-                <span class="menu-close">关闭</span>
+                <span class="menu-close" @click="openSonglist">关闭</span>
               </div>
-              <ul class="audio-inline"></ul>
+              <ul class="audio-inline">
+                <li v-for="song in playlist" style="">{{ song.FileName }}</li>
+              </ul>
             </div>
           </div>
         </div>
@@ -149,33 +152,133 @@
 </template>
 
 <script>
+  import { mapGetters,mapActions } from 'vuex'
+
   export default {
+    data() {
+      return {
+        activeIndex: -1,            //  当前播放歌曲角标
+        songlistShow: false,        //  播放列表显示或隐藏
+        playSwitch: true,
+        totalTime: "00:00",
+        now: "00:00"
+      }
+    },
+    mounted() {
+      this.$refs.audio.addEventListener('play', function() {
+        // 播放时长解析
+        this.now = this.transformTime(this.$refs.audio.currentTime)
+        setInterval(() => {
+          this.now = this.transformTime(this.$refs.audio.currentTime)
+        }, 1000);
+        this.now = this.transformTime(this.$refs.audio.currentTime)
+      }.bind(this), false)
+
+      this.$refs.audio.addEventListener('ended', function () {
+        // 监听播放器是否播放完成
+        if(this.playlist.length != 0) {
+          if(this.activeIndex + 2 < this.playlist.length) {
+            this.$refs.audio.src = this.playlist[this.activeIndex].MediaPath
+            this.$refs.audio.play()
+          }else {
+            this.activeIndex = -1
+          }
+        }
+      }.bind(this), false);
+    },
     created() {
-      this.$nextTick(function (){
-        $(".audio-box").hide();
-        $(".musicList>div>p").click(function () {
-          $(this).parent("div").toggleClass("selected");
-        })
-        $("i.fa-play-circle").click(function () {
-          $(".audio-box").show();
+    },
+    computed: {
+      ...mapGetters({
+        play: 'play',
+        playlist: 'playlist'
+      }),
+    },
+    watch: {
+      'play': function() {
+        if(this.play && this.playlist.length != 0) {
+          this.$nextTick(() => {
+            this.activeIndex = 0
+            this.$refs.audio.src = this.playlist[this.activeIndex].MediaPath
+            this.$refs.audio.playbackRate =6
 
-        })
-        $(".audio-box span.fa").click(function () {
-          $(".audio-box").hide();
-        })
-      })
-
+            this.$refs.audio.play()
+            this.playSwitch = false
+          })
+        }
+      }
     },
     methods: {
       logout() {
         this.$store.dispatch('LogOut').then(() => {
           location.reload()  // 为了重新实例化vue-router对象 避免bug
         })
+      },
+      prev() {
+        if(this.playlist.length > 1) {
+          if(this.activeIndex - 1 >= 0) {
+            this.activeIndex = this.activeIndex - 1
+            this.$refs.audio.src = this.playlist[this.activeIndex].MediaPath
+            this.$refs.audio.play()
+          }else {
+            this.activeIndex = this.playlist.length -1
+            this.$refs.audio.src = this.playlist[this.playlist.length -1].MediaPath
+            this.$refs.audio.play()
+          }
+        }
+      },
+      next() {
+        if(this.playlist.length > 1) {
+          if(this.activeIndex + 2 <= this.playlist.length) {
+            this.activeIndex = this.activeIndex + 1
+            this.$refs.audio.src = this.playlist[this.activeIndex].MediaPath
+            this.$refs.audio.play()
+          }else {
+            this.activeIndex = 0
+            this.$refs.audio.src = this.playlist[0].MediaPath
+            this.$refs.audio.play()
+          }
+        }
+
+      },
+      playToggle() {
+        if(this.playlist.length != 0) {
+          if(this.playSwitch) {
+            this.$refs.audio.play()
+          }else {
+            this.$refs.audio.pause()
+          }
+          this.playSwitch = !this.playSwitch
+        }
+      },
+      openSonglist() {
+        // 播放列表显示或隐藏
+        this.songlistShow = !this.songlistShow
+      },
+      mute() {
+        this.$refs.audio.muted = !this.$refs.audio.muted
+      },
+      transformTime(seconds) {
+        let m, s;
+        m = Math.floor(seconds / 60);
+        m = m.toString().length == 1 ? ('0' + m) : m;
+        s = Math.floor(seconds - 60 * m);
+        s = s.toString().length == 1 ? ('0' + s) : s;
+        return m + ':' + s;
+      },
+      close() {
+
       }
     }
   }
 </script>
 
-<style scoped>
-
+<style type="text/scss" rel="stylesheet/scss" lang="scss">
+  .audio-inline {
+    li {
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap
+    }
+  }
 </style>

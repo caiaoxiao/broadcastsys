@@ -73,6 +73,12 @@
       refresh() {
 //        let xuiUsername = localStorage.getItem('xui.username')
         let xuiUsername = 1008 // 过滤掉登陆者
+        this.$store.dispatch('setCurrentLoginUser',{
+          deviceState: "registered",
+          userID: xuiUsername,
+          callDirection: null,
+          channelUUID: null
+      })
         this.vertoHandle.sendMethod("jsapi",{command:"fsapi", data:{cmd:"show", arg:"registrations as xml"}},
           function(data) {
             const parser = new DOMParser();
@@ -94,11 +100,13 @@
             }
             registrations.forEach(function(r) {
               let user = {}
-              user.deviceState = "registered"
-              user.userID = r.reg_user
-              user.callDirection = null
-              user.channelUUID = null
-              deviceList.push(user)
+              if(r.reg_user != xuiUsername) {
+                user.deviceState = "registered"
+                user.userID = r.reg_user
+                user.callDirection = null
+                user.channelUUID = null
+                deviceList.push(user)
+              }
             })
             if (deviceList.length) this.$store.dispatch('setDeviceList',deviceList)
 
@@ -178,9 +186,10 @@
         } else if (channelCallState == "HANGUP") {
           channelCallState = "register";
         }
+
         // 入栈
         if (callDirection == "inbound") {
-          if (currentLoginUser.userExten  == callerNumber) {
+          if (currentLoginUser.userID  == callerNumber) {
             currentLoginUser.channelUUID = channelUUID;
             currentLoginUser.channelCallState = channelCallState;
             currentLoginUser.callDirection = callDirection;
@@ -199,7 +208,7 @@
 
           // 出栈
         } else if (callDirection == "outbound") {
-          if (currentLoginUser.userExten  == calleeNumber) {
+          if (currentLoginUser.userID  == calleeNumber) {
             currentLoginUser.channelUUID = channelUUID;
             currentLoginUser.channelCallState = channelCallState;
             currentLoginUser.callDirection = callDirection;
@@ -216,10 +225,9 @@
           }
 
         }
-//        if (currentLoginUserChanged) this.setState({currentLoginUser: currentLoginUser});
+        if (currentLoginUserChanged) this.$store.dispatch('setCurrentLoginUser', currentLoginUser);
         if (usersChanged) this.$store.dispatch('setDeviceList',users)
         debugger
-
       },
     },
     components: {

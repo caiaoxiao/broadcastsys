@@ -6,7 +6,7 @@
           <div class="form-group">
             <label for="inputEmail3" class="col-sm-1 control-label">预案名称</label>
             <div class="col-sm-11">
-              <input type="text" class="form-control" placeholder="请输入预案名称" v-model="planName">
+              <input type="text" class="form-control" placeholder="请输入预案名称" v-model="fromData.FolderName">
             </div>
           </div>
 

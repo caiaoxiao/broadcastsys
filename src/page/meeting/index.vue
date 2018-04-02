@@ -230,9 +230,12 @@
           //  赋值到会议话机数组
           this.nowSession = Object.assign([], this.selectPhone);
           //  单个设备开始会议
-          this.fsAPI("conference", this.name + " " + "dial" + " " + "user/"+this.selectPhone[0].userID,function(res){
-            console.log("邀请会议",res)
-          });
+          this.selectPhone.forEach(function(s, i){
+            this.fsAPI("conference",
+              this.name + " " + "bgdial" + " " + "user/"+this.selectPhone[i].userID,function(res){
+              console.log("邀请会议",res)
+            });
+          }.bind(this))
 
           //  重置勾选话机数组
           this.selectPhone = []

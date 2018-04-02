@@ -99,7 +99,7 @@
         </div>
       </div>
 
-        <playList v-if="playListShow"  @closeDialog="close"></playList>
+      <playList v-if="playListShow"  @closeDialog="close"></playList>
 
 
 
@@ -164,23 +164,7 @@
       ]),
     },
     methods: {
-      returnClass(deviceState) {
-        switch (deviceState) {
-          case 'registered':
-              return 'online';
-          case 'ringing':
-              return 'waitting';
 
-        }
-      },
-      returnState(deviceState) {
-        switch (deviceState) {
-          case 'registered':
-            return '在线';
-          case 'ringing':
-            return '振铃';
-        }
-      },
       itemClick(e, row) {
         let _this = this
         let target = e.currentTarget

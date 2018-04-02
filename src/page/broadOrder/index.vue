@@ -13,12 +13,13 @@
             <table class="table">
               <thead>
               <tr>
-                <td>文件名称</td>
+                <td>预案名称</td>
                 <td>预约模式</td>
                 <td>预约时间</td>
                 <td>播放模式</td>
                 <td>播放次数</td>
                 <td>播放终端</td>
+                <td>操作</td>
               </tr>
               </thead>
               <tbody>
@@ -29,6 +30,7 @@
                 <td>循环播放</td>
                 <td>1</td>
                 <td>701</td>
+                <td>立即播放</td>
               </tr>
               <tr>
                 <td>fdafewr.mp3</td>
@@ -37,6 +39,7 @@
                 <td>循环播放</td>
                 <td>1</td>
                 <td>701</td>
+                <td>立即播放</td>
               </tr>
               </tbody>
             </table>
@@ -47,6 +50,7 @@
 
 
     </div>
+    <edit v-if="editShow" @close="booking"></edit>
     <confirm-dialog v-if="dialogShow">
       <p slot="content">确定要删除这个文件吗？</p>
     </confirm-dialog>
@@ -61,7 +65,11 @@
   import { confirmDialog } from 'components'
   import { mapGetters,mapActions } from 'vuex'
   export default {
-
+    data() {
+      return {
+        editShow: false,    //编辑框显示或隐藏
+      }
+    },
     created() {
       this.$nextTick(function() {
         getHeight()
@@ -82,10 +90,8 @@
         $(".table>tbody>tr").eq(index).toggleClass("selected")
       },
       booking() {
-        this.$store.dispatch('setDialogShow', true)
-
-//        $('#ccc').show();
-        $('#aa').hide();
+        this.editShow =  !this.editShow
+        $('#aa').toggle()
       },
       deleteItem() {
         this.$store.dispatch('setDialogShow', true)

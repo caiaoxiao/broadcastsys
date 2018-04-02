@@ -4,11 +4,24 @@
     <div class="numList">
       <div>
         <ul class="callNum">
-          <li><i class="fa fa-circle red" aria-hidden="true"></i>1005<span>00:00:01</span></li>
-          <li><i class="fa fa-circle orange" aria-hidden="true"></i>1005</li>
-          <li><i class="fa fa-clock-o" aria-hidden="true"></i>1005</li>
+          <!--<li v-for="item in callQueue">-->
+            <!--<i  class="fa fa-circle red" aria-hidden="true"></i>-->
+            <!--1005-->
+            <!--<span>00:00:01</span>-->
+          <!--</li>-->
+          <li v-for="item in callQueue" @click="answerCall(item)">
+            <!--<i  class="fa fa-circle red" aria-hidden="true"></i>-->
+            <i v-if="item.state == 'ringing'" class="fa fa-circle orange" aria-hidden="true"></i>
+            <i v-if="item.state == 'hangup'" class="fa fa-clock-o" aria-hidden="true"></i>
+            {{item.num}}
+          </li>
+          <!--<li><i class="fa fa-clock-o" aria-hidden="true"></i>1005</li>-->
         </ul>
       </div>
+    </div>
+    <div>
+      <video width="800" id="video-container" autoplay="autoplay" hidden="true"></video>
+
     </div>
     <div class="phoneDial">
       <div class="numDisplay">
@@ -32,7 +45,7 @@
       <div class="dialAction">
         <div class="dial" @click="callDivert">呼叫转移</div>
         <div class="dial ring" @click="makeCall"><i class="fa fa-phone fa-2x" aria-hidden="true"></i></div>
-        <div class="dial hangup">挂断</div>
+        <div class="dial hangup" @click="hangupCall">挂断</div>
       </div>
     </div>
   </div>
@@ -40,13 +53,13 @@
 </template>
 
 <script>
+  import { mapGetters,mapActions } from 'vuex'
   import {getHeight} from 'utils/height'
 
   export default {
     data() {
       return {
-        currentCall: null,
-        vertoHandle: null,
+
         destination_number: ''
       }
     },
@@ -56,77 +69,55 @@
 //        $.verto.init({}, this.bootstrap);
       })
     },
-    methods: {
-      bootstrap(status) {
-        let $this = this
-        // 需要用到vuex里存储的用户信息
-        this.vertoHandle = new jQuery.verto({
-          login: 1008+'@'+ window.location.hostname,
-          passwd: '1234',
-          socketUrl: 'wss://'+ window.location.hostname +':8082',
-          ringFile: 'sounds/bell_ring2.wav',
-          tag: "webcam",
-          videoParams: {
-            "minWidth": "1280",
-            "minHeight": "720",
-            "minFrameRate": 30
-          },
-          iceServers: true,
-          deviceParams: {
-            useMic: true,
-            useSpeak: true
-          },
-          audioParams: {
-            googAutoGainControl: true,
-            googNoiseSuppression: true,
-            googHighpassFilter: true
-          },
+    computed: {
+      ...mapGetters({
+        vertoHandle: 'vertoHandle',
+        group_users: 'group_users',
+        users: 'users',
+        currentLoginUser: 'currentLoginUser',
+        callQueue: 'callQueue'
+      }),
+    },
+    watch: {
+      'callQueue': function() {
 
-        }, {
-          onWSLogin: this.onWSLogin,
-          onWSClose: this.onWSClose,
-          onDialogState: function(d) {
-            switch (d.state.name) {
-              case "trying":
-                break;
-              case "answering":
-                break;
-              case "active":
-                break;
-              case "hangup":
-                console.log("Call ended with cause: " + d.cause);
-                break;
-              case "destroy":
-                // Some kind of client side cleanup...
-                break;
-            }
-          }
-        });
-      },
-      onWSLogin(verto, success) {
-        console.log('onWSLogin', success);
-      },
-      onWSClose(verto, success) {
-        console.log('onWSClose', success);
-      },
+      }
+    },
+    methods: {
       clear() {
         this.destination_number = this.destination_number.substring(0, this.destination_number.length-1)
       },
       keypad(value) {
         this.destination_number = this.destination_number + value
       },
+      answerCall(item) {
+        this.callQueue[0].curCall.answer();
+      },
       callDivert() {
         this.$store.dispatch('CallDivert', {type: true, num: this.destination_number})
       },
       makeCall() {
-        this.currentCall = this.vertoHandle.newCall({
+        this.vertoHandle.newCall({
           // Extension to dial.
           destination_number: this.destination_number,
-          caller_id_name: 'FreeSWITCH User',
+          caller_id_name: 'LegalHigh',
           caller_id_number: '1008',
+          outgoingBandwidth: 'default',
+          incomingBandwidth: 'default',
           useStereo: true,
+          dedEnc: false,
+          tag: "video-container",
+          deviceParams: {
+            useMic: "any",
+            useSpeak: "any",
+            useCamera: "any"
+          }
         })
+      },
+      hangupCall() {
+        this.vertoHandle.hangup();
       }
+
     }
   }
 </script>

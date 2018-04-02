@@ -8,77 +8,25 @@
       <div class="selection"  >
         <div class="menuType"><i class="fa fa-outdent" aria-hidden="true"></i>播放列表</div>
         <div id="songListHeight">
-          <div class="songSheet">
+          <div class="songSheet" v-for="songlist in playList"  @click="(()=> songlist.unfold = !songlist.unfold)">
             <div class="songSheetName songSheetNameSelect">
               <div class="songSetting">
                 <span class="toggle"><i class="fa fa-angle-right" aria-hidden="true"></i></span>
-                <p contenteditable="false">歌单名称</p>
-                <span class="musicNum">[10]</span>
+                <p >{{songlist.FolderName}}</p>
+                <span class="musicNum">[{{ songlist.Files ? songlist.Files.length :0}}]</span>
               </div>
               <span class="songSheetTool">选择</span>
             </div>
-            <ul class="musicList">
-              <li>
-                <p>洗刷刷.mp3</p>
+            <ul class="musicList" v-if="songlist.unfold">
+              <li v-for="fileItem in songlist.Files">
+                <p>{{ fileItem.FileName }}</p>
                 <ul class="musicListTools">
                   <li><i class="fa fa-play-circle" aria-hidden="true"></i>试听</li>
-                  <li><i class="fa fa-plus" aria-hidden="true"></i>添加</li>
-                </ul>
-                <span class="totalTime">05:12</span>
-              </li>
-              <li>
-                <p>噢噢噢噢.text</p>
-                <ul class="musicListTools">
-                  <li><i class="fa fa-play-circle" aria-hidden="true"></i>试听</li>
-                  <li><i class="fa fa-plus" aria-hidden="true"></i>添加</li>
-                </ul>
-                <span class="totalTime">05:12</span>
-              </li>
-              <li>
-                <p>xixix.wma</p>
-                <ul class="musicListTools">
-                  <li><i class="fa fa-play-circle" aria-hidden="true"></i>试听</li>
-                  <li><i class="fa fa-plus" aria-hidden="true"></i>添加</li>
-                </ul>
-                <span class="totalTime">05:12</span>
-              </li>
-            </ul>
-          </div>
-          <div class="songSheet">
-            <div class="songSheetName">
-              <div class="songSetting">
-                <span class="toggle"><i class="fa fa-angle-right" aria-hidden="true"></i></span>
-                <p contenteditable="false">歌单名称</p>
-                <span class="musicNum">[10]</span>
 
-              </div>
-              <span class="songSheetTool"><i class="fa fa-plus" aria-hidden="true"></i></span>
-            </div>
-            <ul class="musicList">
-              <li>
-                <p>洗刷刷.mp3</p>
-                <ul class="musicListTools">
-                  <li><i class="fa fa-play-circle" aria-hidden="true"></i>试听</li>
-                  <li><i class="fa fa-plus" aria-hidden="true"></i>添加</li>
                 </ul>
                 <span class="totalTime">05:12</span>
               </li>
-              <li>
-                <p>噢噢噢噢.text</p>
-                <ul class="musicListTools">
-                  <li><i class="fa fa-play-circle" aria-hidden="true"></i>试听</li>
-                  <li><i class="fa fa-plus" aria-hidden="true"></i>添加</li>
-                </ul>
-                <span class="totalTime">05:12</span>
-              </li>
-              <li>
-                <p>xixix.wma</p>
-                <ul class="musicListTools">
-                  <li><i class="fa fa-play-circle" aria-hidden="true"></i>试听</li>
-                  <li><i class="fa fa-plus" aria-hidden="true"></i>添加</li>
-                </ul>
-                <span class="totalTime">05:12</span>
-              </li>
+
             </ul>
           </div>
         </div>
@@ -91,7 +39,7 @@
     </div>
 
     <div class="btnDiv">
-      <button type="button" class="btn btn-info" @click="close">OK,播放！</button>
+      <button type="button" class="btn btn-info" @click="play">OK,播放！</button>
       <button type="button" class="btn btn-default" @click="close">取消</button>
     </div>
   </div>
@@ -102,22 +50,42 @@
   import {getHeight} from 'utils/height'
 
   export default {
+    props: ['selectPhone'],
     data() {
       return {
-        tabType: '播放列表'
+        tabType: '播放列表',
+        playList: []
       }
     },
     created() {
       this.$nextTick(function() {
+          debugger
         getHeight()
+        this.refresh()
       })
     },
     methods: {
+      refresh() {
+        // 1、查询歌单数组
+        this.$ajax.get('Folder/getTreeFiles', {params: {UserID: '133585596bb04c9cbe311d0859dd7196'}})
+          .then(res => {
+            if(res.data.code == 1) {
+              let result = res.data.result
+              result.forEach(function(r,i){
+                r.unfold = false
+              })
+              this.playList = result
+            }
+          })
+      },
       tabClick(e) {
         this.tabType = e.target.innerText
       },
+      play() {
+        this.selectPhone
+      },
       close() {
-        $('.playMenu').removeClass('Show').addClass('Hide')
+        this.$emit('closeDialog')
       }
     }
   }

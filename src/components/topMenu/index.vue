@@ -25,7 +25,6 @@
     },
     created() {
       this.menuList = routes.options.routes[2].children
-      console.log(this.menuList)
     }
   }
 </script>

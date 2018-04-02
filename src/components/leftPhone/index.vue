@@ -80,7 +80,7 @@
     },
     watch: {
       'callQueue': function() {
-          this.callQueue.curCall
+
       }
     },
     methods: {
@@ -91,12 +91,7 @@
         this.destination_number = this.destination_number + value
       },
       answerCall(item) {
-        this.callQueue[0].curCall.answer({
-          useVideo: this.callQueue[0].curCall.params.wantVideo,
-          useMic: "any",
-          useSpeak: "any",
-          useCamera: "any"
-        });
+        this.callQueue[0].curCall.answer();
       },
       callDivert() {
         this.$store.dispatch('CallDivert', {type: true, num: this.destination_number})
@@ -122,6 +117,7 @@
       hangupCall() {
         this.vertoHandle.hangup();
       }
+
     }
   }
 </script>

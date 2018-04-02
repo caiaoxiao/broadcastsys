@@ -8,7 +8,8 @@ import store from 'store'
 import ElementUI from 'element-ui'
 // 导入axios
 import axios from 'axios'
-axios.defaults.baseURL = 'https://scc.ieyeplus.com:8082'
+// axios.defaults.baseURL = 'https://scc.ieyeplus.com:8082'
+axios.defaults.baseURL = 'https://scc.ieyeplus.com:8443/IpBc'
 Vue.prototype.$ajax = axios
 // 导入JQ
 import $ from 'jquery'
@@ -34,7 +35,7 @@ import 'assets/js/addList/jquery_002'
 import BScroll from 'better-scroll'
 // 5.引入verto相关js
 import 'jquery-json'
-import 'verto/src/jquery.verto.js'
+import verto from 'verto/src/jquery.verto.js'
 import 'verto/src/jquery.FSRTC.js'
 import 'verto/src/jquery.jsonrpcclient.js'
 import 'utils/xcti'

@@ -45,13 +45,13 @@
           </ul>
           <div data-name="con">
             <div class="moduleList"  >
-              <div class="singleM" v-for="item in group_users">
+              <div class="singleM" v-for="item in deviceList">
                 <div class="moduleStyle"
-                     :class="[item.registerState == 'registered' ? 'online' : 'offline' ]"
+                     :class="[item.deviceState == 'registered' ? 'online' : 'offline' ]"
                      @click.stop="itemClick($event, item)">
-                  <div class="moduleNum">{{ item.userExten }}</div>
+                  <div class="moduleNum">{{ item.userID }}</div>
                   <div class="moduleKind">视频终端</div>
-                  <div class="moduleState" >{{ item.registerState == 'registered' ? '在线' : '离线' }}</div>
+                  <div class="moduleState" >{{ item.deviceState == 'registered' ? '在线' : '离线' }}</div>
                 </div>
               </div>
             </div>
@@ -162,13 +162,11 @@
       }
     },
     computed: {
-      ...mapGetters({
-        dialogShow: 'dialogShow',
-        vertoHandle: 'vertoHandle',           // verto初始化
-        group_users: 'group_users',           // 分组设备(不包括当前用户)
-        users: 'users',                       // 所有设备
-        currentLoginUser: 'currentLoginUser'  // 当前用户
-      }),
+      ...mapGetters([
+        'dialogShow',
+        'vertoHandle',           // verto初始化
+        'deviceList',           // 分组设备(不包括当前用户)
+      ]),
     },
     components: {
       leftPhone,
@@ -192,7 +190,7 @@
           if($(target).hasClass("onlineSelected") ){
             $(target).removeClass("onlineSelected")
             this.selectPhone.forEach(function(s,i) {
-              if(s.userExten == row.userExten) {
+              if(s.userID == row.userID) {
                 _this.selectPhone.splice(i, 1)
               }
             })
@@ -207,7 +205,7 @@
           if($(target).hasClass("callingSelected")) {
             $(target).removeClass("callingSelected");
             this.selectNowSession.forEach(function(s,i) {
-              if(s.userExten == row.userExten) {
+              if(s.userID == row.userID) {
                 _this.selectNowSession.splice(i, 1)
               }
             })
@@ -227,11 +225,12 @@
       //  开始会议
       startMeeting() {
         const laChannelName = this.getChannelName("liveArray");
+        debugger
         if(this.selectPhone.length != 0) {
           //  赋值到会议话机数组
           this.nowSession = Object.assign([], this.selectPhone);
           //  单个设备开始会议
-          this.fsAPI("conference", this.name + " " + "dial" + " " + "user/"+this.selectPhone[0].userExten,function(res){
+          this.fsAPI("conference", this.name + " " + "dial" + " " + "user/"+this.selectPhone[0].userID,function(res){
             console.log("邀请会议",res)
           });
 
@@ -266,28 +265,14 @@
           msg.data[i] = params[i];
         }
 
-        this.sendMethod("verto.broadcast", msg);
+        this.vertoHandle.sendMethod("verto.broadcast", msg);
       },
-      sendMethod(method, params, success_cb, error_cb) {
-        const self = this;
 
-        this.vertoHandle.rpcClient.call(method, params, function(e) {
-          /* Success */
-//          self.processReply(method, true, e);
-          console.log("sendMethod success", e);
-          if (success_cb) success_cb(e);
-        }, function(e) {
-          /* Error */
-          console.log("sendMethod ERR", e);
-          if (error_cb) error_cb(e);
-//          self.processReply(method, false, e);
-        });
-      },
       getChannelName(what) { // liveArray chat mod
         return "conference-" + what + "." + this.name + "@" + window.location.hostname
       },
       fsAPI(cmd, arg, success_cb, failed_cb) {
-        this.sendMethod("jsapi", {
+        this.vertoHandle.sendMethod("jsapi", {
           command: "fsapi",
           data: {
             cmd: cmd,

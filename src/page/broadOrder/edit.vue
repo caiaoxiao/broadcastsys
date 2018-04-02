@@ -6,7 +6,7 @@
           <div class="form-group">
             <label for="inputEmail3" class="col-sm-1 control-label">预案名称</label>
             <div class="col-sm-11">
-              <input type="text" class="form-control" placeholder="">
+              <input type="text" class="form-control" placeholder="请输入预案名称" v-model="planName">
             </div>
           </div>
 
@@ -23,35 +23,18 @@
 
               <div class="menuType"><i class="fa fa-outdent" aria-hidden="true"></i>播放列表</div>
               <div id="songListHeight">
-                <div class="songSheet">
-                  <div class="songSheetName">
+                <div class="songSheet" v-for="songlist in playList" @click="(()=> songlist.unfold = !songlist.unfold)">
+                  <div class="songSheetName" :class="songlist.selected ? 'songSheetNameSelect' : ''">
                     <div class="songSetting">
                       <span class="toggle"><i class="fa fa-angle-right" aria-hidden="true"></i></span>
-                      <p contenteditable="false">歌单名称</p>
-                      <span class="musicNum">[10]</span>
-
+                      <p contenteditable="false">{{songlist.FolderName}}</p>
+                      <span class="musicNum">[{{ songlist.Files ? songlist.Files.length :0}}]</span>
                     </div>
-                    <span class="songSheetTool"><i class="fa fa-plus" aria-hidden="true"></i></span>
+                    <span class="songSheetTool" @click.stop="selectSonglist(songlist)">选择</span>
                   </div>
-                  <ul class="musicList">
-                    <li>
-                      <p>洗刷刷.mp3</p>
-                      <ul class="musicListTools">
-                        <li><i class="fa fa-play-circle" aria-hidden="true"></i>试听</li>
-
-                      </ul>
-                      <span class="totalTime">05:12</span>
-                    </li>
-                    <li>
-                      <p>噢噢噢噢.text</p>
-                      <ul class="musicListTools">
-                        <li><i class="fa fa-play-circle" aria-hidden="true"></i>试听</li>
-
-                      </ul>
-                      <span class="totalTime">05:12</span>
-                    </li>
-                    <li>
-                      <p>xixix.wma</p>
+                  <ul class="musicList" v-if="songlist.unfold">
+                    <li v-for="fileItem in songlist.Files">
+                      <p>{{fileItem.FileName}}</p>
                       <ul class="musicListTools">
                         <li><i class="fa fa-play-circle" aria-hidden="true"></i>试听</li>
 
@@ -62,15 +45,11 @@
                 </div>
               </div>
             </div>
-
-
-
-
           </div>
 
           <div>
             <div class="textFlies">
-              <textarea class="form-control"  id="textarea01"></textarea>
+              <textarea class="form-control" v-model="realTimeText"  id="textarea01"></textarea>
 
             </div>
           </div>
@@ -85,12 +64,12 @@
         <div class="con" data-name="con">
           <div>
             <div class="selectedList" id="height04">
-              <div class="singleFlies">1002</div>
-              <div class="singleFlies">2008</div>
-              <div class="singleFlies">9281</div>
-              <div class="singleFlies">9809</div>
+              <div class="singleFlies"
+                   :class="device.selected ? 'selected' : ''"
+                   v-for="device in deviceList"
+                   @click="selectItem(device)">{{device.userID}}</div>
             </div>
-            <div class="selectAll">全选</div>
+            <div class="selectAll" @click="selectAll(1)">全选</div>
           </div>
           <div>
             <div class="sp-department">
@@ -123,21 +102,25 @@
           </div>
         </div>
         <div class="">
-          <div class="menuType"><i class="fa fa-th-large" aria-hidden="true"></i>播放列表</div>
+          <div class="menuType"><i class="fa fa-th-large" aria-hidden="true"></i>播放设备列表</div>
           <div class="selectedList" id="height07">
-            <div class="singleFlies selectDelate">10092</div>
-            <div class="singleFlies selectDelate">2006</div>
-            <div class="singleFlies selectDelate">1009</div>
-            <div class="singleFlies selectDelate">29009</div>
+            <div class="singleFlies selectDelate" v-for="device in selectDevice" @click="deleteDevice(device)">
+              {{device.userID}}</div>
           </div>
-          <div class="selectAll">全部删除</div>
+          <div class="selectAll" @click="deleteAll()">全部删除</div>
         </div>
       </div>
     </div>
     <div class="setting">
       <div class="settingMoudle">
         <div class="settingTitle">选择时间</div>
-        <div class="settingCon"></div>
+        <div class="settingCon">
+          <el-date-picker
+            v-model="formData.time"
+            type="datetime"
+            placeholder="选择日期时间">
+          </el-date-picker>
+        </div>
       </div>
       <div class="settingMoudle">
         <div class="settingTitle">预约模式</div>
@@ -149,9 +132,9 @@
       <div class="settingMoudle">
         <div class="settingTitle">播放次数</div>
         <div class="settingCon">
-          <span class="times">-</span>
-          <input type="text" value="1"/>
-          <span class="times">+</span>
+          <span class="times" @click="subtract">-</span>
+          <input type="text" v-model="cycleIndex" class="cycleIndex"/>
+          <span class="times" @click="add">+</span>
         </div>
 
       </div>
@@ -159,12 +142,12 @@
         <div class="settingTitle">播放模式</div>
         <div class="settingCon">
           <span class="moudle moudleSelected">循环播放</span>
-          <span class="moudle">按次播放</span>
+          <span class="moudle">单次播放</span>
         </div>
       </div>
     </div>
     <div class="btnDiv">
-      <button type="button" class="btn btn-info " @click="close">确定</button>
+      <button type="button" class="btn btn-info " @click="submitPlan">确定</button>
       <button type="button" class="btn btn-default" @click="close">取消</button>
     </div>
   </div>
@@ -173,35 +156,203 @@
 </template>
 
 <script>
+  import parseXML from 'utils/xml_parser'
+  import {isArray,isObject,isString} from 'utils/tool'
+  import { mapGetters,mapActions } from 'vuex'
   import {getHeight} from 'utils/height'
   import {getHeights} from 'utils/page/broadOrder'
   export default {
     data() {
       return {
-        playCount: 0
+        planName: '',
+        playList: [],       // 歌单列表
+        selectDevice: [],   // 已勾选的设备
+        checkplaylist: [], // 已勾选的歌单
+        deviceList: [],     // 在线设备列表
+        isSelectAll: false, // 是否全选
+        playCount: 0,
+        cycleIndex: 0,      // 预案循环次数
+        realTimeText: '',
+        formData: {
+          time: new Date()
+        }
       }
     },
     created() {
       this.$nextTick(function() {
         getHeight()
         getHeights()
+        this.refresh()
       })
     },
+    computed: {
+      ...mapGetters([
+        'vertoHandle',
+        'currentLoginUser'
+      ]),
+    },
     methods: {
-      compute(e) {
-        let type = e.target.innerText
-        if(type == '-') {
-          if(this.playCount !== 0) {
-            this.playCount = this.playCount - 1
+      refresh() {
+        // 1、查询歌单数组
+        this.$ajax.get('Folder/getTreeFiles', {params: {UserID: '133585596bb04c9cbe311d0859dd7196'}})
+          .then(res => {
+            if(res.data.code == 1) {
+              let result = res.data.result
+              result.forEach(function(r,i){
+                r.unfold = false
+                r.selected = false
+              })
+              this.playList = result
+            }
+          })
+        // 2、查询所有在线设备
+        this.vertoHandle.sendMethod("jsapi",{command:"fsapi", data:{cmd:"show", arg:"registrations as xml"}},
+          function(data) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(data.message, "text/xml");
+            const msg = parseXML(doc);
+
+            let registrations = [];
+            let deviceList = []
+            if(msg) {
+              if (isArray(msg.row)) {
+                registrations = msg.row;
+              } else if (isObject(msg.row)) {
+                registrations.push(msg.row);
+              } else if (isArray(msg)) {
+                registrations = msg;
+              } else if (isObject(msg)) {
+                registrations.push(msg);
+              }
+            }
+            registrations.forEach(function(r) {
+              let user = {}
+              user.deviceState = "registered"
+              user.userID = r.reg_user
+              user.callDirection = null
+              user.selected = false
+              deviceList.push(user)
+            })
+            if (deviceList.length) this.deviceList = deviceList
+
+          }.bind(this),function(data) {
+            console.log("error:"+data)
+          }.bind(this))
+
+        // 订阅注册事件
+        this.vertoHandle.subscribe("FSevent.custom::sofia::register", {handler: this.handleFSEventRegister.bind(this)});
+        // 订阅取消注册事件
+        this.vertoHandle.subscribe("FSevent.custom::sofia::unregister", {handler: this.handleFSEventRegister.bind(this)});
+      },
+      // 注册事件 和 取消注册事件
+      handleFSEventRegister(v, e) {
+        let deviceList = this.deviceList
+        if (e.eventChannel == 'FSevent.custom::sofia::register') {
+          let isContinue = true
+          deviceList.forEach(function(d, i) {
+            if(d.userID == e.data.username) {
+              isContinue=false
+              return;
+            }
+          })
+
+          if(isContinue) {
+            let user = {}
+            user.deviceState = "registered"
+            user.userID = e.data['to-user']
+            user.callDirection = null
+            user.selected = false
+            deviceList.push(user)
+
           }
-        }else if(type == '+') {
-          this.playCount = this.playCount + 1
+
+        }else if( e.eventChannel =='FSevent.custom::sofia::unregister') {
+          deviceList.forEach(function(d, i) {
+            if (d.userID == e.data.username) {
+              deviceList.splice(i,1)
+            }
+          })
         }
 
+        this.deviceList(Object.assign([], deviceList))
+      },
+      subtract() {
+        if(this.cycleIndex > 0) {
+          this.cycleIndex = this.cycleIndex -1
+        }
+      },
+      add() {
+        if(this.cycleIndex < 10) {
+          this.cycleIndex = this.cycleIndex +1
+        }
+      },
+      selectSonglist(songlist){
+        if(!songlist.selected) {
+          this.checkplaylist.push(songlist)
+        }else {
+          this.checkplaylist.forEach(function(c,i) {
+            if(songlist.FolderID == c.FolderID) {
+              this.checkplaylist.splice(i, 1)
+            }
+          }.bind(this))
+        }
+        songlist.selected = !songlist.selected
+      },
+      selectItem(device) {
+        if(!device.selected) {
+          this.selectDevice.push(device)
+        }else {
+          this.deleteDevice(device)
+        }
+        device.selected = !device.selected
+
+      },
+      selectAll(type) {
+        if(type == 1) {
+          if(!this.isSelectAll) {
+            this.deviceList.forEach(function(d,i){
+              d.selected = true
+            })
+            this.selectDevice = this.deviceList
+          }else {
+            this.deviceList.forEach(function(d,i){
+              d.selected = false
+            })
+          }
+          this.isSelectAll = !this.isSelectAll
+        }
+      },
+      deleteDevice(device) {
+        this.selectDevice.forEach(function(s,i) {
+          if(device.userID == s.userID) {
+
+            this.selectDevice.splice(i,1)
+          }
+        }.bind(this))
+      },
+      deleteAll() {
+        this.selectDevice = []
+      },
+      submitPlan() {
+        // 提交预案
+        if(this.planName == ''){
+          console.log("预案名称不能为空")
+        }else {
+          if(this.selectSonglist.length == 0 && this.realTimeText == ''){
+            console.log('歌单选择或者实时文本输入不能为空')
+
+          }else {
+            if(this.selectDevice.length == 0) {
+              console.log("要播放的设备不能为空")
+            }else {
+              debugger
+
+            }
+          }
+        }
       },
       close() {
-        this.$store.dispatch('setDialogShow', false)
-        $('#aa').show()
+        this.$emit('close')
       }
     }
   }

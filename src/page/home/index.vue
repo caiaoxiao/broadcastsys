@@ -9,190 +9,78 @@
 <script>
   import parseXML from 'utils/xml_parser';
   import { mapGetters,mapActions } from 'vuex'
-  import {itemClick,isArray,isObject,isString} from 'utils/page/meeting'
+  import {isArray,isObject,isString} from 'utils/tool'
   import { topMenu, footNav, container } from 'components'
   export default {
     data () {
-      return {
-        msg: 'Welcome to Your Vue.js App'
-      }
+      return {}
     },
     created() {
-      //  初始化vertoHandle
       this.$nextTick(function() {
-        $.verto.init({}, this.bootstrap);
+        // 初始化vertoHandle
+        $.verto.init({}, this.initVertoHandle);
       })
     },
     computed: {
-      ...mapGetters({
-        vertoHandle: 'vertoHandle',
-        group_users: 'group_users',
-        users: 'users',
-        currentLoginUser: 'currentLoginUser'
-      }),
+      ...mapGetters([
+        'vertoHandle',
+        'group_users',
+        'deviceList',
+        'currentLoginUser'
+      ]),
     },
     methods: {
-      bootstrap(status) {
-        let $this = this
-        this.$store.dispatch('setVertoInit', new jQuery.verto({
-          login: 1008+'@'+ window.location.hostname,
-          passwd: '1234',
-          socketUrl: 'wss://'+ window.location.hostname +':8082',
-          ringFile: 'sounds/bell_ring2.wav',
-          videoParams: {
-            "minWidth": "1280",
-            "minHeight": "720",
-            "minFrameRate": 30
-          },
-          iceServers: [],
-          deviceParams: {
-            useMic: "any",
-            useSpeak: "any"
-          },
+      initVertoHandle(status) {
+        let _this = this
+        this.$store.dispatch('setVertoInit',
+          new jQuery.verto({
+            login: '1008'+'@'+ window.location.hostname,
+            passwd: '1234',
+            socketUrl: 'wss://'+ window.location.hostname +':8082',
+            ringFile: 'sounds/bell_ring2.wav',
+            videoParams: {
+              "minWidth": "1280",
+              "minHeight": "720",
+              "minFrameRate": 30
+            },
+            iceServers: [],
+            tag: "audio-container",
+            deviceParams: {
+              useMic: "any",
+              useSpeak: "any"
+            },
+          }, {
+            onWSLogin(verto, success) {
+              // 登录回调
+              _this.refresh()
+              console.log('onWSLogin', success);
+            },
+            onWSClose(verto, success) {
+              console.log('onWSClose', success);
+            },
+            onDialogState(data) {
+              console.log("监听状态中")
+            },
+          }))
+      },
+      //  设备状态实时更新
+      changeDeviceState(d,type) {
+        if(type== "inbound") {
 
-
-        }, {
-          onWSLogin: function(verto, success) {
-            $this.refresh()
-            console.log('onWSLogin', success);
-          },
-          onWSClose: function(verto, success) {
-            console.log('onWSClose', success);
-          },
-          onDialogState: function(d) {
-            let arr = []
-            let callType = d.direction.name
-            console.log("dddd",d)
-            if(callType == "inbound") {
-              switch (d.state.name) {
-                case "trying":
-                  break;
-                case "ringing":       // 振铃，装载进队列
-                  arr.push({
-                    curCall: d,
-                    state: d.state.name,
-                    num: d.params.caller_id_number
-                  })
-                  $this.$store.dispatch('setCallQueue', arr)
-                  break;
-                case "answering":     // 接听电话，改变状态
-
-                  break;
-                case "active":
-                  break;
-                case "hangup":        //  拒接，改变状态
-                  arr = $this.$store.getters.callQueue
-                  arr.forEach(function(a, i){
-                    if(a.num == d.params.remote_caller_id_number) {
-                      arr[i].state = d.state.name
-                    }
-                  })
-                  $this.$store.dispatch('setCallQueue', arr)
-                  console.log("Call ended with cause: " + d.cause);
-                  break;
-                case "destroy":
-                  // Some kind of client side cleanup...
-                  break;
-              }
-            }else if(callType == "outbound"){
-
-            }
-
-
-
-          }
-        }))
+        }
       },
       // 查询所有设备 以及事件初始化
       refresh() {
 //        let xuiUsername = localStorage.getItem('xui.username')
         let xuiUsername = 1008 // 过滤掉登陆者
-        let group_users = {};
-        let users = [];
-        let currentLoginUser = {};
-        this.$ajax.get('api/groups/group_users',{})
-          .then(function(res)  {
-            let result = res.data
-            console.log("user_groups", result);
-            result.forEach(function(d) {
-              let user = {};
-              let groupName = d.groupName;
-              if (!groupName) groupName = "ungrouped";
-              if (!group_users[d.groupID]) {
-                user = {groupID:d.groupID, groupName:groupName,  userExten:d.userExten, userID:d.userID, userName:d.userName, userDomain:d.userDomain};
-                if (d.userName != xuiUsername && d.userExten != "admin") {
-                  group_users[d.groupID] = {groupID: d.groupID, groupName:groupName, users:[user]};
-                } else if (d.userName == xuiUsername) {
-                  currentLoginUser = user;
-                }
-              } else {
-                user = {groupID:d.groupID, userExten:d.userExten, userID:d.userID, userName:d.userName, userDomain:d.userDomain};
-                if (d.userName != xuiUsername && d.userExten != "admin") {
-                  group_users[d.groupID].users.push(user);
-                } else if (d.userName == xuiUsername) {
-                  currentLoginUser = user;
-                }
-              }
-
-              user.registerState = "unregistered";
-              currentLoginUser.registerState = "registered";
-              user.selectedState = currentLoginUser.selectedState = "unselected";
-              user.channelCallState = currentLoginUser.channelCallState = "idle";
-              user.channelUUID = currentLoginUser.channelUUID = null;
-              user.callDirection = currentLoginUser.callDirection = null;
-              users.push(user);
-            })
-
-            this.$store.dispatch('setGroupUsers', group_users.ungrouped.users )           // 分组数据
-            this.$store.dispatch('setUser', users )                                       // 所有数据
-            this.$store.dispatch('setCurrentLoginUser', currentLoginUser )                // 当前用户
-
-            console.log( group_users)
-            console.log(users)
-            console.log(currentLoginUser)
-
-            this.syncUserRegisterStatus();
-
-          }.bind(this))
-          .catch((e) => {
-            console.log("get group_users ERR");
-          });
-        /*
-         this.handleGetRegister()
-         this.handleGetCallOrRinging()*/
-        // 订阅注册事件
-        this.vertoHandle.subscribe("FSevent.custom::sofia::register", {handler: this.handleFSEventRegister.bind(this)});
-        // 订阅取消注册事件
-        this.vertoHandle.subscribe("FSevent.custom::sofia::unregister", {handler: this.handleFSEventRegister.bind(this)});
-        this.vertoHandle.subscribe("FSevent.channel_callstate", {handler: this.handleFSEventChannel.bind(this)});
-      },
-      // 注册事件 和 取消注册事件
-      handleFSEventRegister(v, e) {
-        let registerState = "unregistered";
-        let usersChanged = false;
-        if (e.eventChannel == "FSevent.custom::sofia::register") {
-          registerState = "registered";
-        }
-        this.users.forEach(function(u) {
-          if (u.userExten == e.data.username) {
-            usersChanged = true;
-            u.registerState = registerState;
-          }
-        })
-        this.$store.dispatch('setUser',Object.assign([], this.users))
-      },
-      //  获取已注册的设备状态
-      syncUserRegisterStatus() {
-        let _this = this;
         this.vertoHandle.sendMethod("jsapi",{command:"fsapi", data:{cmd:"show", arg:"registrations as xml"}},
           function(data) {
-            let users = [];
             const parser = new DOMParser();
             const doc = parser.parseFromString(data.message, "text/xml");
             const msg = parseXML(doc);
 
             let registrations = [];
-
+            let deviceList = []
             if(msg) {
               if (isArray(msg.row)) {
                 registrations = msg.row;
@@ -205,20 +93,58 @@
               }
             }
             registrations.forEach(function(r) {
-              users = _this.users.map(function(u) {
-                if (u.userExten == r.reg_user) {
-                  u.registerState = "registered";
-                }
-                return u;
-              });
-            });
+              let user = {}
+              user.deviceState = "registered"
+              user.userID = r.reg_user
+              user.callDirection = null
+              user.channelUUID = null
+              deviceList.push(user)
+            })
+            if (deviceList.length) this.$store.dispatch('setDeviceList',deviceList)
 
-            if (users.length) _this.$store.dispatch('setUser',users)
-
-          },function(data) {
+          }.bind(this),function(data) {
             console.log("error:"+data)
           }.bind(this))
+
+        // 订阅注册事件
+        this.vertoHandle.subscribe("FSevent.custom::sofia::register", {handler: this.handleFSEventRegister.bind(this)});
+        // 订阅取消注册事件
+        this.vertoHandle.subscribe("FSevent.custom::sofia::unregister", {handler: this.handleFSEventRegister.bind(this)});
+        this.vertoHandle.subscribe("FSevent.channel_callstate", {handler: this.handleFSEventChannel.bind(this)});
       },
+      // 注册事件 和 取消注册事件
+      handleFSEventRegister(v, e) {
+        let deviceList = this.deviceList
+        if (e.eventChannel == 'FSevent.custom::sofia::register') {
+          let isContinue = true
+          deviceList.forEach(function(d, i) {
+            if(d.userID == e.data.username) {
+              isContinue=false
+              return;
+            }
+          })
+
+          if(isContinue) {
+            let user = {}
+            user.deviceState = "registered"
+            user.userID = e.data['to-user']
+            user.callDirection = null
+            user.channelUUID = null
+            deviceList.push(user)
+
+          }
+
+        }else if( e.eventChannel =='FSevent.custom::sofia::unregister') {
+          deviceList.forEach(function(d, i) {
+            if (d.userID == e.data.username) {
+              deviceList.splice(i,1)
+            }
+          })
+        }
+
+        this.$store.dispatch('setDeviceList',Object.assign([], deviceList))
+      },
+
       //  获取正在振铃或者通话中的状态
       handleGetCallOrRinging() {
         let _this = this;
@@ -233,13 +159,13 @@
         )
       },
       handleFSEventChannel(v, e) {
-        let callDirection = e.data["Call-Direction"];
-        let callerNumber = e.data["Caller-Caller-ID-Number"];
-        let calleeNumber = e.data["Caller-Destination-Number"];
-        let channelUUID = e.data["Unique-ID"];
-        let channelCallState = e.data["Channel-Call-State"];
+        let callDirection = e.data["Call-Direction"];            //入栈还是出栈
+        let callerNumber = e.data["Caller-Caller-ID-Number"];    //主叫号码
+        let calleeNumber = e.data["Caller-Destination-Number"];  //被叫号码
+        let channelUUID = e.data["Unique-ID"];                   //id
+        let channelCallState = e.data["Channel-Call-State"];     //通话状态
         let currentLoginUser = this.currentLoginUser;
-        let users = this.users;
+        let users = this.deviceList;
         let currentLoginUserChanged = false;
         let usersChanged = false;
 
@@ -250,48 +176,50 @@
         } else if (channelCallState == "ACTIVE") {
           channelCallState = "active";
         } else if (channelCallState == "HANGUP") {
-          channelCallState = "idle";
+          channelCallState = "register";
         }
-        // 呼入
+        // 入栈
         if (callDirection == "inbound") {
-          if (currentLoginUser.userExtn == callerNumber) {
+          if (currentLoginUser.userExten  == callerNumber) {
             currentLoginUser.channelUUID = channelUUID;
             currentLoginUser.channelCallState = channelCallState;
             currentLoginUser.callDirection = callDirection;
             currentLoginUserChanged = true;
           } else {
             users.forEach(function(user) {
-              if (user.extn == callerNumber) {
+              if (user.userID  == callerNumber) {
                 user.channelUUID == channelUUID;
-                user.channelCallState = channelCallState;
+                user.deviceState = channelCallState;
                 user.callDirection = callDirection;
                 usersChanged = true;
               }
             })
 
           }
-          // 呼出
+
+          // 出栈
         } else if (callDirection == "outbound") {
-          if (currentLoginUser.userExtn == calleeNumber) {
+          if (currentLoginUser.userExten  == calleeNumber) {
             currentLoginUser.channelUUID = channelUUID;
             currentLoginUser.channelCallState = channelCallState;
             currentLoginUser.callDirection = callDirection;
             currentLoginUserChanged = true;
           } else {
             users.forEach(function(user) {
-              if (user.extn == calleeNumber) {
+              if (user.userID  == calleeNumber) {
                 user.channelUUID == channelUUID;
-                user.channelCallState = channelCallState;
+                user.deviceState = channelCallState;
                 user.callDirection = callDirection;
                 usersChanged = true;
               }
             })
           }
+
         }
+//        if (currentLoginUserChanged) this.setState({currentLoginUser: currentLoginUser});
+        if (usersChanged) this.$store.dispatch('setDeviceList',users)
+        debugger
 
-        if (currentLoginUserChanged) this.setState({currentLoginUser: currentLoginUser});
-
-        if (usersChanged) this.setState({users: users});
       },
     },
     components: {

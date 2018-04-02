@@ -6,7 +6,7 @@ const verto = {
   state: {
     vertoHandle: null,  // verto初始化
     group_users: [],
-    users: [],
+    deviceList: [],
     currentLoginUser: [],
     callQueue: [],
   },
@@ -17,8 +17,8 @@ const verto = {
     SET_GROUP_USERS: (state, data) => {
       state.group_users = data
     },
-    SET_USERS: (state, data) => {
-      state.users = data
+    SET_DEVICE_LIST: (state, data) => {
+      state.deviceList = data
     },
     SET_CURRENT_LOGIN_USER: (state, data) => {
       state.currentLoginUser = data
@@ -38,8 +38,8 @@ const verto = {
       commit('SET_GROUP_USERS', data)
     },
     //  设置所有数据
-    setUser({ commit }, data) {
-      commit('SET_USERS', data)
+    setDeviceList({ commit }, data) {
+      commit('SET_DEVICE_LIST', data)
     },
     //  设置当前用户
     setCurrentLoginUser({ commit }, data) {

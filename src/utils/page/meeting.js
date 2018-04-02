@@ -47,18 +47,5 @@ export function itemClick(e) {
 
 }
 
-export function isArray(obj) {
-  if(Array.isArray){
-    return Array.isArray(obj);
-  }else{
-    return Object.prototype.toString.call(obj) === "[object Array]";
-  }
-}
 
-export function isObject(obj) {
-  return Object.prototype.toString.call(obj) === "[object Object]";
-}
 
-export function isString(obj) {
-  return Object.prototype.toString.call(obj) === "[object String]";
-}

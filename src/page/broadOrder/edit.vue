@@ -174,6 +174,9 @@
         cycleIndex: 0,      // 预案循环次数
         realTimeText: '',
         formData: {
+          FolderName: '',
+          PlanPreModel: 1,
+          PlanModel: 2,
           time: new Date()
         }
       }

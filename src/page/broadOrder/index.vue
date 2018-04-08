@@ -68,12 +68,14 @@
     data() {
       return {
         editShow: false,    //编辑框显示或隐藏
+        selectFlan: []
       }
     },
     created() {
       this.$nextTick(function() {
         getHeight()
         getHeights()
+        this.refresh()
       })
     },
     computed: {
@@ -86,8 +88,21 @@
       confirmDialog
     },
     methods: {
+      refresh() {
+        this.$ajax.post('Plan/List')
+          .then(res => {
+            if(res.data.code == 1) {
+              debugger
+            }
+          })
+      },
       fileClick(index) {
-        $(".table>tbody>tr").eq(index).toggleClass("selected")
+        let target = $(".table>tbody>tr").eq(index)
+        if(target.hasClass(selected)) {
+          this.selectFlan.push()
+        }
+        target.toggleClass("selected")
+
       },
       booking() {
         this.editShow =  !this.editShow

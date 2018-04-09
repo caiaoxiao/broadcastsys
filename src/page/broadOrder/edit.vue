@@ -6,7 +6,7 @@
           <div class="form-group">
             <label for="inputEmail3" class="col-sm-1 control-label">预案名称</label>
             <div class="col-sm-11">
-              <input type="text" class="form-control" placeholder="请输入预案名称" v-model="fromData.FolderName">
+              <input type="text" class="form-control" placeholder="请输入预案名称" v-model="formData.PlanName">
             </div>
           </div>
 
@@ -49,7 +49,7 @@
 
           <div>
             <div class="textFlies">
-              <textarea class="form-control" v-model="realTimeText"  id="textarea01"></textarea>
+              <textarea class="form-control" v-model="formData.PlanActualTxt"  id="textarea01"></textarea>
 
             </div>
           </div>
@@ -116,7 +116,7 @@
         <div class="settingTitle">选择时间</div>
         <div class="settingCon">
           <el-date-picker
-            v-model="formData.time"
+            v-model="formData.PlanPreTime"
             type="datetime"
             placeholder="选择日期时间">
           </el-date-picker>
@@ -164,20 +164,22 @@
   export default {
     data() {
       return {
-        planName: '',
         playList: [],       // 歌单列表
         selectDevice: [],   // 已勾选的设备
-        checkplaylist: [], // 已勾选的歌单
+        checkplaylist: [],
         deviceList: [],     // 在线设备列表
         isSelectAll: false, // 是否全选
         playCount: 0,
         cycleIndex: 0,      // 预案循环次数
-        realTimeText: '',
         formData: {
-          FolderName: '',
+          CreateUserID: '133585596bb04c9cbe311d0859dd7196',
+          PlanName: '',
           PlanPreModel: 1,
           PlanModel: 2,
-          time: new Date()
+          PlanPreTime: new Date(),
+          PlanActualTxt: '',
+          Files: [],         // 已勾选的歌单
+          FeatureBases: []
         }
       }
     },
@@ -291,11 +293,11 @@
       },
       selectSonglist(songlist){
         if(!songlist.selected) {
-          this.checkplaylist.push(songlist)
+          this.formData.Files.push(songlist)
         }else {
-          this.checkplaylist.forEach(function(c,i) {
+          this.formData.Files.forEach(function(c,i) {
             if(songlist.FolderID == c.FolderID) {
-              this.checkplaylist.splice(i, 1)
+              this.formData.Files.splice(i, 1)
             }
           }.bind(this))
         }
@@ -338,17 +340,26 @@
       },
       submitPlan() {
         // 提交预案
-        if(this.planName == ''){
+
+        if(this.formData.PlanName == ''){
           console.log("预案名称不能为空")
         }else {
-          if(this.selectSonglist.length == 0 && this.realTimeText == ''){
+          if(this.formData.Files.length == 0 && this.formData.PlanActualTxt == ''){
             console.log('歌单选择或者实时文本输入不能为空')
 
           }else {
             if(this.selectDevice.length == 0) {
               console.log("要播放的设备不能为空")
             }else {
-              debugger
+              this.formData.FeatureBases = this.selectDevice
+              this.$ajax.post('Plan/Create', this.formData)
+                .then((res) => {
+                  if(res.data.code == 1) {
+                    debugger
+                  }else {
+                    console.log("新增失败")
+                  }
+                })
 
             }
           }

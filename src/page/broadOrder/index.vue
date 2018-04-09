@@ -23,23 +23,17 @@
               </tr>
               </thead>
               <tbody>
-              <tr @click="fileClick(0)">
-                <td>fdafewr.mp3</td>
-                <td>定时</td>
-                <td>2017-11-05 13:00:00</td>
-                <td>循环播放</td>
-                <td>1</td>
+              <tr @click="selectClick(index, plan)" v-for="(plan, index) in planData">
+                <td>{{ plan.PlanName }}</td>
+                <td>{{ plan.PlanPreModel == 1 ? '定时预约' : ''}}</td>
+                <td>{{ plan.PlanPreTime }}</td>
+                <td>{{ plan.PlanModel == 1 ? '循环播放' : '按次播放' }}</td>
+                <td>{{ plan.PlanTime }}</td>
                 <td>701</td>
-                <td>立即播放</td>
+                <td>
+                  <span>立即播放</span>
+                </td>
               </tr>
-              <tr>
-                <td>fdafewr.mp3</td>
-                <td>定时</td>
-                <td>2017-11-05 13:00:00</td>
-                <td>循环播放</td>
-                <td>1</td>
-                <td>701</td>
-                <td>立即播放</td>
               </tr>
               </tbody>
             </table>
@@ -51,8 +45,8 @@
 
     </div>
     <edit v-if="editShow" @close="booking"></edit>
-    <confirm-dialog v-if="dialogShow">
-      <p slot="content">确定要删除这个文件吗？</p>
+    <confirm-dialog v-if="dialogShow" @submit="confirm">
+      <p slot="content">确定要删除这些预案吗？</p>
     </confirm-dialog>
   </div>
 
@@ -68,12 +62,15 @@
     data() {
       return {
         editShow: false,    //编辑框显示或隐藏
+        selectPlan: [],
+        planData: []
       }
     },
     created() {
       this.$nextTick(function() {
         getHeight()
         getHeights()
+        this.refresh()
       })
     },
     computed: {
@@ -86,18 +83,55 @@
       confirmDialog
     },
     methods: {
-      fileClick(index) {
-        $(".table>tbody>tr").eq(index).toggleClass("selected")
+      refresh() {
+        this.$ajax.post('Plan/List')
+          .then(res => {
+            if(res.data.code == 1) {
+              this.planData = res.data.result
+            }else {
+
+            }
+          })
+      },
+      selectClick(index, plan) {
+        let target = $(".table>tbody>tr").eq(index)
+        if(target.hasClass('selected')) {
+          this.selectPlan.forEach(function(s, i) {
+            if(s.PlanID == plan.PlanID) {
+              this.selectPlan.splice(i, 1)
+            }
+          }.bind(this))
+        }else {
+          this.selectPlan.push(plan)
+        }
+        this.selectPlan
+        target.toggleClass("selected")
+
       },
       booking() {
         this.editShow =  !this.editShow
         $('#aa').toggle()
       },
       deleteItem() {
-        this.$store.dispatch('setDialogShow', true)
+        if(this.selectPlan.length != 0) {
+          this.$store.dispatch('setDialogShow', true)
+        }
+      },
+      confirm(){
+        let ids = []
+        this.selectPlan.forEach(function(s, i) {
+          ids.push(s.PlanID)
+        })
+        this.$ajax.post('Plan/RemoveList', ids)
+          .then(res => {
+            if(res.data.code == 1) {
+              this.$store.dispatch('setDialogShow', false)
+              this.refresh()
+            }else {
 
+            }
+          })
       }
-
     }
   }
 </script>

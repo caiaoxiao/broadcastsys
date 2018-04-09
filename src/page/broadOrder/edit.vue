@@ -351,6 +351,7 @@
             if(this.selectDevice.length == 0) {
               console.log("要播放的设备不能为空")
             }else {
+              this.formData.FeatureBases = this.selectDevice
               this.$ajax.post('Plan/Create', this.formData)
                 .then((res) => {
                   if(res.data.code == 1) {

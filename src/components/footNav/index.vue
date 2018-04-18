@@ -161,17 +161,27 @@
         songlistShow: false,        //  播放列表显示或隐藏
         playSwitch: true,
         totalTime: "00:00",
-        now: "00:00"
+        now: "00:00",
+        caonima: null
+
       }
     },
     mounted() {
       this.$refs.audio.addEventListener('play', function() {
         // 播放时长解析
+        // 1. 进度条移动
+        let progressWidth = parseInt($('.audio-setbacks').css('width'))
+        let totalTime = this.transformSeconds(this.playlist[this.activeIndex].FileTime)
+        let speed = progressWidth/totalTime
         this.now = this.transformTime(this.$refs.audio.currentTime)
-        setInterval(() => {
+
+        this.caonima = setInterval(() => {
           this.now = this.transformTime(this.$refs.audio.currentTime)
+          $('.audio-backs-btn').css('right', this.transformSeconds(this.now )*speed * - 1 +'px')
         }, 1000);
-        this.now = this.transformTime(this.$refs.audio.currentTime)
+
+
+
       }.bind(this), false)
 
       this.$refs.audio.addEventListener('ended', function () {
@@ -181,9 +191,18 @@
             this.$refs.audio.src = this.playlist[this.activeIndex].MediaPath
             this.$refs.audio.play()
           }else {
-            this.activeIndex = -1
+            if(this.playlist.length == 1) {
+              this.activeIndex = 0
+            }else {
+              this.activeIndex =  this.activeIndex +1
+            }
+
+
           }
         }
+        clearInterval(this.caonima)
+            this.now = '00:00'
+         $('.audio-backs-btn').css('right', "-4px")
       }.bind(this), false);
     },
     created() {
@@ -200,15 +219,26 @@
           this.$nextTick(() => {
             this.activeIndex = 0
             this.$refs.audio.src = this.playlist[this.activeIndex].MediaPath
-            this.$refs.audio.playbackRate =6
-
+            this.$refs.audio.playbackRate = 12
             this.$refs.audio.play()
             this.playSwitch = false
           })
         }
-      }
+
+      },
     },
     methods: {
+      transformSeconds(total) {
+        // 秒数转换
+        let arr = total.split(':').reverse()
+        let time = parseInt(arr[0])
+        arr.forEach((t, i) =>{
+          if(i > 0) {
+            time = time + parseInt(t)*Math.pow(60,i)
+          }
+        })
+        return time
+      },
       logout() {
         this.$store.dispatch('LogOut').then(() => {
           location.reload()  // 为了重新实例化vue-router对象 避免bug

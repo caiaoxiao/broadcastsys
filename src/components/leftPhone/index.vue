@@ -59,7 +59,6 @@
   export default {
     data() {
       return {
-
         destination_number: ''
       }
     },
@@ -94,14 +93,17 @@
         this.callQueue[0].curCall.answer();
       },
       callDivert() {
-        this.$store.dispatch('CallDivert', {type: true, num: this.destination_number})
+        // 呼叫转移
+        if(this.destination_number != '') {
+          this.$store.dispatch('CallDivert', {type: true, num: this.destination_number})
+        }
       },
       makeCall() {
         this.vertoHandle.newCall({
           // Extension to dial.
           destination_number: this.destination_number,
           caller_id_name: 'LegalHigh',
-          caller_id_number: '1008',
+          caller_id_number: '9000',
           outgoingBandwidth: 'default',
           incomingBandwidth: 'default',
           useStereo: true,

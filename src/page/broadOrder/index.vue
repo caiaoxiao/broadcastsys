@@ -22,7 +22,7 @@
                 <td>操作</td>
               </tr>
               </thead>
-              <tbody>
+              <tbody v-if="planData.length != 0">
               <tr @click="selectClick(index, plan)" v-for="(plan, index) in planData">
                 <td>{{ plan.PlanName }}</td>
                 <td>{{ plan.PlanPreModel == 1 ? '定时预约' : ''}}</td>
@@ -31,10 +31,9 @@
                 <td>{{ plan.PlanTime }}</td>
                 <td>701</td>
                 <td>
-                  <span>立即播放</span>
+                  <span @click.stop="nowPlay">立即播放</span>
                 </td>
               </tr>
-                <td>立即播放</td>
               </tr>
               </tbody>
             </table>
@@ -109,14 +108,21 @@
         target.toggleClass("selected")
 
       },
-      booking() {
+      booking(type) {
         this.editShow =  !this.editShow
         $('#aa').toggle()
+        if(type == 1) {
+          this.refresh()
+
+        }
       },
       deleteItem() {
         if(this.selectPlan.length != 0) {
           this.$store.dispatch('setDialogShow', true)
         }
+      },
+      nowPlay() {
+
       },
       confirm(){
         let ids = []

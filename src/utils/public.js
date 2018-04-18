@@ -81,3 +81,4 @@ vue.prototype.TrClick = function(index) {
   console.log($(".table>tbody>tr"))
   $(".table>tbody>tr").eq(index).toggleClass("selected")
 }
+

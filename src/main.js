@@ -36,6 +36,7 @@ import BScroll from 'better-scroll'
 // 5.引入verto相关js
 import 'jquery-json'
 import verto from 'verto/src/jquery.verto.js'
+import 'utils/verto.js'
 import 'verto/src/jquery.FSRTC.js'
 import 'verto/src/jquery.jsonrpcclient.js'
 import 'utils/xcti'

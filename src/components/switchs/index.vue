@@ -8,7 +8,6 @@
     methods: {
       open() {
         $(".playList").removeClass("ListHide").addClass("ListShow");
-
       }
     }
   }

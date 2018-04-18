@@ -496,13 +496,15 @@ ul.musicList>li{width:100%;height:35px;position:relative;line-height: 35px;}
 
 @media(min-width:966px){
   ul.musicList>li>p{width:100px;}
-  ul.musicListTools{margin-left:125px;}
+  ul.musicListTools{margin-left:135px;}
 }
 @media(min-width:1400px){
   ul.musicList>li>p{width:220px;}
-  ul.musicListTools{margin-left:245px;}
+  ul.musicListTools{margin-left:255px;}
 }
-ul.musicList>li>p{position:absolute;top:0px;left:25px; line-height:35px;text-overflow:ellipsis;}
+ul.musicList>li>p{position:absolute;top:0px;left:25px; line-height:35px;
+  overflow: hidden;white-space: nowrap ;
+  text-overflow:ellipsis;}
 ul.musicList>li>p>i{position:absolute;top:9px;left:7px;}
 ul.musicList>li>i{margin-left:15px;line-height:35px;}
 ul.musicListTools{}

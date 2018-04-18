@@ -3,9 +3,9 @@
     <div class="leftList">
       <div class="orgTitle">成员列表[视频终端]11111</div>
       <ul class="orgList">
-        <li @click="playVideo('1006')"><i class="fa fa-user" aria-hidden="true"></i>1001</li>
-        <li><i class="fa fa-user" aria-hidden="true"></i>1001</li>
-        <li><i class="fa fa-user" aria-hidden="true"></i>1001</li>
+        <li @click="playVideo(item.userID)" v-for="item in deviceList">
+          <i class="fa fa-user" aria-hidden="true"></i>{{item.userID}}
+        </li>
       </ul>
     </div>
     <div class="videoRight">
@@ -59,8 +59,8 @@
       return {
         currentScreen: '1分屏',
         currentScreen: '四分屏',
-        deviceList: [],
         num: 4,
+        videoDevice: [],
       }
     },
     created() {
@@ -72,7 +72,7 @@
     computed: {
       ...mapGetters({
         vertoHandle: 'vertoHandle',
-        group_users: 'group_users',
+        deviceList: 'deviceList',
         users: 'users',
         currentLoginUser: 'currentLoginUser'
       }),
@@ -89,6 +89,7 @@
           }.bind(this))
       },
       playVideo(num) {
+        this.videoDevice.push(num)
         var vid_width = 640;
         var vid_height = 360;
 
@@ -129,6 +130,8 @@
             useSpeak: 'any',
             useCamera: 'any'
           }
+        },function(){
+            console.log("添加视频成功")
         });
       },
       stopVideo() {

@@ -150,6 +150,10 @@
       <button type="button" class="btn btn-info " @click="submitPlan">确定</button>
       <button type="button" class="btn btn-default" @click="close">取消</button>
     </div>
+    <tool-tip :dialogShow="dialogShow"  @close="closeTip">
+      <p slot="content">{{dialogText}}</p>
+    </tool-tip>
+
   </div>
 
 
@@ -159,6 +163,7 @@
   import parseXML from 'utils/xml_parser'
   import {isArray,isObject,isString} from 'utils/tool'
   import { mapGetters,mapActions } from 'vuex'
+  import {toolTip} from 'components'
   import {getHeight} from 'utils/height'
   import {getHeights} from 'utils/page/broadOrder'
   export default {
@@ -179,8 +184,11 @@
           PlanPreTime: new Date(),
           PlanActualTxt: '',
           Files: [],         // 已勾选的歌单
-          FeatureBases: []
-        }
+          FeatureBases: [],
+          FeatureCode: []
+        },
+        dialogShow: false,
+        dialogText: null,
       }
     },
     created() {
@@ -189,6 +197,9 @@
         getHeights()
         this.refresh()
       })
+    },
+    components: {
+      toolTip
     },
     computed: {
       ...mapGetters([
@@ -230,6 +241,7 @@
                 registrations.push(msg);
               }
             }
+
             registrations.forEach(function(r) {
               let user = {}
               user.deviceState = "registered"
@@ -338,28 +350,49 @@
       deleteAll() {
         this.selectDevice = []
       },
+      fsAPI(cmd, arg, success_cb, failed_cb) {
+        this.vertoHandle.sendMethod("jsapi", {
+          command: "fsapi",
+          data: {
+            cmd: cmd,
+            arg: arg
+          },
+        }, success_cb, failed_cb);
+      },
+      closeTip() {
+        this.dialogShow = false
+      },
       submitPlan() {
         // 提交预案
-
         if(this.formData.PlanName == ''){
-          console.log("预案名称不能为空")
+          this.dialogText = '预案名称不能为空'
+          this.dialogShow = true
         }else {
           if(this.formData.Files.length == 0 && this.formData.PlanActualTxt == ''){
-            console.log('歌单选择或者实时文本输入不能为空')
-
+            this.dialogText = '歌单选择或者实时文本输入不能为空'
+            this.dialogShow = true
           }else {
             if(this.selectDevice.length == 0) {
-              console.log("要播放的设备不能为空")
+              this.dialogText = '要播放的设备不能为空'
+              this.dialogShow = true
             }else {
+              this.selectDevice.forEach(function(s,i) {
+                s.FeatureCode = s.userID
+              }.bind(this))
               this.formData.FeatureBases = this.selectDevice
-              this.$ajax.post('Plan/Create', this.formData)
-                .then((res) => {
-                  if(res.data.code == 1) {
-                    debugger
-                  }else {
-                    console.log("新增失败")
-                  }
-                })
+
+              debugger
+              this.fsAPI(`sched_api +10 bgapi originate`, `user/1002 &playback(${this.formData.Files[0].Files[0].MediaPath})`,()=>{
+                this.$ajax.post('Plan/Create', this.formData)
+                  .then((res) => {
+                    if(res.data.code == 1) {
+                      this.$emit('close',1)
+                    }else {
+                      console.log("新增失败")
+                    }
+                  })
+              })
+
 
             }
           }

@@ -99,7 +99,7 @@
         </div>
       </div>
 
-      <playList v-if="playListShow"  @closeDialog="close"></playList>
+      <playList v-if="playListShow"  @closeDialog="close(2)"></playList>
 
 
 
@@ -116,15 +116,16 @@
     <switchs></switchs>
 
     <div class="playList">
-      <i class="fa fa-chevron-right" aria-hidden="true"  @click="close"></i>
+      <i class="fa fa-chevron-right" aria-hidden="true"  @click="close(1)"></i>
       <div class="listTitle">播放设备列表</div>
       <div class="musicList" id="end">
         <div v-for="item in selectPhone" class="singleFlies selectDelate" @click="removeItem(item)">
-          {{ item.userExten }}
+          {{ item.userID }}
         </div>
       </div>
       <div class="selectAll" @click="removeAll">全部移除</div>
     </div>
+    <callDivert v-if="phoneShow"></callDivert>
   </div>
 </template>
 
@@ -133,12 +134,13 @@
   import {getHeights,itemClicks} from 'utils/page/ipBroad'
   import { mapGetters,mapActions } from 'vuex'
   import playList from './playList.vue'
-  import {leftPhone, rightPhone,switchs} from 'components'
+  import {leftPhone, rightPhone,switchs,callDivert} from 'components'
 
   export default {
     data() {
       return {
         selectPhone: [],
+        name: 3500+ '-' + window.location.hostname,
         playListShow: false,     //播放列表显示切换
       }
     },
@@ -146,7 +148,8 @@
       leftPhone,
       rightPhone,
       switchs,
-      playList
+      playList,
+      callDivert
     },
     created() {
       this.$nextTick(function() {
@@ -156,9 +159,8 @@
     },
     computed: {
       ...mapGetters([
-        'dialogShow',
+        'phoneShow',
         'vertoHandle',           // verto初始化
-        'group_users',           // 分组设备(不包括当前用户)
         'deviceList',                       // 所有设备
         'currentLoginUser'  // 当前用户
       ]),
@@ -173,6 +175,7 @@
             $(target).removeClass("onlineSelected")
             this.selectPhone.forEach(function(s,i) {
               if(s.userID == row.userID) {
+
                 _this.selectPhone.splice(i, 1)
               }
             })
@@ -191,10 +194,13 @@
 
         })
       },
-      close() {
-        $('.playMenu').removeClass('Show').addClass('Hide');
-        this.playListShow = false
-
+      close(type) {
+        if(type == 1) {
+          $('.playList').removeClass("ListShow").addClass("ListHide");
+        }else {
+          $('.playMenu').removeClass('Show').addClass('Hide');
+          this.playListShow = false
+        }
       },
       removeItem(event) {
         let _this = this
@@ -203,24 +209,72 @@
             _this.selectPhone.splice(i, 1)
           }
         })
-        this.group_users.forEach(function(g, i) {
-          if(g.userExten == event.userExten) {
+        this.deviceList.forEach(function(g, i) {
+          if(g.userID == event.userID) {
             $('#height01 .singleM').eq(i).find('.moduleStyle').removeClass("onlineSelected")
-            debugger
           }
         })
       },
       removeAll() {
         if(this.selectPhone.length != 0) {
           this.selectPhone = []
-          this.group_users.forEach(function (g, i) {
+          this.deviceList.forEach(function (g, i) {
             $('#height01 .singleM').eq(i).find('.moduleStyle').removeClass("onlineSelected")
           })
         }
       },
+
       shout() {
-        // 对播放列表的设备进行喊话
-        this.selectPhone
+        // 喊话
+        const laChannelName = this.getChannelName("liveArray");
+
+        if(this.selectPhone.length != 0) {
+          this.fsAPI('bgapi originate', )
+          //  批量邀请设备开始会议
+          this.selectPhone.forEach(function(s, i){
+            this.vertoHandle.fsAPI("conference",
+              this.name + " " + "bgdial" + " " + "user/"+this.selectPhone[i].userID,function(res){
+                console.log("邀请会议",res)
+              });
+          }.bind(this))
+
+          //  重置勾选话机数组
+          this.selectPhone = []
+
+          // 创建会议室
+          this.broadcast(laChannelName, {
+            liveArray: {
+              command: "bootstrap",
+              context: laChannelName,
+              name: this.name,
+              obj: {}
+            }
+          });
+        }
+      },
+      broadcast(channel, params) {
+
+        let msg = {
+          eventChannel: channel,
+          data: {}
+        }
+
+        for (var i in params) {
+          msg.data[i] = params[i]
+        }
+        this.vertoHandle.sendMethod("verto.broadcast", msg);
+      },
+      getChannelName(what) { // liveArray chat mod
+        return "conference-" + what + "." + this.name + "@" + window.location.hostname
+      },
+      fsAPI(cmd, arg, success_cb, failed_cb) {
+        this.vertoHandle.sendMethod("jsapi", {
+          command: "fsapi",
+          data: {
+            cmd: cmd,
+            arg: arg
+          },
+        }, success_cb, failed_cb);
       },
       allOver() {
         // 结束全部喊话和播放

@@ -60,6 +60,7 @@
             },
             onDialogState(data) {
               console.log("监听状态中")
+
             },
           }))
       },
@@ -152,7 +153,6 @@
 
         this.$store.dispatch('setDeviceList',Object.assign([], deviceList))
       },
-
       //  获取正在振铃或者通话中的状态
       handleGetCallOrRinging() {
         let _this = this;
@@ -186,7 +186,6 @@
         } else if (channelCallState == "HANGUP") {
           channelCallState = "register";
         }
-
         // 入栈
         if (callDirection == "inbound") {
           if (currentLoginUser.userID  == callerNumber) {
@@ -227,7 +226,6 @@
         }
         if (currentLoginUserChanged) this.$store.dispatch('setCurrentLoginUser', currentLoginUser);
         if (usersChanged) this.$store.dispatch('setDeviceList',users)
-        debugger
       },
     },
     components: {

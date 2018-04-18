@@ -20,9 +20,9 @@
           </div>
           <div v-if="songList.unfold">
             <ul class="musicList" v-for="fileItem in songList.Files" >
-              <li class="Grid">
-                <p class="Grid-cell">{{ fileItem.FileName }}</p>
-                <ul class="musicListTools Grid-cell">
+              <li>
+                <p>{{ fileItem.FileName }}</p>
+                <ul class="musicListTools">
                   <li><i class="fa fa-play-circle" aria-hidden="true"></i>试听</li>
                   <li @click="upload(fileItem)"><i class="fa fa-cloud-download" aria-hidden="true"></i>下载</li>
                   <li @click="removeFile(songList, fileItem)"><i class="fa fa-times" aria-hidden="true"></i>移除</li>
@@ -105,8 +105,9 @@
             v-for="(file, index) in defaultList"  @click="fileClick(file,index)">
           <p class="Grid-cell" style="overflow:hidden;height: 35px;">{{ file.FileName }}</p>
           <ul class="musicListTools Grid-cell">
-            <li v-if="file.MediaType == 3"  @click.stop="priview(file)"><i class="fa fa-file-text-o"
-                                                                      aria-hidden="true"></i>预览</li>
+            <li v-if="file.MediaType == 3"  @click.stop="priview(file)">
+              <i class="fa fa-file-text-o" aria-hidden="true"></i>预览
+            </li>
             <li @click="audition(file)" v-if="file.MediaType == 1">
               <i class="fa fa-play-circle" aria-hidden="true"></i>试听
             </li>
@@ -391,7 +392,6 @@
         }
       },
 
-
       confirm() {
         // 弹窗确定事件
         if(this.submitType == 1) {
@@ -585,9 +585,6 @@
     }
   }
 
-  ul.musicListTools {
-    margin-left: 0;
-  }
   #add {
     input {
       background: none;

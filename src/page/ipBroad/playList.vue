@@ -24,7 +24,7 @@
                   <li><i class="fa fa-play-circle" aria-hidden="true"></i>试听</li>
 
                 </ul>
-                <span class="totalTime">05:12</span>
+                <span class="totalTime" v-if="fileItem.MediaType == 1"> {{ fileItem.FileTime}}</span>
               </li>
 
             </ul>
@@ -48,6 +48,7 @@
 
 <script>
   import {getHeight} from 'utils/height'
+  import {getHeights} from 'utils/page/ipBroad'
 
   export default {
     props: ['selectPhone'],
@@ -59,8 +60,8 @@
     },
     created() {
       this.$nextTick(function() {
-          debugger
         getHeight()
+        getHeights()
         this.refresh()
       })
     },

@@ -5,12 +5,12 @@
 
 const phone = {
   state: {
-    // dialogShow: false,  // 呼叫转移弹窗显示或隐藏
+    phoneShow: false,  // 呼叫转移弹窗显示或隐藏
     phoneNum: ''
   },
   mutations: {
     SET_PHONEDATA: (state, obj) => {
-      // state.dialogShow = obj.type
+      state.phoneShow = obj.type
       state.phoneNum = obj.num
 
     },

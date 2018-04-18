@@ -47,11 +47,11 @@
             <div class="moduleList"  >
               <div class="singleM" v-for="item in deviceList">
                 <div class="moduleStyle"
-                     :class="[item.deviceState == 'registered' ? 'online' : 'offline' ]"
+                     :class="returnClass(item.deviceState)"
                      @click.stop="itemClick($event, item)">
                   <div class="moduleNum">{{ item.userID }}</div>
                   <div class="moduleKind">视频终端</div>
-                  <div class="moduleState" >{{ item.deviceState == 'registered' ? '在线' : '离线' }}</div>
+                  <div class="moduleState" >{{ returnState(item.deviceState) }}</div>
                 </div>
               </div>
             </div>
@@ -139,16 +139,17 @@
     <confirm-dialog v-if="dialogShow">
       <slot name="content">确定要呼叫到</slot>
     </confirm-dialog>
+    <callDivert v-if="phoneShow"></callDivert>
   </div>
 </template>
 
 <script>
   import parseXML from 'utils/xml_parser';
-
   import {getHeight} from 'utils/height'
-  import {getHeights,itemClick,isArray,isObject,isString} from 'utils/page/meeting'
+  import {getHeights,itemClick} from 'utils/page/meeting'
+  import {isArray,isObject,isString} from 'utils/tool.js'
   import { mapGetters,mapActions } from 'vuex'
-  import {leftPhone,rightPhone,confirmDialog} from 'components'
+  import {leftPhone,rightPhone,confirmDialog,callDivert} from 'components'
   export default {
 
     data() {
@@ -166,12 +167,14 @@
         'dialogShow',
         'vertoHandle',           // verto初始化
         'deviceList',           // 分组设备(不包括当前用户)
+        'phoneShow',             // 话机显示或隐藏
       ]),
     },
     components: {
       leftPhone,
       rightPhone,
-      confirmDialog
+      confirmDialog,
+      callDivert
     },
     created() {
       this.$nextTick(function() {
@@ -225,7 +228,6 @@
       //  开始会议
       startMeeting() {
         const laChannelName = this.getChannelName("liveArray");
-        debugger
         if(this.selectPhone.length != 0) {
           //  赋值到会议话机数组
           this.nowSession = Object.assign([], this.selectPhone);
@@ -267,10 +269,8 @@
         for (var i in params) {
           msg.data[i] = params[i];
         }
-
         this.vertoHandle.sendMethod("verto.broadcast", msg);
       },
-
       getChannelName(what) { // liveArray chat mod
         return "conference-" + what + "." + this.name + "@" + window.location.hostname
       },
@@ -293,28 +293,32 @@
           }.bind(this));
         }
       },
+
       publicFunction(type) {
         if(this.selectNowSession.length != 0) {
-          this.fsAPI("conference", "list",function(res){
-            let msg = (res.message).split(";")[0]
-            let index = msg.indexOf(')')
-            let id = msg.slice(index+1)
-            console.log("会议分配的id为: ", id)
+          this.fsAPI("conference", "list as json",function(res){
+            let msg = (res.message).split("\n").splice(1)
 
-            this.fsAPI("conference", this.name + " " + type +" " + id,function(res){
-              switch (type){
-                case "mute":
-                  console.log("禁止发言成功：",res)
-                  break;
-                case "unmute":
-                  console.log("允许发言成功：",res)
-                  break;
-                case "kick":
-                  console.log("踢出会议成功：",res)
-                  break;
-              }
-              this.removeChecked()
-            }.bind(this))
+            msg.forEach((m,i) =>{
+              if(m == "") return;
+              let id = m.split(";")[0]
+              this.fsAPI("conference", this.name + " " + type +" " + id,function(res){
+                switch (type){
+                  case "mute":
+                    console.log("禁止发言成功：",res)
+                    break;
+                  case "unmute":
+                    console.log("允许发言成功：",res)
+                    break;
+                  case "kick":
+                    console.log("踢出会议成功：",res)
+                    break;
+                }
+                this.removeChecked()
+              }.bind(this))
+            })
+
+
           }.bind(this))
         }else {
           console.log("请勾选要执行的设备！")
@@ -336,7 +340,7 @@
       },
       // 会议录音
       meetingRecord(type) {
-        this.fsAPI("conference",this.name + " recording "+ type + " /tmp/record.wav", function(res){
+        this.vertoHandle.fsAPI("conference",this.name + " recording "+ type + " /tmp/record.wav", function(res){
           console.log("会议录音成功: ", res)
         })
       }

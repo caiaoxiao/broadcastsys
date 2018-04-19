@@ -28,3 +28,8 @@ npm test
 ```
 
 For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+
+
+## 更新
+
+更新了home当中的代码，根据通话状态更新callqueue，在其他页面中watch callqueue的状态来判断是否有视频告警，是否要跳转到视频页面进行播放，实现视频联动

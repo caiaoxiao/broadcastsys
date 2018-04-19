@@ -21,13 +21,29 @@
         $.verto.init({}, this.initVertoHandle);
       })
     },
-    computed: {
-      ...mapGetters([
-        'vertoHandle',
-        'group_users',
-        'deviceList',
-        'currentLoginUser'
-      ]),
+        computed: {
+      ...mapGetters({
+        vertoHandle:'vertoHandle',
+        group_users:'group_users',
+        users:'users',
+        currentLoginUser:'currentLoginUser',
+        deviceList:'deviceList',
+        callQueue:'callQueue'
+      }),
+    },
+    watch: {
+      'callQueue': function(call) {
+                if(call[0].caller=='1002');
+		{
+	        var url = 'screen.html' 
+		var s1 =  "?s1=http://192.168.1.33:8080/tKLk3X2yLb5Iptzio06dU52GNG9HhlSi/embed/eIJvmiC/ZRXTod4Th2/jquery|fullscreen"; 	
+		var s2 =  "" //&s2=http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4";
+		var s3 =  "" // &s3=http://www.w3school.com.cn/example/html5/mov_bbb.mp4";
+		var s4 =  "" //&s4=https://media.w3.org/2010/05/sintel/trailer.mp4";
+		window.open(url+s1+s2+s3+s4,'newwindow','height=1920,width=1080,top=0,left=0,toolbar=no,menubar=no,scrollbars=no,location=no, status=no');
+		}
+               // this.$router.push({path:'/video'});
+      }
     },
     methods: {
       initVertoHandle(status) {
@@ -58,10 +74,59 @@
             onWSClose(verto, success) {
               console.log('onWSClose', success);
             },
-            onDialogState(data) {
-              console.log("监听状态中")
+	    onDialogState: function(d) {
+            let arr = []
+            let callType = d.direction.name
+              if (d.cause == "USER_NOT_REGISTERED")
+              {
+                //do nothing 
+              }
+              else {
+              switch (d.state.name) {
+                case "trying":
+                  break;
+                case "ringing":       // 振铃，装载进队列
+                  arr.push({
+                    curCall: d,
+                    state: d.state.name,
+                    caller: d.params.caller_id_number,
+		    des:d.params.callee_id_number
+                  })
+                  _this.$store.dispatch('setCallQueue', arr)
+                  break;
+                case "requesting":
+                  arr.push({
+                    curCall:d, 
+                    state: d.state.name,
+                    caller: d.params.caller_id_number,
+		    des:d.params.destination_number
+                  })
+                   _this.$store.dispatch('setCallQueue',arr)
+		break;
+                case "answering":     // 接听电话，改变状态
+                  break;
+                case "active":
+                  break;
+                case "hangup":        //  拒接，改变状态
+                  arr = _this.$store.getters.callQueue
+                  arr.forEach(function(a, i){
+                    if(a.caller == d.params.caller_id_number &&  (a.des == d.params.destination_number || a.des==d.params.callee_id_number)) {
+                      arr.splice(i,1);
+                    }
+                  })
+                  _this.$store.dispatch('setCallQueue', arr)
+                  console.log("Call ended with cause: " + d.cause);
+                  break;
+                case "destroy":
+                  // Some kind of client side cleanup...
+                  break;
+		default:
+			console.log(d.state.name);
+              }
+            }
+            
 
-            },
+          }
           }))
       },
       //  设备状态实时更新

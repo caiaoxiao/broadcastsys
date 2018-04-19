@@ -49,7 +49,11 @@
                 <div class="moduleStyle"
                      :class="returnClass(item.deviceState)"
                      @click.stop="itemClick($event, item)">
-                  <div class="moduleNum">{{ item.userID }}</div>
+                  <div class="moduleNum">{{ item.userID }}
+                    <span v-if="item.calleeNumber || item.callerNumber">
+                      {{ item.calleeNumber ? item.calleeNumber : item.callerNumber }}
+                    </span> 
+                  </div>
                   <div class="moduleKind">视频终端</div>
                   <div class="moduleState" >{{ returnState(item.deviceState) }}</div>
                 </div>

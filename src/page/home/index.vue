@@ -171,6 +171,8 @@
                 user.userID = r.reg_user
                 user.callDirection = null
                 user.channelUUID = null
+                user.networkIP = r.network_ip
+                user.networkPort = r.network_port 
                 deviceList.push(user)
               }
             })
@@ -261,7 +263,7 @@
           } else {
             users.forEach(function(user) {
               if (user.userID  == callerNumber) {
-                user.channelUUID == channelUUID;
+                user.channelUUID = channelUUID;
                 user.deviceState = channelCallState;
                 user.callDirection = callDirection;
                 usersChanged = true;
@@ -280,14 +282,13 @@
           } else {
             users.forEach(function(user) {
               if (user.userID  == calleeNumber) {
-                user.channelUUID == channelUUID;
+                user.channelUUID = channelUUID;
                 user.deviceState = channelCallState;
                 user.callDirection = callDirection;
                 usersChanged = true;
               }
             })
           }
-
         }
         if (currentLoginUserChanged) this.$store.dispatch('setCurrentLoginUser', currentLoginUser);
         if (usersChanged) this.$store.dispatch('setDeviceList',users)

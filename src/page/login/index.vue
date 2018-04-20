@@ -10,22 +10,19 @@
     <!---->
     <div class="login">
       <div class="loginLogo">
-
         <img src="../../assets/img/logo.fw.png" />
       </div>
       <div class="userImg"><img src="../../assets/img/ouba.jpg" /></div>
       <div class="userInfoInput">
-        <form class="form-horizontal">
-          <div class="form-group">
-
+        <form class="form-horizontal" :model="user" :rules="rules" ref="form">
+          <div class="form-group" prop="account">
             <div class="col-sm-12">
-              <input type="text" class="form-control" placeholder="请输入用户名">
+              <input type="text" class="form-control" name="account" v-model="user.account" :autofocus="true" placeholder="请输入用户名">
             </div>
           </div>
-          <div class="form-group">
-
+          <div class="form-group" prop="password">
             <div class="col-sm-12">
-              <input type="password" class="form-control" placeholder="请输入密码">
+              <input type="password" class="form-control" v-model="user.password" placeholder="请输入密码">
             </div>
           </div>
           <div class="form-group">
@@ -39,24 +36,31 @@
           </div>
           <div class="form-group">
             <div class=" col-sm-12">
-              <button type="submit" class="btn btn-primary  btn-block" @click="login">登 录</button>
+              <button type="submit" class="btn btn-primary  btn-block" @click="submitFrom">登 录</button>
             </div>
           </div>
         </form>
       </div>
-
     </div>
   </div>
-
-
 </template>
 
 <script>
-
+  import {mapActions} from 'vuex'
+  import {SET_USER_INFO} from 'store/actions/type'
   export default {
-    data() {
+    data(){
       return {
-          num: 5
+        user: {
+          account: null,
+          password: null
+        },
+        rules: {
+          account: [{required: true, message: '请输入账户名！', trigger: 'blur'}],
+          password: [{required: true, message: '请输入账户密码！', trigger: 'blur'}]
+        },
+        //请求时的loading效果
+        load_data: false
       }
     },
     created() {
@@ -67,21 +71,35 @@
             function () {
               $.getScript("src/assets/js/getStart.js")
             })
-         /*线上 $.getScript("/static/cav.js",
-            function () {
-              $.getScript("/static/getStart.js")
-            })*/
+          /*线上 $.getScript("/static/cav.js",
+           function () {
+           $.getScript("/static/getStart.js")
+           })*/
         }
       })
     },
     methods: {
-
-      login() {
-        this.$store.dispatch('Login', {username: 'admin',password: '123456'}).then(() => {
-          this.loading = false
-          this.$router.push({ path: '/' })
-        }).catch(() => {
-          this.loading = false
+      ...mapActions({
+        set_user_info: SET_USER_INFO
+      }),
+      submitFrom() {
+        let $this = this
+        this.$AjaxGet('User/Login', this.user, function (data){
+          if(data.code != 0) {
+            $this.load_data = true
+            $this.set_user_info({
+              user: data.result,
+              login: true
+            })
+            $this.$message.success("登录成功")
+            setTimeout($this.$router.push({path: '/'}), 2000)
+          }else {
+            $this.load_data = false
+            $this.$notify.info({
+              title: '温馨提示',
+              message: '账号或密码错误'
+            })
+          }
         })
       }
     }

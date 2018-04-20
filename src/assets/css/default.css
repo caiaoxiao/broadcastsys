@@ -555,6 +555,7 @@ span.totalTime{float:right;display:inline-block;line-height:35px;padding-right:1
 .userName>span>a{color:#47a3da;}
 .userName>span.org{font-size:12px;color:#6F7882;}
 .userName>span.org>a{margin-left: 10px;font-size: 14px;}
+.userName>span.sys{}
 .happend{position:absolute;top:5px;right:0px;}
 .deviceStatus{position:absolute;bottom:50px;right:0px;box-shadow:-2px -2px 3px #000;
   background-color: #313439;

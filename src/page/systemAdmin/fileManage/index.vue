@@ -492,11 +492,11 @@
         if(file =='') {
           if(this.filePaths.length !=0) {
             this.filePaths.forEach(function(f,i) {
-              window.open(`https://192.168.1.145:8443/IpBc/File/Download/${f.MediaID}`)
+              window.open(`https://scc.ieyeplus.com:8443/IpBc/File/Download/${f.MediaID}`)
             })
           }
         }else {
-          window.open(`https://192.168.1.145:8443/IpBc/File/Download/${file.MediaID}`)
+          window.open(`https://scc.ieyeplus.com:8443/IpBc/File/Download/${file.MediaID}`)
         }
       },
       addText() {

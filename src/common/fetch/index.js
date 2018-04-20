@@ -25,7 +25,7 @@ export default function fetch(options) {
       timeout: 2000,
       //设置请求时的header
       headers: {
-        'Github-url': 'https://192.168.1.150:8443/IpBc/',
+        'Github-url': 'https://scc.ieyeplus.com:8443/IpBc/',
         'X-Powered-By': 'zzmhot'
       }
     })

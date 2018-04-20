@@ -19,6 +19,7 @@
       this.$nextTick(function() {
         // 初始化vertoHandle
         $.verto.init({}, this.initVertoHandle);
+
       })
     },
     computed: {

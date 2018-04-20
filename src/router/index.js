@@ -57,7 +57,12 @@ const routes = [
 
 
     ]
-  }
+  },
+  {
+    path:'/setting',
+    name:'系统设置',
+    component:_import('setting/index')
+  },
 ]
 
 const router = new Router({
@@ -68,7 +73,7 @@ const router = new Router({
 
 //全局路由配置
 //路由开始之前的操作
-const whiteList = ['/login']
+/* const whiteList = ['/login']
 router.beforeEach((to, from, next) => {
   NProgress.start()
   if (getToken()) {
@@ -89,6 +94,26 @@ router.beforeEach((to, from, next) => {
         NProgress.done()
       }
 
+    }
+  }
+}) */
+
+router.beforeEach((to, from, next) => {
+  NProgress.done().start()
+  let toName = to.name
+// let fromName = from.name
+  let is_login = store.state.user_info.login
+  if (!is_login && toName !== 'login') {
+    next({
+      name: 'login'
+    })
+  } else {
+    if (is_login && toName === 'login') {
+      next({
+        path: '/'
+      })
+    } else {
+      next()
     }
   }
 })

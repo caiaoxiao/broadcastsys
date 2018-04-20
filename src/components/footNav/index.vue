@@ -2,7 +2,10 @@
   <div class="bottomTools">
     <div class="userInfo">
       <div class="userImg"><img src="../../assets/img/ouba.jpg" /></div>
-      <div class="userName"><span>张三<a @click="logout">[退出]</a></span><span class="org">所属机构</span></div>
+      <div class="userName">
+        <span>张三<a @click="logout">[退出]</a></span>
+        <span class="org">所属机构<a @click="setting()"><i class="fa fa-cogs"></i>系统设置</a></span>
+      </div>
     </div>
 
     <div class="span_large">
@@ -243,6 +246,9 @@
         this.$store.dispatch('LogOut').then(() => {
           location.reload()  // 为了重新实例化vue-router对象 避免bug
         })
+      },
+      setting(){
+        this.$router.push('/setting')
       },
       prev() {
         if(this.playlist.length > 1) {

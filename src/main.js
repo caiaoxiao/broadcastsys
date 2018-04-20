@@ -21,6 +21,8 @@ import 'assets/css/font-awesome.css'
 import 'assets/css/default.css'
 // 引入播放条样式
 import 'assets/css/loaderskit.css'
+//引入系统设置样式
+import 'assets/css/setting.css'
 // 引入公用 js
 import 'utils/public'
 // 1.滚动条

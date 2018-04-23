@@ -174,6 +174,8 @@
                 user.channelUUID = null
                 user.networkIP = r.network_ip
                 user.networkPort = r.network_port 
+                user.operationState = 0 
+                user.oppoChannelUUID = null
                 deviceList.push(user)
               }
             })
@@ -256,11 +258,20 @@
         }
         // 入栈
         if (callDirection == "inbound") {
-          if (currentLoginUser.userID  == callerNumber) {
-            currentLoginUser.channelUUID = channelUUID;
-            currentLoginUser.channelCallState = channelCallState;
-            currentLoginUser.callDirection = callDirection;
-            currentLoginUserChanged = true;
+          
+          if ('9000' == callerNumber && '9001' == calleeNumber && channelCallState == 'active') {
+            users.forEach(function(user) {
+               if(user.operationState == 1) {
+                 user.operationState = 0;
+                 _this.fsAPI("uuid_bridge", channelUUID + " " + user.channelUUID, function(res) {console.log("qiang call")}.bind(this)); 
+                 usersChanged = true;
+               }
+               else if (user.operationState == 2) {
+                 user.operationState = 0
+                 _this.fsAPI("uuid_bridge", channelUUID + " " + user.oppoChannelUUID, function(res) {console.log("qiang delete")}.bind(this))
+                 usersChanged = true;
+               }
+            })
           } else {
             users.forEach(function(user) {
               if (user.userID  == callerNumber) {
@@ -281,11 +292,21 @@
             currentLoginUser.callDirection = callDirection;
             currentLoginUserChanged = true;
           } else {
+            let opChannelUUID = e.data["Other-Leg-Unique-ID"];
+
+            users.forEach(function(user){
+              if(user.userID == callerNumber) {
+                user.oppoChannelUUID = channelUUID;
+                usersChanged = true;
+              }
+            })
+
             users.forEach(function(user) {
               if (user.userID  == calleeNumber) {
                 user.channelUUID = channelUUID;
                 user.deviceState = channelCallState;
                 user.callDirection = callDirection;
+                user.oppoChannelUUID = opChannelUUID;
                 usersChanged = true;
               }
             })

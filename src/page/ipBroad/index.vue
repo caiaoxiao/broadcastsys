@@ -162,7 +162,8 @@
         'phoneShow',
         'vertoHandle',           // verto初始化
         'deviceList',                       // 所有设备
-        'currentLoginUser'  // 当前用户
+        'currentLoginUser',  // 当前用户
+	'callQueue'
       ]),
     },
     methods: {
@@ -229,12 +230,30 @@
         const laChannelName = this.getChannelName("liveArray");
 
         if(this.selectPhone.length != 0) {
-          this.fsAPI('bgapi originate', )
+	  //this.fsAPI('conference',this.name + ' ' + 'bgdial' + ' ' + "user/9000")
+	  vertoHandle.newCall({
+          // Extension to dial.
+          destination_number: '3500',
+          caller_id_name: 'LegalHigh',
+          caller_id_number: '9000',
+          outgoingBandwidth: 'default',
+          incomingBandwidth: 'default',
+          useStereo: true,
+          dedEnc: false,
+          tag: "video-container",
+          deviceParams: {
+            useMic: "any",
+            useSpeak: "any",
+            useCamera: "any"
+          }
+          })
           //  批量邀请设备开始会议
           this.selectPhone.forEach(function(s, i){
-            this.vertoHandle.fsAPI("conference",
-              this.name + " " + "bgdial" + " " + "user/"+this.selectPhone[i].userID,function(res){
-                console.log("邀请会议",res)
+            var op =   this.name + '+flags{mute}'+  " " + "bgdial" + " " + "user/"+this.selectPhone[i].userID
+	    console.log("************************************************",op)
+            this.fsAPI("conference",op,
+              function(res){
+		console.log("邀请返回*********************************")
               });
           }.bind(this))
 

@@ -51,7 +51,7 @@
         let _this = this
         this.$store.dispatch('setVertoInit',
           new jQuery.verto({
-            login: '1008'+'@'+ window.location.hostname,
+            login: '9000'+'@'+ window.location.hostname,
             passwd: '1234',
             socketUrl: 'wss://'+ window.location.hostname +':8082',
             ringFile: 'sounds/bell_ring2.wav',
@@ -139,7 +139,7 @@
       // 查询所有设备 以及事件初始化
       refresh() {
 //        let xuiUsername = localStorage.getItem('xui.username')
-        let xuiUsername = 1008 // 过滤掉登陆者
+        let xuiUsername = 9000 // 过滤掉登陆者
         this.$store.dispatch('setCurrentLoginUser',{
           deviceState: "registered",
           userID: xuiUsername,
@@ -236,6 +236,16 @@
           }
         )
       },
+    
+      fsAPI(cmd, arg, success_cb, failed_cb) {
+        this.vertoHandle.sendMethod("jsapi",{
+          command: "fsapi",
+          data: {
+            cmd: cmd,
+            arg: arg
+          },
+        }, success_cb, failed_cb);
+      }, 
       handleFSEventChannel(v, e) {
         let callDirection = e.data["Call-Direction"];            //入栈还是出栈
         let callerNumber = e.data["Caller-Caller-ID-Number"];    //主叫号码
@@ -246,7 +256,7 @@
         let users = this.deviceList;
         let currentLoginUserChanged = false;
         let usersChanged = false;
-
+        let _this = this;
         if (callerNumber == "0000000000") return;
 
         if (channelCallState == "RINGING") {
@@ -259,7 +269,7 @@
         // 入栈
         if (callDirection == "inbound") {
           
-          if ('9000' == callerNumber && '9001' == calleeNumber && channelCallState == 'active') {
+          if ('9000' == callerNumber && '9001' == calleeNumber && channelCallState == 'ringing') {
             users.forEach(function(user) {
                if(user.operationState == 1) {
                  user.operationState = 0;

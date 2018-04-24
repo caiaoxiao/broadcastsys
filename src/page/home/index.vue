@@ -13,7 +13,10 @@
   import { topMenu, footNav, container } from 'components'
   export default {
     data () {
-      return {}
+      return {
+        liveArray:{},
+        vertoConf:{}
+      }
     },
     created() {
       this.$nextTick(function() {
@@ -34,7 +37,7 @@
     },
     watch: {
       'callQueue': function(call) {
-                if(call[0].caller=='1002');
+                if(call[0].des=='9110');
 		{
 	        var url = 'screen.html' 
 		var s1 =  "?s1=http://192.168.1.33:8080/tKLk3X2yLb5Iptzio06dU52GNG9HhlSi/embed/eIJvmiC/ZRXTod4Th2/jquery|fullscreen"; 	
@@ -51,7 +54,7 @@
         let _this = this
         this.$store.dispatch('setVertoInit',
           new jQuery.verto({
-            login: '1008'+'@'+ window.location.hostname,
+            login: '9000'+'@'+ window.location.hostname,
             passwd: '1234',
             socketUrl: 'wss://'+ window.location.hostname +':8082',
             ringFile: 'sounds/bell_ring2.wav',
@@ -75,7 +78,7 @@
             onWSClose(verto, success) {
               console.log('onWSClose', success);
             },
-	    onDialogState: function(d) {
+	          onDialogState: function(d) {
             let arr = []
             let callType = d.direction.name
               if (d.cause == "USER_NOT_REGISTERED")
@@ -103,7 +106,7 @@
 		    des:d.params.destination_number
                   })
                    _this.$store.dispatch('setCallQueue',arr)
-		break;
+		              break;
                 case "answering":     // 接听电话，改变状态
                   break;
                 case "active":
@@ -121,13 +124,103 @@
                 case "destroy":
                   // Some kind of client side cleanup...
                   break;
-		default:
-			console.log(d.state.name);
+		      default:
+			        console.log(d.state.name);
               }
             }
             
 
-          }
+          },
+              
+          onMessage:function(verto, dialog, message, data) {
+	  console.log('this is a message',message)
+	  let _this = this
+          var initLiveArray =  function(verto, dialog, data) {
+    // Set up addtional configuration specific to the call.
+    _this.vertoConf = new $.verto.conf(verto, {
+      dialog: dialog,
+      hasVid: true,
+      laData: data.pvtData,
+      // For subscribing to published chat messages.
+      chatCallback: function(verto, eventObj) {
+        var from = eventObj.data.fromDisplay || eventObj.data.from || 'Unknown';
+        var message = eventObj.data.message || '';
+      },
+    });
+    var config = {subParams: {callID: dialog ? dialog.callID : null},};
+    // Set up the live array, using the live array data received from FreeSWITCH.
+    _this.liveArray = new $.verto.liveArray(verto, data.pvtData.laChannel, data.pvtData.laName, config);
+    // Subscribe to live array changes.
+    _this.liveArray.onChange = function(liveArrayObj, args) {
+	console.log(args);
+      //console.log("Call UUID is: " + args.key);
+      //console.log("Call data is: ", args.data);
+      try {
+        switch (args.action) {
+
+          // Initial list of existing conference users.
+          case "bootObj":
+            break;
+
+          // New user joined conference.
+          case "add":
+            console.log('conference user added')
+            break;
+
+          // User left conference.
+          case "del":
+          console.log('conference user deleted')
+            break;
+
+          // Existing user's state changed (mute/unmute, talking, floor, etc)
+          case "modify":
+          console.log('conference user changed')
+            break;
+
+        }
+      } catch (err) {
+        console.error("ERROR: " + err);
+      }
+    };
+    // Called if the live array throws an error.
+    _this.liveArray.onErr = function (obj, args) {
+      console.error("Error: ", obj, args);
+    }
+}
+          switch (message) {
+              case $.verto.enum.message.pvtEvent:
+                  if (data.pvtData) {
+                    switch (data.pvtData.action) {
+                      // This client has joined the live array for the conference.
+                       case "conference-liveArray-join":
+                      // With the initial live array data from the server, you can
+                      // configure/subscribe to the live array.
+                      initLiveArray(verto, dialog, data);
+                      break;
+                      // This client has left the live array for the conference.
+                      case "conference-liveArray-part":
+	 	 console.log('part')
+                      // Some kind of client-side wrapup...
+                      break;
+                                                  }
+             }                       
+              break;
+                      // TODO: Needs doc.
+          case $.verto.enum.message.info:
+	 	 console.log('info')
+              break;
+                      // TODO: Needs doc.
+          case $.verto.enum.message.display:
+	 	 console.log('display')
+              break;
+          case $.verto.enum.message.clientReady:
+      // 1.8.x+
+      // Fired when the server has finished re-attaching any active sessions.
+      // data.reattached_sessions contains an array of session IDs for all
+      // sessions that were re-attached.
+            break;
+            }
+        }
           }))
       },
       //  设备状态实时更新
@@ -139,7 +232,7 @@
       // 查询所有设备 以及事件初始化
       refresh() {
 //        let xuiUsername = localStorage.getItem('xui.username')
-        let xuiUsername = 1008 // 过滤掉登陆者
+        let xuiUsername = 9000 // 过滤掉登陆者
         this.$store.dispatch('setCurrentLoginUser',{
           deviceState: "registered",
           userID: xuiUsername,

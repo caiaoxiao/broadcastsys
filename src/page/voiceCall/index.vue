@@ -13,6 +13,9 @@
                  </ul>
             </div>
           </div>
+     <div>
+         <video width="800" id="video-container" autoplay="autoplay" hidden="true"></video>
+     </div>
      <div class="phoneDial">
        <div class="numDisplay">
         <span>{{destination_number}}</span>
@@ -226,16 +229,16 @@
       })
     },
     computed: {
-      ...mapGetters([
+      ...mapGetters({
     	
-        'dialogShow',
-        'callQueue',
-        'vertoHandle',
-        'group_users',
-        'users',
-        'deviceList', 
-        'currentLoginUser'
-      ]),
+        dialogShow:'dialogShow',
+        callQueue:'callQueue',
+        vertoHandle:'vertoHandle',
+        group_users:'group_users',
+        users:'users',
+        deviceList:'deviceList', 
+        currentLoginUser:'currentLoginUser'
+      }),
     },
     watch: {
       'callqueue': function() {

@@ -21,10 +21,7 @@
     created() {
       this.$nextTick(function() {
         // 初始化vertoHandle
-	if(this.vertoHandle==null)
         $.verto.init({}, this.initVertoHandle);
-	else
-	console.log('verto aleray not null')
 
       })
     },

@@ -13,6 +13,9 @@
                  </ul>
             </div>
           </div>
+     <div>
+         <video width="800" id="video-container" autoplay="autoplay" hidden="true"></video>
+     </div>
      <div class="phoneDial">
        <div class="numDisplay">
         <span>{{destination_number}}</span>

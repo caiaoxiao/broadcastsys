@@ -11,9 +11,9 @@
           <!--</li>-->
           <li v-for="item in callQueue" @click="answerCall(item)">
             <!--<i  class="fa fa-circle red" aria-hidden="true"></i>-->
-            <i v-if="item.state == 'ringing'" class="fa fa-circle orange" aria-hidden="true"></i>
-            <i v-if="item.state == 'hangup'" class="fa fa-clock-o" aria-hidden="true"></i>
-            {{item.num}}
+            <i v-if="item.state == 'ringing' || item.state=='requesting' || item.state=='active'" class="fa fa-circle orange" aria-hidden="true"></i>
+            <!--i v-if="item.state == 'hangup'" class="fa fa-clock-o" aria-hidden="true"></i-->
+            {{item.caller}}
           </li>
           <!--<li><i class="fa fa-clock-o" aria-hidden="true"></i>1005</li>-->
         </ul>

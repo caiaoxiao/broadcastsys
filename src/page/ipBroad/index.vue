@@ -140,7 +140,7 @@
     data() {
       return {
         selectPhone: [],
-        name: 3500+ '-' + window.location.hostname,
+        name: '3000' + '-' + window.location.hostname,
         playListShow: false,     //播放列表显示切换
       }
     },
@@ -231,10 +231,10 @@
 
         if(this.selectPhone.length != 0) {
 	  //this.fsAPI('conference',this.name + ' ' + 'bgdial' + ' ' + "user/9000")
-	  vertoHandle.newCall({
+	  this.vertoHandle.newCall({
           // Extension to dial.
-          destination_number: '3500',
-          caller_id_name: 'LegalHigh',
+          destination_number: '3000',
+          caller_id_name: '9000',
           caller_id_number: '9000',
           outgoingBandwidth: 'default',
           incomingBandwidth: 'default',

@@ -13,12 +13,18 @@
   import { topMenu, footNav, container } from 'components'
   export default {
     data () {
-      return {}
+      return {
+        liveArray:{},
+        vertoConf:{}
+      }
     },
     created() {
       this.$nextTick(function() {
         // 初始化vertoHandle
+	if(this.vertoHandle==null)
         $.verto.init({}, this.initVertoHandle);
+	else
+	console.log('verto aleray not null')
 
       })
     },
@@ -34,7 +40,7 @@
     },
     watch: {
       'callQueue': function(call) {
-                if(call[0].caller=='1002');
+                if(call[0].des=='9110');
 		{
 	        var url = 'screen.html' 
 		var s1 =  "?s1=http://192.168.1.33:8080/tKLk3X2yLb5Iptzio06dU52GNG9HhlSi/embed/eIJvmiC/ZRXTod4Th2/jquery|fullscreen"; 	
@@ -127,7 +133,86 @@
             }
             
 
-          }
+          },
+              
+          onMessage:function(verto, dialog, message, data) {
+	  console.log('this is a message',message)
+	  let _this = this
+          var initLiveArray =  function(verto, dialog, data,pbx,room) {
+          // Set up addtional configuration specific to the call.
+          var config = {subParams: {callID: dialog ? dialog.callID : null},};
+          // Set up the live array, using the live array data received from FreeSWITCH.
+         _this.liveArray = new $.verto.liveArray(verto,pbx,room, config);
+         // Subscribe to live array changes.
+         _this.liveArray.onChange = function(liveArrayObj, args) {
+         try {
+         switch (args.action) {
+
+          // Initial list of existing conference users.
+          case "bootObj":
+            break;
+
+          // New user joined conference.
+          case "add":
+            console.log('conference user added')
+            break;
+
+          // User left conference.
+          case "del":
+          console.log('conference user deleted')
+            break;
+
+          // Existing user's state changed (mute/unmute, talking, floor, etc)
+          case "modify":
+          console.log('conference user changed')
+            break;
+
+            }
+          } catch (err) {
+             console.error("ERROR: " + err);
+            }
+            };
+    // Called if the live array throws an error.
+    _this.liveArray.onErr = function (obj, args) {
+      console.error("Error: ", obj, args);
+       }
+      }
+          switch (message) {
+              case $.verto.enum.message.pvtEvent:
+                  if (data.pvtData) {
+                    switch (data.pvtData.action) {
+                      // This client has joined the live array for the conference.
+                       case "conference-liveArray-join":
+                      // With the initial live array data from the server, you can
+                      // configure/subscribe to the live array.
+                      break;
+                      // This client has left the live array for the conference.
+                      case "conference-liveArray-part":
+	 	 console.log('part')
+                      // Some kind of client-side wrapup...
+                      break;
+                     }
+             }                       
+              break;
+                      // TODO: Needs doc.
+          case $.verto.enum.message.info:
+	 	 console.log('info')
+              break;
+                      // TODO: Needs doc.
+          case $.verto.enum.message.display:
+	 	 console.log('display')
+              break;
+          case $.verto.enum.message.clientReady:
+      // 1.8.x+
+      // Fired when the server has finished re-attaching any active sessions.
+      // data.reattached_sessions contains an array of session IDs for all
+      // sessions that were re-attached.
+                initLiveArray(verto, dialog, data,"conference-liveArray.9000-scc.ieyeplus.com@scc.ieyeplus.com","9000-scc.ieyeplus.com");
+                initLiveArray(verto, dialog, data,"conference-liveArray.9110-scc.ieyeplus.com@scc.ieyeplus.com","9110-scc.ieyeplus.com");
+              console.log('verto channel ready')
+            break;
+            }
+        }
           }))
       },
       //  设备状态实时更新

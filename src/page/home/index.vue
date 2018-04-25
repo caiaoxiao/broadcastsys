@@ -144,7 +144,8 @@
           deviceState: "registered",
           userID: xuiUsername,
           callDirection: null,
-          channelUUID: null
+          channelUUID: null,
+          oppoChannelUUID: null
       })
         this.vertoHandle.sendMethod("jsapi",{command:"fsapi", data:{cmd:"show", arg:"registrations as xml"}},
           function(data) {
@@ -281,8 +282,25 @@
                  _this.fsAPI("uuid_bridge", channelUUID + " " + user.oppoChannelUUID, function(res) {console.log("qiang delete")}.bind(this))
                  usersChanged = true;
                }
-            })
-          } else {
+               else if (user.operationState == 3) {
+                 user.operationState = 0
+                 console.log(user.userID);
+                 console.log(channelUUID);
+                 console.log(user.channelUUID);
+                 console.log(user.oppoChannelUUID); 
+                 console.log("99999999999999"); 
+                 _this.fsAPI("uuid_bridge", user.oppoChannelUUID + " " + channelUUID, function(res) {console.log("daijie")}.bind(this))
+                 usersChanged = true;
+               } 
+           })
+          } 
+           else if (callerNumber == '9000') {
+                  currentLoginUser.channelUUID = channelUUID;
+                  currentLoginUser.deviceState = channelCallState;
+                  currentLoginUser.callDirection = callDirection;
+                  currentLoginUserChanged = true;
+           }        
+           else {
             users.forEach(function(user) {
               if (user.userID  == callerNumber) {
                 user.channelUUID = channelUUID;
@@ -301,7 +319,10 @@
             currentLoginUser.channelCallState = channelCallState;
             currentLoginUser.callDirection = callDirection;
             currentLoginUserChanged = true;
-          } else {
+          }
+           
+                
+           else {
             let opChannelUUID = e.data["Other-Leg-Unique-ID"];
 
             users.forEach(function(user){

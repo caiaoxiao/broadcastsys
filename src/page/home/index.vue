@@ -207,7 +207,7 @@
       // Fired when the server has finished re-attaching any active sessions.
       // data.reattached_sessions contains an array of session IDs for all
       // sessions that were re-attached.
-                initLiveArray(verto, dialog, data,"conference-liveArray.9000-scc.ieyeplus.com@scc.ieyeplus.com","9000-scc.ieyeplus.com");
+                initLiveArray(verto, dialog, data,"conference-liveArray.9100-scc.ieyeplus.com@scc.ieyeplus.com","9100-scc.ieyeplus.com");
                 initLiveArray(verto, dialog, data,"conference-liveArray.9110-scc.ieyeplus.com@scc.ieyeplus.com","9110-scc.ieyeplus.com");
               console.log('verto channel ready')
             break;

@@ -506,6 +506,9 @@
                 case 'verto.info':
                     dialog.handleInfo(data.params);
                     break;
+                case 'verto.clientReady':
+                    dialog.handleInfo(data.params);
+                    break;
                 default:
                     console.debug("INVALID METHOD OR NON-EXISTANT CALL REFERENCE IGNORED", dialog, data.method);
                     break;
@@ -609,6 +612,12 @@
 
                 break;
 
+            case "verto.clientReady":
+                if (verto.callbacks.onMessage) {
+                    verto.callbacks.onMessage(verto, null, $.verto.enum.message.clientReady, data.params.msg);
+                }
+                console.debug("verto client is ready" );
+                break;
             default:
                 console.error("INVALID METHOD OR NON-EXISTANT CALL REFERENCE IGNORED", data.method);
                 break;

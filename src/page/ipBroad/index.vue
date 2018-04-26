@@ -140,7 +140,7 @@
     data() {
       return {
         selectPhone: [],
-        name: 3000+ '-' + window.location.host,
+        name: '3000' + '-' + window.location.hostname,
         playListShow: false,     //播放列表显示切换
       }
     },
@@ -162,7 +162,8 @@
         'phoneShow',
         'vertoHandle',           // verto初始化
         'deviceList',                       // 所有设备
-        'currentLoginUser'  // 当前用户
+        'currentLoginUser',  // 当前用户
+	'callQueue'
       ]),
     },
     methods: {
@@ -229,7 +230,8 @@
         const laChannelName = this.getChannelName("liveArray");
 
         if(this.selectPhone.length != 0) {
-          this.vertoHandle.newCall({
+	  //this.fsAPI('conference',this.name + ' ' + 'bgdial' + ' ' + "user/9000")
+	  this.vertoHandle.newCall({
           // Extension to dial.
           destination_number: '3000',
           caller_id_name: '9000',
@@ -248,12 +250,13 @@
           //  批量邀请设备开始会议
           this.selectPhone.forEach(function(s, i){
             var op =   this.name + '+flags{mute}'+  " " + "bgdial" + " " + "user/"+this.selectPhone[i].userID
-            console.log("************************************************",op)
+	    console.log("************************************************",op)
             this.fsAPI("conference",op,
               function(res){
-                console.log("邀请返回*********************************")
+		console.log("邀请返回*********************************")
               });
           }.bind(this))
+
           //  重置勾选话机数组
           this.selectPhone = []
 

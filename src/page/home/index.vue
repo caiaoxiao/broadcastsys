@@ -81,7 +81,7 @@
             onWSClose(verto, success) {
               console.log('onWSClose', success);
             },
-	          onDialogState: function(d) {
+	    onDialogState: function(d) {
             let arr = []
             let callType = d.direction.name
               if (d.cause == "USER_NOT_REGISTERED")
@@ -109,7 +109,7 @@
 		    des:d.params.destination_number
                   })
                    _this.$store.dispatch('setCallQueue',arr)
-		              break;
+		break;
                 case "answering":     // 接听电话，改变状态
                   break;
                 case "active":
@@ -127,8 +127,8 @@
                 case "destroy":
                   // Some kind of client side cleanup...
                   break;
-		      default:
-			        console.log(d.state.name);
+		default:
+			console.log(d.state.name);
               }
             }
             
@@ -138,28 +138,15 @@
           onMessage:function(verto, dialog, message, data) {
 	  console.log('this is a message',message)
 	  let _this = this
-          var initLiveArray =  function(verto, dialog, data) {
-    // Set up addtional configuration specific to the call.
-    _this.vertoConf = new $.verto.conf(verto, {
-      dialog: dialog,
-      hasVid: true,
-      laData: data.pvtData,
-      // For subscribing to published chat messages.
-      chatCallback: function(verto, eventObj) {
-        var from = eventObj.data.fromDisplay || eventObj.data.from || 'Unknown';
-        var message = eventObj.data.message || '';
-      },
-    });
-    var config = {subParams: {callID: dialog ? dialog.callID : null},};
-    // Set up the live array, using the live array data received from FreeSWITCH.
-    _this.liveArray = new $.verto.liveArray(verto, data.pvtData.laChannel, data.pvtData.laName, config);
-    // Subscribe to live array changes.
-    _this.liveArray.onChange = function(liveArrayObj, args) {
-	console.log(args);
-      //console.log("Call UUID is: " + args.key);
-      //console.log("Call data is: ", args.data);
-      try {
-        switch (args.action) {
+          var initLiveArray =  function(verto, dialog, data,pbx,room) {
+          // Set up addtional configuration specific to the call.
+          var config = {subParams: {callID: dialog ? dialog.callID : null},};
+          // Set up the live array, using the live array data received from FreeSWITCH.
+         _this.liveArray = new $.verto.liveArray(verto,pbx,room, config);
+         // Subscribe to live array changes.
+         _this.liveArray.onChange = function(liveArrayObj, args) {
+         try {
+         switch (args.action) {
 
           // Initial list of existing conference users.
           case "bootObj":
@@ -180,16 +167,16 @@
           console.log('conference user changed')
             break;
 
-        }
-      } catch (err) {
-        console.error("ERROR: " + err);
-      }
-    };
+            }
+          } catch (err) {
+             console.error("ERROR: " + err);
+            }
+            };
     // Called if the live array throws an error.
     _this.liveArray.onErr = function (obj, args) {
       console.error("Error: ", obj, args);
-    }
-}
+       }
+      }
           switch (message) {
               case $.verto.enum.message.pvtEvent:
                   if (data.pvtData) {
@@ -198,14 +185,13 @@
                        case "conference-liveArray-join":
                       // With the initial live array data from the server, you can
                       // configure/subscribe to the live array.
-                      initLiveArray(verto, dialog, data);
                       break;
                       // This client has left the live array for the conference.
                       case "conference-liveArray-part":
 	 	 console.log('part')
                       // Some kind of client-side wrapup...
                       break;
-                                                  }
+                     }
              }                       
               break;
                       // TODO: Needs doc.
@@ -221,6 +207,9 @@
       // Fired when the server has finished re-attaching any active sessions.
       // data.reattached_sessions contains an array of session IDs for all
       // sessions that were re-attached.
+                initLiveArray(verto, dialog, data,"conference-liveArray.9100-scc.ieyeplus.com@scc.ieyeplus.com","9100-scc.ieyeplus.com");
+                initLiveArray(verto, dialog, data,"conference-liveArray.9110-scc.ieyeplus.com@scc.ieyeplus.com","9110-scc.ieyeplus.com");
+              console.log('verto channel ready')
             break;
             }
         }
@@ -270,6 +259,8 @@
                 user.channelUUID = null
                 user.networkIP = r.network_ip
                 user.networkPort = r.network_port 
+                user.operationState = 0 
+                user.oppoChannelUUID = null
                 deviceList.push(user)
               }
             })
@@ -330,6 +321,16 @@
           }
         )
       },
+    
+      fsAPI(cmd, arg, success_cb, failed_cb) {
+        this.vertoHandle.sendMethod("jsapi",{
+          command: "fsapi",
+          data: {
+            cmd: cmd,
+            arg: arg
+          },
+        }, success_cb, failed_cb);
+      }, 
       handleFSEventChannel(v, e) {
         let callDirection = e.data["Call-Direction"];            //入栈还是出栈
         let callerNumber = e.data["Caller-Caller-ID-Number"];    //主叫号码
@@ -340,7 +341,7 @@
         let users = this.deviceList;
         let currentLoginUserChanged = false;
         let usersChanged = false;
-
+        let _this = this;
         if (callerNumber == "0000000000") return;
 
         if (channelCallState == "RINGING") {
@@ -352,11 +353,20 @@
         }
         // 入栈
         if (callDirection == "inbound") {
-          if (currentLoginUser.userID  == callerNumber) {
-            currentLoginUser.channelUUID = channelUUID;
-            currentLoginUser.channelCallState = channelCallState;
-            currentLoginUser.callDirection = callDirection;
-            currentLoginUserChanged = true;
+          
+          if ('9000' == callerNumber && '9001' == calleeNumber && channelCallState == 'ringing') {
+            users.forEach(function(user) {
+               if(user.operationState == 1) {
+                 user.operationState = 0;
+                 _this.fsAPI("uuid_bridge", channelUUID + " " + user.channelUUID, function(res) {console.log("qiang call")}.bind(this)); 
+                 usersChanged = true;
+               }
+               else if (user.operationState == 2) {
+                 user.operationState = 0
+                 _this.fsAPI("uuid_bridge", channelUUID + " " + user.oppoChannelUUID, function(res) {console.log("qiang delete")}.bind(this))
+                 usersChanged = true;
+               }
+            })
           } else {
             users.forEach(function(user) {
               if (user.userID  == callerNumber) {
@@ -377,11 +387,21 @@
             currentLoginUser.callDirection = callDirection;
             currentLoginUserChanged = true;
           } else {
+            let opChannelUUID = e.data["Other-Leg-Unique-ID"];
+
+            users.forEach(function(user){
+              if(user.userID == callerNumber) {
+                user.oppoChannelUUID = channelUUID;
+                usersChanged = true;
+              }
+            })
+
             users.forEach(function(user) {
               if (user.userID  == calleeNumber) {
                 user.channelUUID = channelUUID;
                 user.deviceState = channelCallState;
                 user.callDirection = callDirection;
+                user.oppoChannelUUID = opChannelUUID;
                 usersChanged = true;
               }
             })

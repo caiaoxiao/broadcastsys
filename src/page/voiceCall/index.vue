@@ -7,8 +7,8 @@
             <div>
                  <ul class="callNum">
                         <li v-for="item in callQueue" @click="answerCall(item)">
-                             <i v-if="item.state == 'ringing'" class="fa fa-circle orange" aria-hidden="true"></i>
-                              <i v-if="item.state == 'hangup'" class="fa fa-clock-o" aria-hidden="true"></i> {{ item.num }}
+                             <i v-if="item.state == 'ringing' ||  item.state=='requesting' || item.state=='active'" class="fa fa-circle orange" aria-hidden="true"></i>
+                             <!-- <i v-if="item.state == 'hangup'" class="fa fa-clock-o" aria-hidden="true"></i>--> {{ item.caller }}
                          </li>
                  </ul>
             </div>
@@ -175,7 +175,7 @@
       </div>
       <div class="functionMenu">
         <ul class="nav nav-justified menuList">
-          <li id="a1" @click="callx"><i class="fa fa-phone fa-2x" aria-hidden="true"></i><span>呼叫</span></li>
+          <li id="a1" @click="call"><i class="fa fa-phone fa-2x" aria-hidden="true"></i><span>呼叫</span></li>
           <li id="a2" @click="strongCall"><i class="fa fa-volume-control-phone fa-2x" aria-hidden="true"></i><span>强行通话</span></li>
           <li id="a3" @click="strongDelete"><i class="fa fa-window-close fa-2x" aria-hidden="true" onclick="$('#eeee').show();"></i><span>强拆</span></li>
           <li id="a4" @click="strongJoin"><i class="fa fa-deaf fa-2x" aria-hidden="true"></i><span>强插</span></li>
@@ -229,16 +229,16 @@
       })
     },
     computed: {
-      ...mapGetters({
+      ...mapGetters([
     	
-        dialogShow:'dialogShow',
-        callQueue:'callQueue',
-        vertoHandle:'vertoHandle',
-        group_users:'group_users',
-        users:'users',
-        deviceList:'deviceList', 
-        currentLoginUser:'currentLoginUser'
-      }),
+        'dialogShow',
+        'callQueue',
+        'vertoHandle',
+        'group_users',
+        'users',
+        'deviceList', 
+        'currentLoginUser'
+      ]),
     },
     watch: {
       'callqueue': function() {
@@ -293,54 +293,111 @@
         }, success_cb, failed_cb);
       }, 
 
-     //luyin
+     // 对指定话机进行的通话录音
       startRecording() {
         this.fsAPI("uuid_record",this.selectNowCall[0].channelUUID + " " + "start" +" " +"/tmp/record"+this.num+".wav",function(res) {console.log("start record")}.bind(this)); 
         this.selectNowCall = []; 
         this.num++;
-      },
-    
-      // qianggua
-       strongHang() {
-         this.fsAPI("uuid_kill",this.currentLoginUser.channelUUID,function(res) {console.log("kill call")}.bind(this));
       }, 
        
-     // qiang call
-       strongCall() {
-         this.fsAPI("uuid_deflect",this.selectNowCall[0].channelUUID+" "+"sip:"+this.selectPhone[0].userID+"@"+this.selectPhone[0].networkIP+":"+this.selectPhone[0].networkPort,function(res) {console.log("qiang call")}.bind(this));
-         this.selectPhone = [];
+     // 实现管理员和指定话机的强行通话
+       strongCall() {        
+         let users = this.deviceList
+         let userChanged = false
+         let select = this.selectNowCall[0]
+          
+         users.forEach(function(user) {
+           if(user.userID == select.userID) {
+              user.operationState = 1
+              userChanged = true
+           }
+          }
+         ) 
+        
+         if(userChanged) this.$store.dispatch('setDeviceList',users)
+ 
+         this.vertoHandle.newCall({
+           destination_number: '9001',
+           caller_id_name: '9000',
+           caller_id_number: '9000',
+           outgoingBandwidth: 'default',
+           incomingBandwidth: 'default',
+           useStereo: true,
+           dedEnc: false,
+           tag: "video-container",
+           deviceParams: {
+            useMic: "any",
+            useSpeak: "any",
+            useCamera: "any",
+           }
+         }) 
+      
          this.selectNowCall = []; 
       },
-     // qiang delete
+    
+     // 实现管理员对指定通话的强拆
        strongDelete() {
-         this.fsAPI("uuid_deflect",this.selectNowCall[0].channelUUID+" "+"sip:"+this.selectPhone[0].userID+"@"+this.selectPhone[0].networkIP+":"+this.selectPhone[0].networkPort,function(res) {console.log("qiang delete")}.bind(this));
-         this.selectPhone = [];
+         let users = this.deviceList
+         let userChanged = false
+         let select = this.selectNowCall[0]
+
+         users.forEach(function(user) {
+           if (user.userID == select.userID) {
+            user.operationState = 2
+            userChanged = true
+           }
+          }
+         )
+
+         if(userChanged) this.$store.dispatch('setDeviceList',users)
+
+          this.vertoHandle.newCall({
+           destination_number: '9001',
+           caller_id_name: '9000',
+           caller_id_number: '9000',
+           outgoingBandwidth: 'default',
+           incomingBandwidth: 'default',
+           useStereo: true,
+           dedEnc: false,
+           tag: "video-container",
+           deviceParams: {
+            useMic: "any",
+            useSpeak: "any",
+            useCamera: "any",
+           }
+         }) 
+
          this.selectNowCall = []; 
       },
-     // qiang join
+
+     // 实现管理员对指定通话的强插
        strongJoin() {
-         this.fsAPI("originate","user/"+this.selectPhone[0].userID+" "+"&three_way("+this.selectNowCall[0].channelUUID+")",function(res) {console.log("qiang join")}.bind(this));
-         this.selectPhone = [];
+         this.fsAPI("originate","user/"+"9000"+" "+"&three_way("+this.selectNowCall[0].channelUUID+")",function(res) {console.log("qiang join")}.bind(this));
          this.selectNowCall = [];
       },
-     // observe
+
+     // 实现管理员对指定通话的监听
        observe() {
-         this.fsAPI("originate","user/"+this.selectPhone[0].userID+" "+"&eavesdrop("+this.selectNowCall[0].channelUUID+")",function(res) {console.log("observe")}.bind(this));
+         this.fsAPI("originate","user/"+"9000"+" "+"&eavesdrop("+this.selectNowCall[0].channelUUID+")",function(res) {console.log("observe")}.bind(this));
+         console.log(this.currentLoginUser); 
          this.selectPhone = [];
          this.selectNowCall = [];
       }, 
-     // daiJie
+
+     // 实现第三方对于指定通话中一方的代接
        daiJie() {
          this.fsAPI("uuid_transfer",this.selectNowCall[0].channelUUID+" "+"sip:"+this.selectPhone[0].userID+"@"+this.selectPhone[0].networkIP+":"+this.selectPhone[0].networkPort,function(res) {console.log("daijie")}.bind(this));
          this.selectPhone = [];
          this.selectNowCall = [];
       },
-     // callTraverse
+
+     // 实现呼叫转移
        callTraverse() {
          this.fsAPI("uuid_deflect",this.selectNowCall[0].channelUUID+" "+"sip:"+this.selectPhone[0].userID+"@"+this.selectPhone[0].networkIP+":"+this.selectPhone[0].networkPort,function(res) {console.log("call traverse")}.bind(this));
          this.selectPhone = [];
          this.selectNowCall = [];
       }, 
+
       clear() {
            this.destination_number = this.destination_number.substring(0, this.destination_number.length-1)
       },
@@ -353,11 +410,9 @@
       callDivert() {
            this.$store.dispatch('CallDivert', {type: true, num: this.destination_number})
       },
-      //yemian call 
+      // call 
       call() {
-
-       this.vertoHandle.newCall({
-         
+       this.vertoHandle.newCall({         
         destination_number : this.destination_number,
         caller_id_name: '9000',
         caller_id_number: '9000',
@@ -374,14 +429,6 @@
       })
         this.selectPhone = [];
       },
-      //hujiao call
-      callx() {
-
-      this.fsAPI("originate","user/"+this.selectPhone[0].userID+" "+ "&bridge(user/"+this.selectPhone[1].userID+")",function(res) {console.log("calling now")}.bind(this)); 
-
-      this.selectPhone = [];
-
-      }, 
           
       hangupCall(){
         this.vertoHandle.hangup();

@@ -69,10 +69,6 @@
             </div>
 
 
-
-
-
-
           </div>
           <div class="moduleList">
             <div class="department">
@@ -218,6 +214,7 @@
         nowCall: [],
         selectNowCall: [],
         selectPhone: [], 
+        selectRingCall: [], 
         num : 0 
        }
     },
@@ -274,11 +271,17 @@
              $(target).addClass("callingSelected");
              this.selectNowCall.push(row)
            }
-         }else if($(target).hasClass("waiting")) {
+         }else if($(target).hasClass("waitting")) {
            if($(target).hasClass("waittingSelected")) {
              $(target).removeClass("waittingSelected");
+             this.selectRingCall.forEach(function(s,i) {
+               if(s.userID == row.userID) {
+                 _this.selectRingCall.splice(i,1)
+               }
+             })
            }else {
              $(target).addClass("waittingSelected");
+             this.selectRingCall.push(row) 
            }
          }
          this.destination_number = this.selectPhone[0].userID;
@@ -367,32 +370,91 @@
            }
          }) 
 
-         this.selectNowCall = []; 
+         this.selectNowCall = [];   
+        // this.fsAPI("uuid_kill",this.selectNowCall[0].channelUUID,function(res) {console.log(qiang delete)}.bind(this));
+        // this.selectNowCall = []; 
       },
 
      // 实现管理员对指定通话的强插
        strongJoin() {
-         this.fsAPI("originate","user/"+"9000"+" "+"&three_way("+this.selectNowCall[0].channelUUID+")",function(res) {console.log("qiang join")}.bind(this));
+         let select = this.selectNowCall[0];
+         this.vertoHandle.newCall({
+           destination_number: '9003'+select.channelUUID,
+           caller_id_name: '9000',
+           caller_id_number: '9000',
+           outgoingBandwidth: 'default',
+           incomingBandwidth: 'default',
+           useStereo: true,
+           dedEnc: false,
+           tag: "video-container",
+           deviceParams: {
+             useMic: "any",
+             useSpeak: "any",
+             useCamera: "any",
+           }
+         }) 
          this.selectNowCall = [];
       },
 
      // 实现管理员对指定通话的监听
        observe() {
-         this.fsAPI("originate","user/"+"9000"+" "+"&eavesdrop("+this.selectNowCall[0].channelUUID+")",function(res) {console.log("observe")}.bind(this));
-         console.log(this.currentLoginUser); 
-         this.selectPhone = [];
+         
+         let select = this.selectNowCall[0];
+         console.log(this.selectNowCall[0].channelUUID); 
+         this.vertoHandle.newCall({
+           destination_number: '9002'+select.channelUUID,
+           caller_id_name: '9000',
+           caller_id_number: '9000',
+           outgoingBandwidth: 'default',
+           incomingBandwidth: 'default',
+           useStereo: true,
+           dedEnc: false,
+           tag: "video-container",
+           deviceParams: {
+             useMic: "any",
+             useSpeak: "any",
+             useCamera: "any",
+           }
+         }) 
+         
          this.selectNowCall = [];
       }, 
 
      // 实现第三方对于指定通话中一方的代接
        daiJie() {
-         this.fsAPI("uuid_transfer",this.selectNowCall[0].channelUUID+" "+"sip:"+this.selectPhone[0].userID+"@"+this.selectPhone[0].networkIP+":"+this.selectPhone[0].networkPort,function(res) {console.log("daijie")}.bind(this));
-         this.selectPhone = [];
-         this.selectNowCall = [];
+
+         let users = this.deviceList; 
+         let userChanged = false;
+         let select = this.selectRingCall[0]; 
+        
+         this.vertoHandle.newCall({
+          destination_number: '9004'+this.selectRingCall[0].oppoChannelUUID,
+          caller_id_name: '9000',
+          caller_id_number: '9000',
+          outgoingBandwidth: 'default',
+          incomingBandwidth: 'default',
+          useStereo: true,
+          dedEnc: false,
+          tag: "video-container",
+          deviceParams: {
+           useMic: "any",
+           useSpeak: "any",
+           useCamera: "any",
+          }
+         })
+         console.log(select.userID); 
+         this.selectRingCall = [];
       },
 
      // 实现呼叫转移
        callTraverse() {
+         console.log(this.selectNowCall[0].channelUUID);
+         console.log(this.selectPhone[0].userID);
+         console.log(this.selectPhone[0].networkIP);
+         console.log(this.selectPhone[0].networkPort);
+         console.log(this.selectPhone[0]);
+         console.log(this.deviceList[0]);
+         console.log("1234567890"); 
          this.fsAPI("uuid_deflect",this.selectNowCall[0].channelUUID+" "+"sip:"+this.selectPhone[0].userID+"@"+this.selectPhone[0].networkIP+":"+this.selectPhone[0].networkPort,function(res) {console.log("call traverse")}.bind(this));
          this.selectPhone = [];
          this.selectNowCall = [];

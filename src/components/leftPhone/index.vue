@@ -9,9 +9,9 @@
       <div>
         <ul class="callNum">
           <!--<li v-for="item in callQueue">-->
-            <!--<i  class="fa fa-circle red" aria-hidden="true"></i>-->
-            <!--1005-->
-            <!--<span>00:00:01</span>-->
+          <!--<i  class="fa fa-circle red" aria-hidden="true"></i>-->
+          <!--1005-->
+          <!--<span>00:00:01</span>-->
           <!--</li>-->
           <li v-for="item in callQueue" @click="answerCall(item)">
             <!--<i  class="fa fa-circle red" aria-hidden="true"></i>-->
@@ -32,31 +32,15 @@
         <i aria-hidden="true" class="fa fa-2x" :class="item.class"></i>
         <span>{{item.name}}</span>
       </div>
-      <div class="dialDisplay">
-        <div @click="keypad('1')" class="dial">1</div>
-        <div @click="keypad('2')" class="dial">2</div>
-        <div @click="keypad('3')" class="dial">3</div>
-        <div @click="keypad('4')" class="dial">4</div>
-        <div @click="keypad('5')" class="dial">5</div>
-        <div @click="keypad('6')" class="dial">6</div>
-        <div @click="keypad('7')" class="dial">7</div>
-        <div @click="keypad('8')" class="dial">8</div>
-        <div @click="keypad('9')" class="dial">9</div>
-        <div @click="keypad('*')" class="dial">*</div>
-        <div @click="keypad('0')" class="dial">0</div>
-        <div @click="keypad('#')" class="dial">#</div>
-      </div>
-      <div class="dialAction">
-        <div class="dial" @click="callDivert">呼叫转移</div>
-        <div class="dial ring" @click="makeCall"><i class="fa fa-phone fa-2x" aria-hidden="true"></i></div>
-        <div class="dial hangup" @click="hangupCall">挂断</div>
-      </div>
+
+
     </div>
   </div>
 
 </template>
 
 <script>
+  import { mapGetters, mapActions } from 'vuex'
   const btnData = [
     { name: '邀请成员', class: 'fa-user-plus' },
     { name: '允许通话', class: 'fa-microphone' },
@@ -76,8 +60,8 @@
     },
     created() {
       this.$nextTick(function () {
-        getHeight()
-//        $.verto.init({}, this.bootstrap);
+        // getHeight()
+        //        $.verto.init({}, this.bootstrap);
       })
     },
     computed: {
@@ -90,13 +74,13 @@
       }),
     },
     watch: {
-      'callQueue': function() {
+      'callQueue': function () {
 
       }
     },
     methods: {
       clear() {
-        this.destination_number = this.destination_number.substring(0, this.destination_number.length-1)
+        this.destination_number = this.destination_number.substring(0, this.destination_number.length - 1)
       },
       keypad(value) {
         this.destination_number = this.destination_number + value
@@ -106,8 +90,8 @@
       },
       callDivert() {
         // 呼叫转移
-        if(this.destination_number != '') {
-          this.$store.dispatch('CallDivert', {type: true, num: this.destination_number})
+        if (this.destination_number != '') {
+          this.$store.dispatch('CallDivert', { type: true, num: this.destination_number })
         }
       },
       makeCall() {

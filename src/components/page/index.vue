@@ -19,7 +19,7 @@
         'pageData',
       ])
     },
-    created() {                                         //  监听路由变化, 重置分页参数
+    created() {
       this.$store.state.pageData = {
         total: 0,
         pageIndex: 1,

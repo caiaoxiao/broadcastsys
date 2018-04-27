@@ -9,8 +9,6 @@ import switchs from 'components/switchs/index.vue'
 import callDivert from 'components/callDivert/index.vue'
 import toolTip from 'components/toolTip/index.vue'
 import page from 'components/page/index.vue'
-
-
 export {
   topMenu,
   container,

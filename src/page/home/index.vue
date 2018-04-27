@@ -21,14 +21,14 @@
     created() {
       this.$nextTick(function() {
         // 初始化vertoHandle
-	if(this.vertoHandle==null)
-        $.verto.init({}, this.initVertoHandle);
-	else
-	console.log('verto aleray not null')
+        if(this.vertoHandle==null)
+          $.verto.init({}, this.initVertoHandle);
+        else
+          console.log('verto aleray not null')
 
       })
     },
-        computed: {
+    computed: {
       ...mapGetters({
         vertoHandle:'vertoHandle',
         group_users:'group_users',
@@ -40,16 +40,16 @@
     },
     watch: {
       'callQueue': function(call) {
-                if(call[0].des=='9110');
-		{
-	        var url = 'screen.html' 
-		var s1 =  "?s1=http://192.168.1.33:8080/tKLk3X2yLb5Iptzio06dU52GNG9HhlSi/embed/eIJvmiC/ZRXTod4Th2/jquery|fullscreen"; 	
-		var s2 =  "" //&s2=http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4";
-		var s3 =  "" // &s3=http://www.w3school.com.cn/example/html5/mov_bbb.mp4";
-		var s4 =  "" //&s4=https://media.w3.org/2010/05/sintel/trailer.mp4";
-		window.open(url+s1+s2+s3+s4,'newwindow','height=1920,width=1080,top=0,left=0,toolbar=no,menubar=no,scrollbars=no,location=no, status=no');
-		}
-               // this.$router.push({path:'/video'});
+        if(call[0].des=='9110');
+        {
+          var url = 'screen.html'
+          var s1 =  "?s1=http://192.168.1.33:8080/tKLk3X2yLb5Iptzio06dU52GNG9HhlSi/embed/eIJvmiC/ZRXTod4Th2/jquery|fullscreen";
+          var s2 =  "" //&s2=http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4";
+          var s3 =  "" // &s3=http://www.w3school.com.cn/example/html5/mov_bbb.mp4";
+          var s4 =  "" //&s4=https://media.w3.org/2010/05/sintel/trailer.mp4";
+          window.open(url+s1+s2+s3+s4,'newwindow','height=1920,width=1080,top=0,left=0,toolbar=no,menubar=no,scrollbars=no,location=no, status=no');
+        }
+        // this.$router.push({path:'/video'});
       }
     },
     methods: {
@@ -81,138 +81,138 @@
             onWSClose(verto, success) {
               console.log('onWSClose', success);
             },
-	    onDialogState: function(d) {
-            let arr = []
-            let callType = d.direction.name
+            onDialogState: function(d) {
+              let arr = []
+              let callType = d.direction.name
               if (d.cause == "USER_NOT_REGISTERED")
               {
-                //do nothing 
+                //do nothing
               }
               else {
-              switch (d.state.name) {
-                case "trying":
-                  break;
-                case "ringing":       // 振铃，装载进队列
-                  arr.push({
-                    curCall: d,
-                    state: d.state.name,
-                    caller: d.params.caller_id_number,
-		    des:d.params.callee_id_number
-                  })
-                  _this.$store.dispatch('setCallQueue', arr)
-                  break;
-                case "requesting":
-                  arr.push({
-                    curCall:d, 
-                    state: d.state.name,
-                    caller: d.params.caller_id_number,
-		    des:d.params.destination_number
-                  })
-                   _this.$store.dispatch('setCallQueue',arr)
-		break;
-                case "answering":     // 接听电话，改变状态
-                  break;
-                case "active":
-                  break;
-                case "hangup":        //  拒接，改变状态
-                  arr = _this.$store.getters.callQueue
-                  arr.forEach(function(a, i){
-                    if(a.caller == d.params.caller_id_number &&  (a.des == d.params.destination_number || a.des==d.params.callee_id_number)) {
-                      arr.splice(i,1);
-                    }
-                  })
-                  _this.$store.dispatch('setCallQueue', arr)
-                  console.log("Call ended with cause: " + d.cause);
-                  break;
-                case "destroy":
-                  // Some kind of client side cleanup...
-                  break;
-		default:
-			console.log(d.state.name);
+                switch (d.state.name) {
+                  case "trying":
+                    break;
+                  case "ringing":       // 振铃，装载进队列
+                    arr.push({
+                      curCall: d,
+                      state: d.state.name,
+                      caller: d.params.caller_id_number,
+                      des:d.params.callee_id_number
+                    })
+                    _this.$store.dispatch('setCallQueue', arr)
+                    break;
+                  case "requesting":
+                    arr.push({
+                      curCall:d,
+                      state: d.state.name,
+                      caller: d.params.caller_id_number,
+                      des:d.params.destination_number
+                    })
+                    _this.$store.dispatch('setCallQueue',arr)
+                    break;
+                  case "answering":     // 接听电话，改变状态
+                    break;
+                  case "active":
+                    break;
+                  case "hangup":        //  拒接，改变状态
+                    arr = _this.$store.getters.callQueue
+                    arr.forEach(function(a, i){
+                      if(a.caller == d.params.caller_id_number &&  (a.des == d.params.destination_number || a.des==d.params.callee_id_number)) {
+                        arr.splice(i,1);
+                      }
+                    })
+                    _this.$store.dispatch('setCallQueue', arr)
+                    console.log("Call ended with cause: " + d.cause);
+                    break;
+                  case "destroy":
+                    // Some kind of client side cleanup...
+                    break;
+                  default:
+                    console.log(d.state.name);
+                }
               }
-            }
-            
 
-          },
-              
-          onMessage:function(verto, dialog, message, data) {
-	  console.log('this is a message',message)
-	  let _this = this
-          var initLiveArray =  function(verto, dialog, data,pbx,room) {
-          // Set up addtional configuration specific to the call.
-          var config = {subParams: {callID: dialog ? dialog.callID : null},};
-          // Set up the live array, using the live array data received from FreeSWITCH.
-         _this.liveArray = new $.verto.liveArray(verto,pbx,room, config);
-         // Subscribe to live array changes.
-         _this.liveArray.onChange = function(liveArrayObj, args) {
-         try {
-         switch (args.action) {
 
-          // Initial list of existing conference users.
-          case "bootObj":
-            break;
+            },
 
-          // New user joined conference.
-          case "add":
-            console.log('conference user added')
-            break;
+            onMessage:function(verto, dialog, message, data) {
+              console.log('this is a message',message)
+              let _this = this
+              var initLiveArray =  function(verto, dialog, data,pbx,room) {
+                // Set up addtional configuration specific to the call.
+                var config = {subParams: {callID: dialog ? dialog.callID : null},};
+                // Set up the live array, using the live array data received from FreeSWITCH.
+                _this.liveArray = new $.verto.liveArray(verto,pbx,room, config);
+                // Subscribe to live array changes.
+                _this.liveArray.onChange = function(liveArrayObj, args) {
+                  try {
+                    switch (args.action) {
 
-          // User left conference.
-          case "del":
-          console.log('conference user deleted')
-            break;
+                      // Initial list of existing conference users.
+                      case "bootObj":
+                        break;
 
-          // Existing user's state changed (mute/unmute, talking, floor, etc)
-          case "modify":
-          console.log('conference user changed')
-            break;
+                      // New user joined conference.
+                      case "add":
+                        console.log('conference user added')
+                        break;
 
-            }
-          } catch (err) {
-             console.error("ERROR: " + err);
-            }
-            };
-    // Called if the live array throws an error.
-    _this.liveArray.onErr = function (obj, args) {
-      console.error("Error: ", obj, args);
-       }
-      }
-          switch (message) {
-              case $.verto.enum.message.pvtEvent:
+                      // User left conference.
+                      case "del":
+                        console.log('conference user deleted')
+                        break;
+
+                      // Existing user's state changed (mute/unmute, talking, floor, etc)
+                      case "modify":
+                        console.log('conference user changed')
+                        break;
+
+                    }
+                  } catch (err) {
+                    console.error("ERROR: " + err);
+                  }
+                };
+                // Called if the live array throws an error.
+                _this.liveArray.onErr = function (obj, args) {
+                  console.error("Error: ", obj, args);
+                }
+              }
+              switch (message) {
+                case $.verto.enum.message.pvtEvent:
                   if (data.pvtData) {
                     switch (data.pvtData.action) {
                       // This client has joined the live array for the conference.
-                       case "conference-liveArray-join":
-                      // With the initial live array data from the server, you can
-                      // configure/subscribe to the live array.
-                      break;
+                      case "conference-liveArray-join":
+                        // With the initial live array data from the server, you can
+                        // configure/subscribe to the live array.
+                        break;
                       // This client has left the live array for the conference.
                       case "conference-liveArray-part":
-	 	 console.log('part')
-                      // Some kind of client-side wrapup...
-                      break;
-                     }
-             }                       
-              break;
-                      // TODO: Needs doc.
-          case $.verto.enum.message.info:
-	 	 console.log('info')
-              break;
-                      // TODO: Needs doc.
-          case $.verto.enum.message.display:
-	 	 console.log('display')
-              break;
-          case $.verto.enum.message.clientReady:
-      // 1.8.x+
-      // Fired when the server has finished re-attaching any active sessions.
-      // data.reattached_sessions contains an array of session IDs for all
-      // sessions that were re-attached.
-                initLiveArray(verto, dialog, data,"conference-liveArray.9100-scc.ieyeplus.com@scc.ieyeplus.com","9100-scc.ieyeplus.com");
-                initLiveArray(verto, dialog, data,"conference-liveArray.9110-scc.ieyeplus.com@scc.ieyeplus.com","9110-scc.ieyeplus.com");
-              console.log('verto channel ready')
-            break;
+                        console.log('part')
+                        // Some kind of client-side wrapup...
+                        break;
+                    }
+                  }
+                  break;
+                // TODO: Needs doc.
+                case $.verto.enum.message.info:
+                  console.log('info')
+                  break;
+                // TODO: Needs doc.
+                case $.verto.enum.message.display:
+                  console.log('display')
+                  break;
+                case $.verto.enum.message.clientReady:
+                  // 1.8.x+
+                  // Fired when the server has finished re-attaching any active sessions.
+                  // data.reattached_sessions contains an array of session IDs for all
+                  // sessions that were re-attached.
+                  initLiveArray(verto, dialog, data,"conference-liveArray.9100-scc.ieyeplus.com@scc.ieyeplus.com","9100-scc.ieyeplus.com");
+                  initLiveArray(verto, dialog, data,"conference-liveArray.9110-scc.ieyeplus.com@scc.ieyeplus.com","9110-scc.ieyeplus.com");
+                  console.log('verto channel ready')
+                  break;
+              }
             }
-        }
           }))
       },
       //  设备状态实时更新
@@ -223,6 +223,7 @@
       },
       // 查询所有设备 以及事件初始化
       refresh() {
+          debugger
 //        let xuiUsername = localStorage.getItem('xui.username')
         let xuiUsername = 9000 // 过滤掉登陆者
         this.$store.dispatch('setCurrentLoginUser',{
@@ -231,7 +232,7 @@
           callDirection: null,
           channelUUID: null,
           oppoChannelUUID: null
-      })
+        })
         this.vertoHandle.sendMethod("jsapi",{command:"fsapi", data:{cmd:"show", arg:"registrations as xml"}},
           function(data) {
             const parser = new DOMParser();
@@ -259,8 +260,8 @@
                 user.callDirection = null
                 user.channelUUID = null
                 user.networkIP = r.network_ip
-                user.networkPort = r.network_port 
-                user.operationState = 0 
+                user.networkPort = r.network_port
+                user.operationState = 0
                 user.oppoChannelUUID = null
                 deviceList.push(user)
               }
@@ -322,7 +323,7 @@
           }
         )
       },
-    
+
       fsAPI(cmd, arg, success_cb, failed_cb) {
         this.vertoHandle.sendMethod("jsapi",{
           command: "fsapi",
@@ -331,7 +332,7 @@
             arg: arg
           },
         }, success_cb, failed_cb);
-      }, 
+      },
       handleFSEventChannel(v, e) {
         let callDirection = e.data["Call-Direction"];            //入栈还是出栈
         let callerNumber = e.data["Caller-Caller-ID-Number"];    //主叫号码
@@ -354,38 +355,38 @@
         }
         // 入栈
         if (callDirection == "inbound") {
-          
+
           if ('9000' == callerNumber && '9001' == calleeNumber && channelCallState == 'ringing') {
             users.forEach(function(user) {
-               if(user.operationState == 1) {
-                 user.operationState = 0;
-                 _this.fsAPI("uuid_bridge", channelUUID + " " + user.channelUUID, function(res) {console.log("qiang call")}.bind(this)); 
-                 usersChanged = true;
-               }
-               else if (user.operationState == 2) {
-                 user.operationState = 0
-                 _this.fsAPI("uuid_bridge", channelUUID + " " + user.oppoChannelUUID, function(res) {console.log("qiang delete")}.bind(this))
-                 usersChanged = true;
-               }
-               else if (user.operationState == 3) {
-                 user.operationState = 0
-                 console.log(user.userID);
-                 console.log(channelUUID);
-                 console.log(user.channelUUID);
-                 console.log(user.oppoChannelUUID); 
-                 console.log("99999999999999"); 
-                 _this.fsAPI("uuid_bridge", user.oppoChannelUUID + " " + channelUUID, function(res) {console.log("daijie")}.bind(this))
-                 usersChanged = true;
-               } 
-           })
-          } 
-           else if (callerNumber == '9000') {
-                  currentLoginUser.channelUUID = channelUUID;
-                  currentLoginUser.deviceState = channelCallState;
-                  currentLoginUser.callDirection = callDirection;
-                  currentLoginUserChanged = true;
-           }        
-           else {
+              if(user.operationState == 1) {
+                user.operationState = 0;
+                _this.fsAPI("uuid_bridge", channelUUID + " " + user.channelUUID, function(res) {console.log("qiang call")}.bind(this));
+                usersChanged = true;
+              }
+              else if (user.operationState == 2) {
+                user.operationState = 0
+                _this.fsAPI("uuid_bridge", channelUUID + " " + user.oppoChannelUUID, function(res) {console.log("qiang delete")}.bind(this))
+                usersChanged = true;
+              }
+              else if (user.operationState == 3) {
+                user.operationState = 0
+                console.log(user.userID);
+                console.log(channelUUID);
+                console.log(user.channelUUID);
+                console.log(user.oppoChannelUUID);
+                console.log("99999999999999");
+                _this.fsAPI("uuid_bridge", user.oppoChannelUUID + " " + channelUUID, function(res) {console.log("daijie")}.bind(this))
+                usersChanged = true;
+              }
+            })
+          }
+          else if (callerNumber == '9000') {
+            currentLoginUser.channelUUID = channelUUID;
+            currentLoginUser.deviceState = channelCallState;
+            currentLoginUser.callDirection = callDirection;
+            currentLoginUserChanged = true;
+          }
+          else {
             users.forEach(function(user) {
               if (user.userID  == callerNumber) {
                 user.channelUUID = channelUUID;
@@ -405,9 +406,9 @@
             currentLoginUser.callDirection = callDirection;
             currentLoginUserChanged = true;
           }
-           
-                
-           else {
+
+
+          else {
             let opChannelUUID = e.data["Other-Leg-Unique-ID"];
 
             users.forEach(function(user){

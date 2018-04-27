@@ -9,7 +9,7 @@ import ElementUI from 'element-ui'
 // 导入axios
 import axios from 'axios'
 // axios.defaults.baseURL = 'https://scc.ieyeplus.com:8082'
-axios.defaults.baseURL = 'https://scc.ieyeplus.com:8443/IpBc'
+// axios.defaults.baseURL = 'https://scc.ieyeplus.com:8443/IpBc'
 Vue.prototype.$ajax = axios
 // 导入JQ
 import $ from 'jquery'

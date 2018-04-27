@@ -252,3 +252,7 @@ ul.userList>li.active{color:#c9302c;border-color: #c9302c;}
 .table .el-table__header-wrapper thead div{background: none; color: #7496B8;}
 .el-input input {background:none; color: #555; border: 0px; margin-top:-6px; padding: 0px;}
 .table .el-table tr{background: none;}
+
+.dept .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content,
+.dept .el-tree-node__content:hover,.dept .el-tree{background: none; border: 0px;}
+.dept .el-tree-node__expand-icon{border-left-color:#fff;}

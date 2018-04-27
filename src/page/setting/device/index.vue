@@ -4,46 +4,49 @@
       <div class="operate">
         <form class="form-inline">
           <div class="form-group">
-            <input type="text" placeholder="" class="form-control select-width" style="width:200px;" />
+            <input type="text" placeholder="" class="form-control select-width" v-model="searchName" style="width:200px;" />
           </div>
-          <button type="submit" class="btn btn-info"><i class="fa fa-search" aria-hidden="true"></i>查询</button>
+          <button type="submit" class="btn btn-info" @click="refresh"><i class="fa fa-search" aria-hidden="true"></i>查询</button>
           <button type="submit" class="btn btn-info" @click="openModal(0)"><i class="fa fa-search" aria-hidden="true"></i>新增</button>
         </form>
       </div>
     </div>
+
     <div class="table">
       <table class="table">
         <thead>
         <tr>
-          <td>ID</td>
           <td>设备号</td>
+          <td>设备编号</td>
           <td>设备名称</td>
           <td>设备类型</td>
           <td>操作</td>
         </tr>
         </thead>
-        <tbody>
-        <tr>
-          <td>890-790-kkldalkkl</td>
-          <td>1001</td>
-          <td>隋岳1车道1号亭</td>
-          <td>单话机</td>
+        <tbody v-if="dataAll.length != 0">
+        <tr @click="selectClick(index, item)" v-for="(item, index) in dataAll">
+          <td>{{item.FeatureBaseID}}</td>
+          <td>{{item.FeatureCode}}</td>
+          <td>{{item.FeatureName}}</td>
           <td>
-            <button type="submit" class="btn btn-sm btn-info">修改</button>
+            {{ item.FeatureType == 0 ? '单话机' : '视频话机' }}
+          </td>
+          <td>
+            <button type="submit" class="btn btn-sm btn-info" @click="openModal(item.OrganizationID)">修改</button>
+            <button type="submit" class="btn btn-sm btn-default" @click="deleteItems(self, 'Feature/Remove', item.FeatureBaseID)">删除</button>
           </td>
         </tr>
-        <tr>
+        <!--<tr>
           <td>890-790-kkldalkkl</td>
           <td><input type="text" value="1002" class="form-control select-width" style="width:200px;" /></td>
           <td><input type="text" value="隋岳1车道2号亭" class="form-control select-width" style="width:200px;" /></td>
-          <td>视频终端</td>
           <td><button type="submit" class="btn btn-sm btn-info">确定</button></td>
-        </tr>
+        </tr>-->
         </tbody>
       </table>
     </div>
     <div v-if="dialogFormVisible">
-      <modal :data="orgData" @close="close"></modal>
+      <modal :data="formData"></modal>
     </div>
   </div>
 </template>
@@ -56,6 +59,7 @@
       ...mapGetters({
         get_user_info: GET_USER_INFO,
         dialogFormVisible: 'dialogFormVisible',
+        pageData: 'pageData',
         deviceList:'deviceList'          // 所有设备
       })
     },
@@ -63,163 +67,78 @@
       return {
         labels: {
           defaultId: "OrganizationID",
-          treeName: "OrgName"
         },
-        dataAll: null,
+        dataAll: [],
+        selectPlan: [],
         //请求时的loading效果
         loading: true,
-        //批量选择数组
-        batch_select: [],
-        orgData: {
-          OrganizationID: this.$store.state.user_info.user.OrganizationID,
-          OrgName: '',
-          orgId: '',
-          userId: '0',
-          userName: '',
-          userAccount: '',
+        self: this,
+        searchName: '',
+        formData: {
+          pid: 0,
+          FeatureBaseID:''
         },
+        FeatureType:[{'0':'单话机'},{'1':'视频话机'}]
+      }
+    },
+    watch: {
+      'pageData.pageSize': function () {
+        this.refresh()
+      },
+      'pageData.pageIndex': function () {
+        this.refresh()
       }
     },
     components: {
       modal
     },
+    created() {
+      this.refresh();
+    },
     methods: {
-      openModal(id){
-          debugger
-          this.deviceList;
-        this.orgData.userId=id;
-        this.$store.state.dialogFormVisible = true
-      },
-      changeOrg(Id){
-        this.orgData.userId=Id;
-        this.changeTitle='分配';
-        this.chanOrg=true;
-      },
-      initSelectData() {
-        var request = {
-          pageSize: this.pageData.pageSize,
-          pageIndex: this.pageData.pageIndex
-        }
-        this.departlist = []
-        this.rolelist = []
-        this.$AjaxPost('Department/List',request, function(ret) {
-          if(ret.code == 1) {
-            this.departlist = ret.result
-            /*this.departlist.unshift({
-             DepartName: "请选择部门",
-             DepartmentID: ''
-             })*/
-
-          }
-        }.bind(this))
-        this.$AjaxPost('Role/List',request, function(ret) {
-          if(ret.code == 1) {
-            this.rolelist = ret.result;
-            this.rolelist.unshift({
-              RoleName: "请选择角色",
-              RoleID: ''
-            })
-          }
-        }.bind(this));
-      },
-      initDatas (data) {
-        if(!this.targetMenu.hasOwnProperty("OrganizationID") && data) {
-          this.orgData = data
-          this.orgData.OrganizationID = data.OrganizationID;
-          this.refresh()
-        }
-      },
       //获取数据
       refresh(){
         var request = {
-          userName: this.orgData.userName,
-          userPhone: this.orgData.userAccount,
           pageSize: this.pageData.pageSize,
           pageIndex: this.pageData.pageIndex,
-          departmentID: this.deptId,
-          roleID: this.roleId,
-          organizationID:this.orgData.OrganizationID
-        };
-        this.$AjaxPost("User/List",request, function(ret) {
+        }
+        this.$AjaxPost("Feature/List",request, function(ret) {
           if(ret.code == 1){
             let result = ret.result
             this.pageData.total=ret.total
-            this.dataAll= result
+            this.dataAll = result
+            for(let i in this.dataAll) {
+              this.formData.FeatureBaseID = this.dataAll[i].FeatureBaseID
+            }
             this.loading = false
           }
         }.bind(this));
       },
-      resetPWD(userId){
-        this.$confirm('是否重置密码?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        })
-          .then(() => {
-            let request = {
-              userID: userId,
-              LoginId:this.get_user_info.user.UserID,
-              OperatorObject: "密码重置",
-            };
-            this.$AjaxPost('User/EditPwd', request, function (ret) {
-              if(ret.code == 1){
-                this.refresh()
-                this.$message.success("修改成功！")
-              }else{
-                this.$message.success("修改失败！")
-              }
-            }.bind(this))
-          })
-      },
-      //批量选择
-      on_batch_select(val){
-        this.batch_select = val
-      },
-      //批量删除
-      on_batch_del(){
-        var batchArr=[];
-        for(var i=0;i<this.batch_select.length;i++){
-          batchArr.push(this.batch_select[i].UserID);
-        }
-        var request = {
-          Ids: batchArr,
-          LoginId: this.get_user_info.user.UserID,
-          OperatorObject: "人员信息"
-        };
-        this.$confirm('此操作将批量删除选择数据, 是否继续?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        })
-          .then(() => {
-            this.loading = true
-            this.$AjaxPost('User/RemoveList/',request, function(ret){
-              if(ret.code == 1){
-                this.refresh()
-                this.$refs.tree.refresh(this.targetMenu);
-                this.$message.success("删除成功！")
-              }else{
-                this.$message.success("删除失败！")
-              }
-            })
-          })
-
-      },
-      close(){
-        if(this.dialogFormVisible){
-          this.$store.state.dialogFormVisible = false;
-          this.$refs.tree.refresh(this.targetMenu);
-          this.refresh();
+      openModal(id) {
+        //  编辑或新增
+        this.$store.state.dialogFormVisible = true
+        if(id == 0) {
+          this.formData.pid = 0
+        }else if(id == 1){
+          this.formData.pid = this.parentID
+        }else {
+          this.formData.pid = id
         }
       },
-      closeChange(){
-        if(this.chanOrg){
-          this.chanOrg=false;
-          this.$refs.tree.refresh(this.targetMenu);
-          this.refresh();
+      selectClick(index, plan) {
+        let target = $(".table>tbody>tr").eq(index)
+        if(target.hasClass('selected')) {
+          this.selectPlan.forEach(function(s, i) {
+            if(s.PlanID == plan.PlanID) {
+              this.selectPlan.splice(i, 1)
+            }
+          }.bind(this))
+        }else {
+          this.selectPlan.push(plan)
         }
+        this.selectPlan
+        target.toggleClass("selected")
       },
-
     }
   }
 </script>

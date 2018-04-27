@@ -104,16 +104,12 @@
     },
     created(){
       let $this=this;
-      this.pid = this.data.edits,
-      this.org.OperatorObject = "组织机构信息";
+      this.pid = this.data.edits;
       if(this.data.orgId == 0){
-        this.title='机构管理—机构新增';
         this.org.fullName = this.data.OrgName;
         this.org.parentID = this.data.OrganizationID;
         this.org.OrganizationID = this.data.OrganizationID;
       }else{
-          debugger
-        this.title= '机构管理—机构编辑';
         this.$AjaxGet("Organization/Detail/", this.data.orgId, function(ret) {
           let result = ret.result;
           if(ret.code != 0) {
@@ -125,9 +121,7 @@
             $this.org.orgCode = result.OrgCode
           }
         });
-
       }
-
     },
     computed: {
       ...mapGetters({

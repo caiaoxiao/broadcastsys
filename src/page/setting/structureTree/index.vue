@@ -1,7 +1,8 @@
 <template>
   <div class="groupList">
     <div class="menuType">
-      <i class="fa fa-list-ul" aria-hidden="true"></i>组织机构</div>
+      <i class="fa fa-list-ul" aria-hidden="true"></i>组织机构
+    </div>
     <div class="dept">
       <el-tree
         ref="tree"
@@ -57,7 +58,7 @@
       ]),
       refresh() {
         let data;
-        this.$ajax.get(this.Api + 'Organization/TreeRoot/' + this.$store.state.user_info.user.OrganizationID)
+        this.$ajax.get(this.Api + 'Organization/Data/' + this.$store.state.user_info.user.OrganizationID)
           .then((res) => {
             data = res.data.result
             this.data = data
@@ -73,6 +74,7 @@
           });
       },
       handleNodeClick(data, node, event) {
+          debugger
         if(event) {                           // 判断点击的是否为默认选中的树节点，如果不是，取消默认选中
           if(node.id != this.$refs.tree.$children[0].node.id) {
             this.$refs.tree.$children[0].$el.className = 'el-tree-node'

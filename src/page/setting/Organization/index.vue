@@ -11,23 +11,28 @@
             <i class="fa fa-search" aria-hidden="true"></i>批量删除
           </button>
         </div>
-        <!--<buttongroup @edits="openModal()" :btnGroupData="btnGroupData" :btns="btns" :batchSelectArr="batchSelectArr"></buttongroup>-->
       </div>
       <div class="table">
-        <el-table :data="dataAll" element-loading-text="拼命加载中" style="background-color: #4E545A">
-
-          <el-table-column type="selection" :span="2" :selectable="selectToggle" ></el-table-column>
-          <el-table-column prop="SortIndex" label="序号" :span="3"></el-table-column>
-          <el-table-column prop="OrgName" label="所属机构" :span="3"></el-table-column>
-          <el-table-column prop="OrgCode" label="机构编码" :span="3"></el-table-column>
-          <el-table-column prop="ChildNum" label="所属部门" :span="3"></el-table-column>
-          <el-table-column label="操作" :span="3">
-            <template>
-              <el-button :plain="true" type="info" size="small" icon="edit" @click="openModal(props.row.OrganizationID)">编辑</el-button>
-              <el-button :plain="true" type="danger" size="small" icon="delete" @click="deleteItems(self, 'Organization/Remove', props.row)">删除</el-button>
-            </template>
-          </el-table-column>
-        </el-table>
+        <table class="table">
+          <thead>
+          <tr>
+            <td>所属机构</td>
+            <td>机构编码</td>
+            <td>操作</td>
+          </tr>
+          </thead>
+          <tbody v-if="dataAll.length != 0">
+          <tr @click="selectClick(index, org)" v-for="(org, index) in dataAll">
+            <td >{{ org.OrgName }}</td>
+            <td >{{ org.OrgCode }}</td>
+            <td width="170">
+              <button type="submit" class="btn btn-sm btn-info" @click="openModal(org.OrganizationID)">修改</button>
+              <button type="submit" class="btn btn-sm btn-default" @click="deleteItems(self, 'Organization/Remove', org.OrganizationID)">删除</button>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+        <!--<paging></paging>-->
       </div>
       <div v-if="dialogFormVisible">
         <modal :data="orgData"></modal>
@@ -40,7 +45,6 @@
   import { mapGetters,mapActions} from 'vuex'
   import tree from "../structureTree/index.vue"
   import modal from "./edit"
-  import buttongroup from "../buttonGroup/index"
   import {GET_USER_INFO} from 'store/getters/type'
 
   export default {
@@ -48,8 +52,6 @@
       ...mapGetters({
         get_user_info: GET_USER_INFO,
         pageData: 'pageData',
-        btns: 'btns',
-        batchSelectArr: 'batchSelectArr',
         dialogFormVisible: 'dialogFormVisible',
         updateState: 'updateState',
         TreeData: 'TreeData'
@@ -57,22 +59,20 @@
     },
     data(){
       return {
-        btnGroupData: {
-          batchApi: 'Organization/RemoveList',
-          keyID: 'OrganizationID',
-        },
         labels: {
           defaultId: "OrganizationID",
           treeName: "OrgName"
         },
-        dataAll: null,
+        dataAll: [],
+        selectOrg: [],
         loading: true,
         //批量选择数组
         batch_select: [],
         orgData: {
           OrganizationID: '0',
           OrgName: '',
-          orgId: ''
+          orgId: '',
+          LoginId:''
         },
         self: this,
         editObj:{},
@@ -82,8 +82,7 @@
     },
     components: {
       modal,
-      tree,
-      buttongroup
+      tree
     },
     created(){
       this.orgData.OrganizationID = this.get_user_info.user.OrganizationID;
@@ -138,6 +137,22 @@
           this.$refs.tree.refresh(this.targetMenu);
           this.refresh();
         }
+      },
+      //选中行
+      selectClick(index, org) {
+        let target = $(".table>tbody>tr").eq(index)
+        if(target.hasClass('selected')) {
+          this.selectOrg.forEach(function(s, i) {
+            if(s.ChildNum == org.ChildNum) {
+              this.selectOrg.splice(i, 1)
+            }
+          }.bind(this))
+        }else {
+          this.selectOrg.push(org)
+        }
+        this.selectOrg
+        target.toggleClass("selected")
+
       },
       selectToggle(row) {
         if (row.ChildNum == 0) {

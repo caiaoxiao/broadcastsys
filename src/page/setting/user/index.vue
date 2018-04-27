@@ -1,5 +1,4 @@
 <template>
-  <div>
     <div class="content" >
       <tree :addr="OrgUrl" ref="tree" :lable="labels" @initData="initDatas"></tree>
       <div class="singleDevice">
@@ -8,26 +7,33 @@
             <button type="submit" class="btn btn-sm btn-info" @click="openModal(0)">
               <i class="fa fa-search" aria-hidden="true"></i>新增用户
             </button>
-            <button type="submit" class="btn btn-sm btn-info" :disabled="batch_select.length === 0" @click="on_batch_del">
+            <!--<button type="submit" class="btn btn-sm btn-info" :disabled="batch_select.length === 0" @click="on_batch_del">
               <i class="fa fa-search" aria-hidden="true"></i>批量删除
-            </button>
+            </button>-->
           </div>
         </div>
         <div class="table">
-          <el-table :data="dataAll" element-loading-text="拼命加载中" border @selection-change="on_batch_select">
-            <el-table-column type="selection" width="55"></el-table-column>
-            <el-table-column prop="UserName" label="用户名"></el-table-column>
-            <el-table-column prop="RoleName" label="角色"></el-table-column>
-            <el-table-column prop="OrgName" label="所属机构"></el-table-column>
-            <el-table-column prop="DepartName" label="所属部门"></el-table-column>
-            <el-table-column label="操作">
-              <template>
-                <el-button type="info" :plain="true" size="small" icon="edit">修改</el-button>
-                <el-button type="danger" :plain="true" size="small" icon="delete">删除</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
-        </div>
+          <table class="table">
+            <thead>
+              <tr>
+                <td>用户名</td>
+                <td>所属用户组</td>
+                <td>所属机构</td>
+                <td>操作</td>
+              </tr>
+            </thead>
+            <tbody v-if="userData.length != 0">
+              <tr @click="selectClick(index, user)" v-for="(user, index) in userData">
+                <td >{{ user.UserName }}</td>
+                <td >{{ user.DepartName }}</td>
+                <td >{{ user.OrgName }}</td>
+                <td width="170">
+                  <button type="submit" class="btn btn-sm btn-info" @click="openModal(user.OrganizationID)">修改</button>
+                  <button type="submit" class="btn btn-sm btn-default" @click="deleteItems(self, 'User/Remove', user.UserID)">删除</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         <!--<paging></paging>-->
       </div>
       <div v-if="dialogFormVisible">
@@ -47,8 +53,6 @@
       ...mapGetters({
         get_user_info: GET_USER_INFO,
         pageData:'pageData',
-        btns:'btns',
-        batchSelectArr: 'batchSelectArr',
         dialogFormVisible: 'dialogFormVisible',
         updateState: 'updateState',
         TreeData: 'TreeData'
@@ -60,18 +64,18 @@
           defaultId: "OrganizationID",
           treeName: "OrgName"
         },
-        dataAll: null,
+        selectUser: [],
+        userData:{
+          OrganizationID:''
+        },
         //请求时的loading效果
         loading: true,
         //批量选择数组
         batch_select: [],
         orgData: {
+          pid:0,
           OrganizationID: this.$store.state.user_info.user.OrganizationID,
-          OrgName: '',
           orgId: '',
-          userId: '0',
-          userName: '',
-          userAccount: '',
         },
         departlist:[],
         rolelist:[],
@@ -129,9 +133,16 @@
       this.refresh()
     },
     methods: {
-      openModal(id){
-        this.orgData.userId=id;
+      openModal(id) {
+        //  编辑或新增
         this.$store.state.dialogFormVisible = true
+        if(id == 0) {
+          this.orgData.orgId = 0
+        }else if(id == 1){
+          this.orgData.orgId = this.parentID
+        }else {
+          this.orgData.orgId = id
+        }
       },
       changeOrg(Id){
         this.orgData.userId=Id;
@@ -148,11 +159,6 @@
         this.$AjaxPost('Department/List',request, function(ret) {
           if(ret.code == 1) {
             this.departlist = ret.result
-            /*this.departlist.unshift({
-              DepartName: "请选择部门",
-              DepartmentID: ''
-            })*/
-
           }
         }.bind(this))
         this.$AjaxPost('Role/List',request, function(ret) {
@@ -175,44 +181,34 @@
       //获取数据
       refresh(){
         var request = {
-          userName: this.orgData.userName,
-          userPhone: this.orgData.userAccount,
           pageSize: this.pageData.pageSize,
           pageIndex: this.pageData.pageIndex,
-          departmentID: this.deptId,
-          roleID: this.roleId,
           organizationID:this.orgData.OrganizationID
         };
         this.$AjaxPost("User/List",request, function(ret) {
           if(ret.code == 1){
             let result = ret.result
             this.pageData.total=ret.total
-            this.dataAll= result
+            this.userData= result
             this.loading = false
           }
         }.bind(this));
       },
-      resetPWD(userId){
-        this.$confirm('是否重置密码?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        })
-          .then(() => {
-            let request = {
-              userID: userId,
-              LoginId:this.get_user_info.user.UserID,
-              OperatorObject: "密码重置",
-            };
-            this.$AjaxPost('User/EditPwd', request, function (ret) {
-              if(ret.code == 1){
-                this.refresh()
-                this.$message.success("修改成功！")
-              }else{
-                this.$message.success("修改失败！")
-              }
-            }.bind(this))
-          })
+      //选中行
+      selectClick(index, user) {
+        let target = $(".table>tbody>tr").eq(index)
+        if(target.hasClass('selected')) {
+          this.selectUser.forEach(function(s, i) {
+            if(s.roleID == user.roleID) {
+              this.selectUser.splice(i, 1)
+            }
+          }.bind(this))
+        }else {
+          this.selectUser.push(user)
+        }
+        this.selectUser
+        target.toggleClass("selected")
+
       },
       //批量选择
       on_batch_select(val){

@@ -1,206 +1,272 @@
 <template>
-  <!--修改or新增用户组-->
-  <div :visible.sync="dialogFormVisible">
-    <div class="popUpbig">
-      <div class="popContent">
-        <el-form ref="formData" :model="dept" :rules="rules">
-          <div class="menuChoose">
-            <h5><i class="fa fa-user-plus"></i></h5>
-              <div class="row">
-                <div class="col-md-6">
-                  <div class="form-group">
-                    <label class="col-sm-2 control-label">用户组</label>
-                    <div class="col-sm-10">
-                      <input type="text" class="form-control" v-model.trim="dept.departname" @click="checkDeptName(dept.departname)">
-                      <el-row>
-                        <span v-if="!isSameParent" style="color: red">不能和上级部门一样!</span>
-                        <span v-if="!ckDeptName" style="color: red">部门重复!</span>
-                      </el-row>
-                    </div>
-                  </div>
-                </div>
-              </div>
+  <!--新增用户至用户组-->
+  <div :visible.sync="dialog" :before-close="update">
+    <div class="popUpbig" id="add" STYLE="display: block">
+      <div class="groupName"><i class="fa fa-user-plus" ></i>新增用户组</div>
+      <div class="orgDisplay">
+        <form class="form-inline">
+          <div class="form-group"style="width: calc(100% - 90px)">
+            <input class="form-control" style="width: 100%" type="text" placeholder="快速查找用户">
           </div>
-          <div class="menuChoose">
-            <h5><i class="fa fa-address-card"></i>菜单权限</h5>
-            <ol class="menuItem clearfix">
-              <li>语音通话</li>
-              <li>IP广播</li>
-              <li>视频</li>
-              <li>会议</li>
-              <li>广播预约</li>
-              <li>系统管理</li>
-              <li>地图</li>
-            </ol>
-          </div>
-          <div class="menuChoose">
-            <h5><i class="fa fa-clipboard"></i>设备组权限</h5>
-            <div class="row">
-              <div class="col-md-6">
-                <div class="subItemTitle">
-                  设备组里列表
-                  <label class="checkbox-inline">
-                    <input type="checkbox" id="inlineCheckbox1" value="option1"> 全选
-                  </label>
-                </div>
-                <ol class="menuItem clearfix">
-                  <li>设备组名</li>
-                  <li>设备组名</li>
-                  <li>设备组名</li>
-                  <li>设备组名</li>
-                  <li>设备组名</li>
-                  <li>设备组名</li>
-                  <li>设备组名</li>
-                </ol>
-              </div>
-              <div class="col-md-6">
-                <div class="subItemTitle">
-                  已选列表
-                  <button type="button" class="btn btn-sm btn-danger">全部移除</button>
-                </div>
-                <ol class="menuItem clearfix">
-                  <li>设备组名</li>
+          <button type="submit" class="btn btn-sm btn-info">
+            <i aria-hidden="true" class="fa fa-search"></i>查询
+          </button>
+        </form>
+        <div class="orgList">
 
-                </ol>
-              </div>
-            </div>
-          </div>
-        </el-form>
+          <ul class="dept">
+            <li><i class="fa fa-caret-right"></i><a>一级机构</a>
+              <ul>
+                <li><i class="fa fa-caret-down"></i><a class="selected">二级机构</a>
+                  <ul>
+                    <li><a>三级机构</a></li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+            <li><a>一级机构</a></li>
+          </ul>
+        </div>
+        <div class="orgMember">
+
+          <ul class="userList">
+            <li class="selected"><i class="fa fa-user" ></i>马大哈<span class="fa fa-check-circle"></span></li>
+            <li><i class="fa fa-user" ></i>马中哈<span class="fa fa-check-circle"></span></li>
+            <li><i class="fa fa-user" ></i>马小哈<span class="fa fa-check-circle"></span></li>
+            <li><i class="fa fa-user" ></i>admin<span class="fa fa-check-circle"></span></li>
+            <li><i class="fa fa-user" ></i>cools<span class="fa fa-check-circle"></span></li>
+            <li><i class="fa fa-user" ></i>嗯哼<span class="fa fa-check-circle"></span></li>
+            <li><i class="fa fa-user" ></i>吴亦凡<span class="fa fa-check-circle"></span></li>
+            <li><i class="fa fa-user" ></i>嘻哈哥<span class="fa fa-check-circle"></span></li>
+          </ul>
+          <div class="selectAll">全选</div>
+        </div>
       </div>
+      <div class="selectedMember">
+        <div class="groupName"><i class="fa fa-users" ></i>隋岳组</div>
+        <ul class="userList">
+          <li class="active"><i class="fa fa-user" ></i>马大哈<span class="fa fa-times-circle"></span></li>
+
+        </ul>
+        <div class="selectAll">全部移除</div>
+      </div>
+
       <div class="btnDiv">
-        <button type="submit" class="btn btn-sm btn-info" @click="submitFrom(self, data.deptId, 'Department/Create', 'Department/Edit', dept)">确定</button>
-        <button type="submit" class="btn btn-sm btn-default" @click="close">取消</button>
+        <button type="submit" class="btn btn-sm btn-info">确定</button>
+        <button type="submit" class="btn btn-sm btn-default" @click="update">取消</button>
       </div>
     </div>
   </div>
 </template>
-<script type="text/javascript">
+<script>
+  import {mapGetters, mapActions} from 'vuex'
   import {GET_USER_INFO} from 'store/getters/type'
-  import { mapGetters,mapActions } from 'vuex'
+  import {getHeight} from 'utils/height'
+  import {getHeights,itemClick} from 'utils/page/deviceGroup'
+  import tree from "../structureTree/index.vue"
   export default {
     computed: {
       ...mapGetters({
         get_user_info: GET_USER_INFO,
-        dialogFormVisible: 'dialogFormVisible',
+        pageData:'pageData',
+        updateState: 'updateState',
+        TreeData: 'TreeData'
       })
     },
-    props: ['data'],
     data(){
       return {
-        dept:{
-          sortIndex:'1',
-          departmentid:'',
-          departname:'',
-          organizationid:'',
-          parentid:'',
-          OrganizationID:this.data.DepartmentID
-          },
+        labels: {
+          defaultId: "OrganizationID",
+          treeName: "OrgName"
+        },
+        selectUser: [],
+        userData:{
+          OrganizationID:''
+        },
+        //请求时的loading效果
+        loading: true,
+        //批量选择数组
+        batch_select: [],
+        orgData: {
+          pid:0,
+          OrganizationID: this.$store.state.user_info.user.OrganizationID,
+          orgId: '',
+        },
+        departlist:[],
+        rolelist:[],
+        OrgUrl: 'Organization/TreeRoot/'+this.$store.state.user_info.user.OrganizationID,
+        chanOrg:false,
+        changeTitle:'',
+        targetMenu:{},
+        roleId:'',
+        deptId:'',
         self: this,
-        title: '',
-        load_data: false,
-        parent: {
-          deptId: '',
-          deptName: ''
-        },
-        on_submit_loading: false,
-        rules: {
-          departname: [{required: true, message: '用户组名称不能为空'},{validator: this.defenseSQL}]
-        },
-        orgId:'',
-        currDeptNumber:'',
-        ckDeptName:true,
-        isSameParent:true
       }
+    },
+    watch:{
+      'deptId':function () {
+        this.refresh();
+      },
+      'roleId':function () {
+        this.refresh();
+      },
+      'pageData.pageSize':function () {
+        this.refresh();
+      },
+      'pageData.pageIndex':function(){
+        this.refresh();
+      },
+      'updateState': function() {
+        if(this.updateState === 1) {
+          this.refresh()
+        }else if(this.updateState === 2) {
+          this.refresh()
+          this.$refs.tree.refresh(this.targetMenu)
+        }
+        this.$store.state.updateState = 0
+      },
+      'TreeData':  {
+        handler:function(data){
+          this.initParentID = null
+          this.targetMenu = data
+          this.orgData = data
+          this.orgData.OrganizationID = data.OrganizationID
+          this.$nextTick(function () {
+            this.refresh()
+          })
+        },
+        deep:true
+      }
+    },
+    components: {
+      tree,
     },
     created(){
-      var $this=this;
-      if($this.data.deptId == 0) {
-        this.title='用户组新增';
-        if($this.data.DepartmentID !=='0') {
-          $this.parent.deptId=$this.data.DepartmentID;
-          $this.$AjaxGet('Department/Detail/', $this.data.DepartmentID , function(ret) {
-            if(ret.code !=0) {
-              //$this.parent.deptName=ret.result.DepartName;
-              //$this.dept.OrganizationID = ret.result.OrganizationID;
-              //$this.dept.ParentID = $this.parent.deptId;
-            }
-          });
-        } else {
-          $this.parent.deptId= $this.data.DepartmentID;
-          $this.parent.deptName=$this.data.DepartName;
-        }
-      } else {
-        this.title= '用户组编辑';
-        $this.$AjaxGet("Department/Detail/", $this.data.deptId, function (ret) {
-          let result = ret.result;
-          $this.dept=result;
-          $this.currDeptNumber=result.DepartName;
-          if ($this.dept.ParentID !== '0') {
-            $this.$AjaxGet('Department/Detail/', $this.dept.ParentID, function (ret) {
-              if (ret.code == 1) {
-                $this.parent.deptId=ret.result.DepartmentID;
-                $this.parent.deptName=ret.result.DepartName;
-              }
-            });
-          } else {
-            $this.parent.deptId='0';
-            $this.parent.deptName= '';
-          }
-        });
-
-      }
+      this.initSelectData()
+      this.refresh()
     },
-
     methods: {
-      ...mapActions([
-        'update',
-      ]),
-      checkDeptName(deptName){
-        if(!deptName){
-          return false;
+      changeOrg(Id){
+        this.orgData.userId=Id;
+        this.changeTitle='分配';
+        this.chanOrg=true;
+      },
+      initSelectData() {
+        var request = {
+          pageSize: this.pageData.pageSize,
+          pageIndex: this.pageData.pageIndex
         }
-        if(deptName==this.parent.deptName){
-          this.isSameParent=false;
-        }else{
-          this.isSameParent=true;
-        }
-        var $this = this;
-        $this.$AjaxGet('Department/List', {
-          departName: deptName,
-          parentID:$this.parent.deptId
-        }, function(ret) {
-          if($this.data.deptId =='0') {
-            if (ret.code == 1) {
-              if (ret.result.length > 0) {
-                $this.ckDeptName=false;
-              } else {
-                $this.ckDeptName=true;
-              }
-            } else {
-              $this.ckDeptName=true;
-            }
-          }else{
-            if($this.currDeptNumber==deptName){
-              $this.ckDeptName=true;
-            }else{
-              if (ret.code == 1) {
-                if (ret.result.length > 0) {
-                  $this.ckDeptName=false;
-
-                } else {
-                  $this.ckDeptName=true;
-                }
-              } else {
-                $this.ckDeptName=true;
-              }
-            }
+        this.departlist = []
+        this.rolelist = []
+        this.$AjaxPost('Department/List',request, function(ret) {
+          if(ret.code == 1) {
+            this.departlist = ret.result
           }
+        }.bind(this))
+        this.$AjaxPost('Role/List',request, function(ret) {
+          if(ret.code == 1) {
+            this.rolelist = ret.result;
+            this.rolelist.unshift({
+              RoleName: "请选择角色",
+              RoleID: ''
+            })
+          }
+        }.bind(this));
+      },
+      initDatas (data) {
+        if(!this.targetMenu.hasOwnProperty("OrganizationID") && data) {
+          this.orgData = data
+          this.orgData.OrganizationID = data.OrganizationID;
+          this.refresh()
+        }
+      },
+      //获取数据
+      refresh(){
+        var request = {
+          pageSize: this.pageData.pageSize,
+          pageIndex: this.pageData.pageIndex,
+          organizationID:this.orgData.OrganizationID
+        };
+        this.$AjaxPost("User/List",request, function(ret) {
+          if(ret.code == 1){
+            let result = ret.result
+            this.pageData.total=ret.total
+            this.userData= result
+            this.loading = false
+          }
+        }.bind(this));
+      },
+      //选中行
+      selectClick(index, user) {
+        let target = $(".table>tbody>tr").eq(index)
+        if(target.hasClass('selected')) {
+          this.selectUser.forEach(function(s, i) {
+            if(s.roleID == user.roleID) {
+              this.selectUser.splice(i, 1)
+            }
+          }.bind(this))
+        }else {
+          this.selectUser.push(user)
+        }
+        this.selectUser
+        target.toggleClass("selected")
 
-        });
       },
-      close(type) {
-        this.$emit('close', type);
+      //批量选择
+      on_batch_select(val){
+        this.batch_select = val
       },
+      //批量删除
+      on_batch_del(){
+        var batchArr=[];
+        for(var i=0;i<this.batch_select.length;i++){
+          batchArr.push(this.batch_select[i].UserID);
+        }
+        var request = {
+          Ids: batchArr,
+          LoginId: this.get_user_info.user.UserID,
+          OperatorObject: "人员信息"
+        };
+        this.$confirm('此操作将批量删除选择数据, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        })
+          .then(() => {
+            this.loading = true
+            this.$AjaxPost('User/RemoveList/',request, function(ret){
+              if(ret.code == 1){
+                this.refresh()
+                this.$refs.tree.refresh(this.targetMenu);
+                this.$message.success("删除成功！")
+              }else{
+                this.$message.success("删除失败！")
+              }
+            })
+          })
+
+      },
+      close(){
+        if(this.dialogFormVisible){
+          this.$store.state.dialogFormVisible = false;
+          this.$refs.tree.refresh(this.targetMenu);
+          this.refresh();
+        }
+      },
+      closeChange(){
+        if(this.chanOrg){
+          this.chanOrg=false;
+          this.$refs.tree.refresh(this.targetMenu);
+          this.refresh();
+        }
+      },
+      methods: {
+        ...mapActions([
+          'update'
+        ]),
+      }
+
     }
-  };
+  }
 </script>
+

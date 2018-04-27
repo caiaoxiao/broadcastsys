@@ -1,48 +1,7 @@
 <script src="../../utils/page/meeting.js"></script>
 <template>
   <div >
-   <div class="phone left">
-      <div class="phoneTitle"><i class="fa fa-user-circle" aria-hidden="true"></i>左话机</div>
-         <div class="numList"> 
-            <div>
-                 <ul class="callNum">
-                        <li v-for="item in callQueue" @click="answerCall(item)">
-                             <i v-if="item.state == 'ringing' ||  item.state=='requesting' || item.state=='active'" class="fa fa-circle orange" aria-hidden="true"></i>
-                             <!-- <i v-if="item.state == 'hangup'" class="fa fa-clock-o" aria-hidden="true"></i>--> {{ item.caller }}
-                         </li>
-                 </ul>
-            </div>
-          </div>
-     <div>
-         <video width="800" id="video-container" autoplay="autoplay" hidden="true"></video>
-     </div>
-     <div class="phoneDial">
-       <div class="numDisplay">
-        <span>{{destination_number}}</span>
-        <img @click="clear" src="../../assets/img/delate.fw.png" />
-       </div>
-       <div class="dialDisplay">
-           <div @click="keypad('1')" class="dial">1</div>       
-           <div @click="keypad('2')" class="dial">2</div>       
-           <div @click="keypad('3')" class="dial">3</div>
-           <div @click="keypad('4')" class="dial">4</div>
-           <div @click="keypad('5')" class="dial">5</div>
-           <div @click="keypad('6')" class="dial">6</div>   
-           <div @click="keypad('7')" class="dial">7</div>
-           <div @click="keypad('8')" class="dial">8</div>
-           <div @click="keypad('9')" class="dial">9</div> 
-           <div @click="keypad('*')" class="dial">*</div>
-           <div @click="keypad('0')" class="dial">0</div>
-           <div @click="keypad('#')" class="dial">#</div>
-       </div>
-       <div class="dialAction">
-          <div class="dial" @click="callDivert">呼叫转移</div>
-          <div class="dial ring" @click="call"><i class="fa fa-phone fa-2x" aria-hidden="true"></i></div> 
-          <div class="dial hangup" @click="hangupCall">挂断</div>
-       </div> 
-     </div>
-    </div>
-
+      <left-phone></left-phone>
     <div id="media">
       <video width=800 id="webcam" autoplay="autoplay" hidden="true"></video>
     </div>
@@ -61,7 +20,7 @@
                 <div class="moduleNum">{{  item.userID }}
                   <span v-if="item.calleeNumber || item.callerNumber">
                      {{item.calleeNumber ? item.calleeNumber : item.callerNumber}}
-                  </span> 
+                  </span>
                 </div>
                 <div class="moduleKind">视频终端</div>
                 <div class="moduleState">{{ returnState(item.deviceState) }}</div>
@@ -171,14 +130,14 @@
       </div>
       <div class="functionMenu">
         <ul class="nav nav-justified menuList">
-          <li id="a1" @click="call"><i class="fa fa-phone fa-2x" aria-hidden="true"></i><span>呼叫</span></li>
-          <li id="a2" @click="strongCall"><i class="fa fa-volume-control-phone fa-2x" aria-hidden="true"></i><span>强行通话</span></li>
-          <li id="a3" @click="strongDelete"><i class="fa fa-window-close fa-2x" aria-hidden="true" onclick="$('#eeee').show();"></i><span>强拆</span></li>
-          <li id="a4" @click="strongJoin"><i class="fa fa-deaf fa-2x" aria-hidden="true"></i><span>强插</span></li>
-          <li id="a5" @click="observe"><i class="fa fa-headphones fa-2x" aria-hidden="true"></i><span>监听</span></li>
-          <li id="a6" @click="daiJie"><i class="fa fa-phone-square fa-2x" aria-hidden="true"></i><span>代接</span></li>
-          <li id="a7" @click="callTraverse"><i class="fa fa-reply fa-2x" aria-hidden="true" onclick="$('#noNum').show();"></i><span>转到</span></li>
-          <li id="a8" @click="startRecording"><i class="fa fa-play fa-2x" aria-hidden="true"></i><span>录音</span></li>
+          <li id="a1" @click="call"  @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-phone fa-2x" aria-hidden="true"></i><span>呼叫</span></li>
+          <li id="a2" @click="strongCall"  @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-volume-control-phone fa-2x" aria-hidden="true"></i><span>强行通话</span></li>
+          <li id="a3" @click="strongDelete"  @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-window-close fa-2x" aria-hidden="true" onclick="$('#eeee').show();"></i><span>强拆</span></li>
+          <li id="a4" @click="strongJoin"  @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-deaf fa-2x" aria-hidden="true"></i><span>强插</span></li>
+          <li id="a5" @click="observe"  @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-headphones fa-2x" aria-hidden="true"></i><span>监听</span></li>
+          <li id="a6" @click="daiJie"  @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-phone-square fa-2x" aria-hidden="true"></i><span>代接</span></li>
+          <li id="a7" @click="callTraverse"  @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-reply fa-2x" aria-hidden="true" onclick="$('#noNum').show();"></i><span>转到</span></li>
+          <li id="a8" @click="startRecording" @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-play fa-2x" aria-hidden="true"></i><span>录音</span></li>
 
         </ul>
       </div>
@@ -197,7 +156,7 @@
   import { leftPhone, rightPhone, deviceList, switchs} from 'components'
 
 
-  
+
   export default {
     components: {
       leftPhone,
@@ -213,9 +172,9 @@
         destination_number: '',
         nowCall: [],
         selectNowCall: [],
-        selectPhone: [], 
-        selectRingCall: [], 
-        num : 0 
+        selectPhone: [],
+        selectRingCall: [],
+        num : 0
        }
     },
     created() {
@@ -227,21 +186,21 @@
     },
     computed: {
       ...mapGetters([
-    	
+
         'dialogShow',
         'callQueue',
         'vertoHandle',
         'group_users',
         'users',
-        'deviceList', 
+        'deviceList',
         'currentLoginUser'
       ]),
     },
     watch: {
       'callqueue': function() {
-   
+
      }
-    }, 
+    },
     methods: {
       itemClick(e, row) {
         let target = e.currentTarget
@@ -281,7 +240,7 @@
              })
            }else {
              $(target).addClass("waittingSelected");
-             this.selectRingCall.push(row) 
+             this.selectRingCall.push(row)
            }
          }
          this.destination_number = this.selectPhone[0].userID;
@@ -294,31 +253,31 @@
             arg: arg
           },
         }, success_cb, failed_cb);
-      }, 
+      },
 
      // 对指定话机进行的通话录音
       startRecording() {
-        this.fsAPI("uuid_record",this.selectNowCall[0].channelUUID + " " + "start" +" " +"/tmp/record"+this.num+".wav",function(res) {console.log("start record")}.bind(this)); 
-        this.selectNowCall = []; 
+        this.fsAPI("uuid_record",this.selectNowCall[0].channelUUID + " " + "start" +" " +"/tmp/record"+this.num+".wav",function(res) {console.log("start record")}.bind(this));
+        this.selectNowCall = [];
         this.num++;
-      }, 
-       
+      },
+
      // 实现管理员和指定话机的强行通话
-       strongCall() {        
+       strongCall() {
          let users = this.deviceList
          let userChanged = false
          let select = this.selectNowCall[0]
-          
+
          users.forEach(function(user) {
            if(user.userID == select.userID) {
               user.operationState = 1
               userChanged = true
            }
           }
-         ) 
-        
+         )
+
          if(userChanged) this.$store.dispatch('setDeviceList',users)
- 
+
          this.vertoHandle.newCall({
            destination_number: '9001',
            caller_id_name: '9000',
@@ -333,11 +292,11 @@
             useSpeak: "any",
             useCamera: "any",
            }
-         }) 
-      
-         this.selectNowCall = []; 
+         })
+
+         this.selectNowCall = [];
       },
-    
+
      // 实现管理员对指定通话的强拆
        strongDelete() {
          let users = this.deviceList
@@ -368,11 +327,11 @@
             useSpeak: "any",
             useCamera: "any",
            }
-         }) 
+         })
 
-         this.selectNowCall = [];   
+         this.selectNowCall = [];
         // this.fsAPI("uuid_kill",this.selectNowCall[0].channelUUID,function(res) {console.log(qiang delete)}.bind(this));
-        // this.selectNowCall = []; 
+        // this.selectNowCall = [];
       },
 
      // 实现管理员对指定通话的强插
@@ -392,15 +351,15 @@
              useSpeak: "any",
              useCamera: "any",
            }
-         }) 
+         })
          this.selectNowCall = [];
       },
 
      // 实现管理员对指定通话的监听
        observe() {
-         
+
          let select = this.selectNowCall[0];
-         console.log(this.selectNowCall[0].channelUUID); 
+         console.log(this.selectNowCall[0].channelUUID);
          this.vertoHandle.newCall({
            destination_number: '9002'+select.channelUUID,
            caller_id_name: '9000',
@@ -415,18 +374,18 @@
              useSpeak: "any",
              useCamera: "any",
            }
-         }) 
-         
+         })
+
          this.selectNowCall = [];
-      }, 
+      },
 
      // 实现第三方对于指定通话中一方的代接
        daiJie() {
 
-         let users = this.deviceList; 
+         let users = this.deviceList;
          let userChanged = false;
-         let select = this.selectRingCall[0]; 
-        
+         let select = this.selectRingCall[0];
+
          this.vertoHandle.newCall({
           destination_number: '9004'+this.selectRingCall[0].oppoChannelUUID,
           caller_id_name: '9000',
@@ -442,7 +401,7 @@
            useCamera: "any",
           }
          })
-         console.log(select.userID); 
+         console.log(select.userID);
          this.selectRingCall = [];
       },
 
@@ -454,11 +413,11 @@
          console.log(this.selectPhone[0].networkPort);
          console.log(this.selectPhone[0]);
          console.log(this.deviceList[0]);
-         console.log("1234567890"); 
+         console.log("1234567890");
          this.fsAPI("uuid_deflect",this.selectNowCall[0].channelUUID+" "+"sip:"+this.selectPhone[0].userID+"@"+this.selectPhone[0].networkIP+":"+this.selectPhone[0].networkPort,function(res) {console.log("call traverse")}.bind(this));
          this.selectPhone = [];
          this.selectNowCall = [];
-      }, 
+      },
 
       clear() {
            this.destination_number = this.destination_number.substring(0, this.destination_number.length-1)
@@ -472,9 +431,9 @@
       callDivert() {
            this.$store.dispatch('CallDivert', {type: true, num: this.destination_number})
       },
-      // call 
+      // call
       call() {
-       this.vertoHandle.newCall({         
+       this.vertoHandle.newCall({
         destination_number : this.destination_number,
         caller_id_name: '9000',
         caller_id_number: '9000',
@@ -491,10 +450,10 @@
       })
         this.selectPhone = [];
       },
-          
+
       hangupCall(){
         this.vertoHandle.hangup();
-      }, 
+      },
       play() {
         $('.playMenu').removeClass('Hide').addClass('Show');
       }

@@ -13,11 +13,9 @@
           <!--1005-->
           <!--<span>00:00:01</span>-->
           <!--</li>-->
-          <li v-for="item in callQueue" @click="answerCall(item)">
-            <!--<i  class="fa fa-circle red" aria-hidden="true"></i>-->
-            <i v-if="item.state == 'ringing' || item.state=='requesting' || item.state=='active'" class="fa fa-circle orange" aria-hidden="true"></i>
-            <!--i v-if="item.state == 'hangup'" class="fa fa-clock-o" aria-hidden="true"></i-->
-            {{item.caller}}
+          <li class ="unselected" v-for="item in confLeft" @click.stop="select($event,item)">
+          <i class="fa fa-circle orange" aria-hidden="true"></i>
+		             {{ item.caller_id_number + ' id : ' + item.conf_id }}
           </li>
           <!--<li><i class="fa fa-clock-o" aria-hidden="true"></i>1005</li>-->
         </ul>
@@ -28,7 +26,7 @@
 
     </div>
     <div class="phoneDial">
-      <div class="dial rightdial" v-for="(item,index) in btnData" @mousedown="$btnMousedown" @mouseup="$btnMouseup">
+      <div class="dial rightdial" v-for="(item,index) in btnData" @click.stop='buttonclick(item.name)' @mousedown="$btnMousedown" @mouseup="$btnMouseup">
         <i aria-hidden="true" class="fa fa-2x" :class="item.class"></i>
         <span>{{item.name}}</span>
       </div>
@@ -45,7 +43,7 @@
     { name: '邀请成员', class: 'fa-user-plus' },
     { name: '允许通话', class: 'fa-microphone' },
     { name: '排队等待', class: 'fa-spinner' },
-    { name: '踢出会话', class: 'fa-sign-out' },
+    { name: '踢出会话', class: 'fa-sign-out'}, 
     { name: '会话录音', class: 'fa-play-circle' },
     { name: '结束服务', class: 'fa-window-close-o' },
     { name: '用户转出', class: '' },
@@ -55,7 +53,8 @@
   export default {
     data() {
       return {
-        btnData
+        btnData,
+	selected:[]
       }
     },
     created() {
@@ -64,21 +63,76 @@
         //        $.verto.init({}, this.bootstrap);
       })
     },
+    watch(){
+
+
+    },
     computed: {
       ...mapGetters({
         vertoHandle: 'vertoHandle',
         group_users: 'group_users',
         users: 'users',
         currentLoginUser: 'currentLoginUser',
-        callQueue: 'callQueue'
+        callQueue: 'callQueue',
+	confLeft : 'confLeft'
       }),
     },
-    watch: {
-      'callQueue': function () {
-
-      }
-    },
     methods: {
+      fsAPI(cmd, arg, success_cb, failed_cb) {
+        this.vertoHandle.sendMethod("jsapi", {
+          command: "fsapi",
+          data: {
+            cmd: cmd,
+            arg: arg
+          },
+        }, success_cb, failed_cb);
+      },
+      buttonclick(name){
+        let _this = this
+        switch(name){
+          case '踢出会话':
+	      console.log('kick clicked')
+              if(this.selected.length > 0)
+                this.selected.forEach(function(a,i){
+                  _this.fsAPI('conference',"9110-scc.ieyeplus.com"+" "+"kick"+" "+a.conf_id)
+                })
+                console.log('please select before click')
+		break
+          case '允许通话':
+	      console.log('permission clicked')
+              if(this.selected.length > 0)
+                this.selected.forEach(function(a,i){
+                  _this.fsAPI('conference',"9110-scc.ieyeplus.com"+" "+"unmute"+" "+a.conf_id)
+                })
+	            else
+                console.log('please select before unmute')
+		break
+          case '排队等待':
+	      console.log('waiting clicked')
+              if(this.selected.length > 0)
+                this.selected.forEach(function(a,i){
+                  _this.fsAPI('conference',"9110-scc.ieyeplus.com"+" "+"mute"+" "+a.conf_id)
+                })
+	            else
+                console.log('please select before unmute')
+		break
+        }
+
+      },
+      select(e,item){
+        let _this = this
+        let target = e.currentTarget
+	      if($(target).hasClass('unselected')){
+            $(target).removeClass().addClass('selected')
+            if(this.selected.findIndex(function(caller,index,array){return caller.conf_id==item.conf_id})==-1 ){
+          this.selected.push(item)}
+        }
+        else if ($(target).hasClass('selected')){
+            $(target).removeClass().addClass('unselected')
+            this.selected.forEach(function(a,i){if(a.conf_id==item.conf_id) _this.selected.splice(i,1)})
+        }
+        
+	    },	
       clear() {
         this.destination_number = this.destination_number.substring(0, this.destination_number.length - 1)
       },

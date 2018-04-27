@@ -77,7 +77,10 @@ export default {
   setCallQueue ({ commit }, data) {
     commit('SET_CALL_QUEUE', data)
   },
-  setUseLivearray ({ commit }, data) {
-    commit('SET_USE_LIVEARRAY', data)
-  }
+  setConfLeft({ commit }, data) {
+    commit('SET_CONF_LEFT', data)
+  },
+  setConfAlarm({ commit }, data) {
+    commit('SET_CONF_ALARM', data)
+  },
 }

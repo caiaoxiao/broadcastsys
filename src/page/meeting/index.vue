@@ -20,17 +20,17 @@
         </div>
         <div class="functionMenu">
           <ul class="nav nav-justified menuList">
-            <li id="a1" @click="closeMeeting"><i class="fa fa-window-close-o fa-2x"  aria-hidden="true"></i><span>结束会议
+            <li id="a1" @click="closeMeeting"  @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-window-close-o fa-2x"  aria-hidden="true"></i><span>结束会议
             </span></li>
-            <li id="a2" @click="publicFunction('unmute')">
+            <li id="a2" @click="publicFunction('unmute')"  @mousedown="$btnMousedown" @mouseup="$btnMouseup">
               <i class="fa fa-microphone fa-2x" aria-hidden="true"></i>
               <span>允许发言</span>
             </li>
-            <li id="a3" @click="publicFunction('mute')"><i class="fa fa-microphone-slash fa-2x"
-                                                           aria-hidden="true"></i><span>禁止发言</span></li>
-            <li id="a4" @click="publicFunction('kick')"><i class="fa fa-sign-out fa-2x" aria-hidden="true"></i><span>踢出会议
+            <li id="a3" @click="publicFunction('mute')"  @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-microphone-slash fa-2x"
+                                                           aria-hidden="true" ></i><span>禁止发言</span></li>
+            <li id="a4" @click="publicFunction('kick')"  @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-sign-out fa-2x" aria-hidden="true"></i><span>踢出会议
             </span></li>
-            <li id="a5" @click="meetingRecord('start')">
+            <li id="a5" @click="meetingRecord('start')"  @mousedown="$btnMousedown" @mouseup="$btnMouseup">
               <i class="fa fa-play-circle fa-2x" aria-hidden="true"></i>
               <span>会议录音</span>
             </li>
@@ -132,8 +132,14 @@
         </div>
         <div class="functionMenu">
           <ul class="nav nav-justified menuList">
-            <li id="a1" @click="startMeeting"><i class="fa fa-fire fa-2x" aria-hidden="true"></i><span>开始会议</span></li>
-            <li id="a2"><i class="fa fa-user-plus fa-2x" aria-hidden="true"></i><span>加入成员</span></li>
+            <li id="a1" @click="startMeeting" @mousedown="$btnMousedown" @mouseup="$btnMouseup">
+              <i class="fa fa-fire fa-2x" aria-hidden="true"></i>
+              <span>开始会议</span>
+            </li>
+            <li id="a2" @mousedown="$btnMousedown" @mouseup="$btnMouseup">
+              <i class="fa fa-user-plus fa-2x" aria-hidden="true"></i>
+              <span>加入成员</span>
+            </li>
 
           </ul>
         </div>

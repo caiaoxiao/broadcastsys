@@ -37,7 +37,12 @@ export default {
   // verto初始化
   vertoHandle: null,
   group_users: [],
+  // 所有设备列表
   deviceList: [],
+  // 当前登录的话机
   currentLoginUser: [],
-  callQueue: []
+  //  设置通话队列
+  callQueue: [],
+  // 是否订阅会议回调
+  use_livearray: false
 }

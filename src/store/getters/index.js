@@ -73,5 +73,8 @@ export default {
   },
   play: state => {
     return state.play
+  },
+  use_livearray: state => {
+    return state.use_livearray
   }
 }

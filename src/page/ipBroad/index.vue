@@ -105,9 +105,9 @@
 
       <div class="functionMenu">
         <ul class="nav nav-justified menuList">
-          <li id="a2" @click="shout"><i class="fa fa-bullhorn fa-2x" aria-hidden="true"></i><span>喊话</span></li>
-          <li id="a3" @click="play"><i class="fa fa-play-circle-o fa-2x" aria-hidden="true"></i><span>播放</span></li>
-          <li id="a4" @click="allOver"><i class="fa fa-window-close fa-2x" aria-hidden="true"></i><span>全部结束</span></li>
+          <li id="a2" @click="shout" @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-bullhorn fa-2x" aria-hidden="true"></i><span>喊话</span></li>
+          <li id="a3" @click="play" @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-play-circle-o fa-2x" aria-hidden="true"></i><span>播放</span></li>
+          <li id="a4" @click="allOver" @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-window-close fa-2x" aria-hidden="true"></i><span>全部结束</span></li>
         </ul>
       </div>
     </div>

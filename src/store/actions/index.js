@@ -76,6 +76,8 @@ export default {
   //  设置通话队列
   setCallQueue ({ commit }, data) {
     commit('SET_CALL_QUEUE', data)
+  },
+  setUseLivearray ({ commit }, data) {
+    commit('SET_USE_LIVEARRAY', data)
   }
-
 }

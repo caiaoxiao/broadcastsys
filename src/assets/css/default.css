@@ -52,19 +52,19 @@ ul,ol,li{list-style:none;padding:0px;margin:0px}
   }
 }
 @media screen and (min-width:966px){
-  .logo{width:250px;}
+  .logo{width:336px;}
   .logo img{
     position:absolute;
-    width:200px;
+    width:336px;
     top:18px;
     left:20px;
   }
 }
 @media screen and (min-width:1400px){
-  .logo{width:300px;}
+  .logo{width:336px;}
   .logo img{
     position:absolute;
-    width:250px;
+    width:336px;
     top:18px;
 
   }
@@ -135,12 +135,12 @@ ul,ol,li{list-style:none;padding:0px;margin:0px}
   .headMenuList{z-index:1999;}
 }
 @media screen and (min-width:966px){
-  .headMenu{margin-left:250px;}
+  .headMenu{margin-left:340px;}
   .headMenu>i{display:none;}
   .headMenuList{z-index:0;}
 }
 @media screen and (min-width:1400px){
-  .headMenu{margin-left:300px;}
+  .headMenu{margin-left:340px;}
   .headMenu>i{display:none;}
   .headMenuList{z-index:0;}
 }
@@ -207,7 +207,7 @@ ul.nav li{padding:0px;color:#fff;border-bottom:5px solid transparent;text-align:
   .phoneDial{position:static;overflow:auto}
 }
 @media(min-width:966px){
-  .phoneDial{position:absolute;bottom:0px;}
+  .phoneDial{position:absolute;bottom:0px;width:100%}
 }
 @media(min-width:1400px){
   .phoneDial{position:absolute;bottom:0px;}
@@ -224,12 +224,14 @@ ul.nav li{padding:0px;color:#fff;border-bottom:5px solid transparent;text-align:
   .dialDisplay {width:186.21px;}
   .dialAction {width:63.79px}
   .dial{line-height:63.70px;}
+  .rightdial{height: 103.7px}
   .ring{height:130px;}
 }
 @media(min-width:1400px){
   .dialDisplay {width:224.2px;}
   .dialAction {width:75.8px}
   .dial{line-height:74.5px;}
+  .rightdial{height: 104.5px}
   .ring{height:152px;}
 }
 
@@ -238,6 +240,8 @@ ul.nav li{padding:0px;color:#fff;border-bottom:5px solid transparent;text-align:
   text-align:center
 }
 .dialAction .dial{width:100%;border-right:none;}
+.rightdial{}
+.rightdial>span{display: block;line-height: 0.0;}
 .ring{color:#008C00}
 .ring>i{margin-top:60px;}
 .hangup{color:#DB1313;}
@@ -280,8 +284,12 @@ ul.nav li{padding:0px;color:#fff;border-bottom:5px solid transparent;text-align:
 @media(min-width:1400px){
   .phoneTitle{display:block;}
 }
-.phoneTitle{line-height:40px;color:#fff;text-align:center;}
-.phoneTitle i{margin-right:15px;}
+.phoneTitle{line-height:40px;color:#fff;padding-left: 15px;position: relative}
+.phoneTitle i{margin-right:5px;}
+.phoneMeeting{position: absolute;top:10px;right: 10px;
+  background-color: #000000;border-radius: 4px;line-height: 0;padding: 5px;
+}
+.meetingOut{background-color: #c9302c;}
 @media(min-width:200px) {
   .numList{margin:0px;border-radius:0px;}
 }
@@ -376,13 +384,14 @@ ul.choose>li.on{border-bottom:2px solid #69C7F9;}
 .calling .moduleState,.calling01 .moduleState{background-color:#8C0000;border-bottom-left-radius:5px;border-bottom-right-radius:5px;}
 .memberList{position:relative;height:50%;}
 @media(min-width:966px){
-  .leftList{width:180px;position:absolute;top:0px;left:0px;height:100%;background-color:#282F32;color:#fff;
+  .leftList{width:180px;position:absolute;top:0px;left:0px;height:100%;
+    background-color:#282F32;color:#fff;
     border-right:1px solid #0A0C0D;
   }
 }
 .orgTitle{background:#4E545A;text-align:center;line-height:40px;}
-ul.orgList>li{line-height:30px;padding-left:30px;}
-ul.orgList>li>i{color:#008C00;margin-right:10px;}
+ul.orglist>li{line-height:30px;padding-left:30px;}
+ul.orglist>li>i{color:#008C00;margin-right:10px;}
 .screen>span{display:block;float:left;width:49.4%;line-height:50px;text-align:center;background-color:#4E545A;margin:1px 1px 0px 0px;}
 .screen>span.nine{width:100%;}
 .screen>span.active{background-color:#282F32;text-shadow:1px 1px 0px #000;}
@@ -670,7 +679,7 @@ position: absolute;top:5px;right: 0px;}
 
 /*audio*/
 .audio-box{
-  margin:0px 100px 0px 200px;
+  margin:0px 250px 0px 250px;
   height: 100%;
   bottom: 0;
   left: 0;

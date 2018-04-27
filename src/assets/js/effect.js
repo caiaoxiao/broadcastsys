@@ -40,9 +40,8 @@
  }
  })
  })*/
-$(
-  $("document").ready(function (){
-    /*
+  /* $("document").ready(function (){
+
    function ui(item,activeStyle,normalStyle) {
      $(item).onmousedown(function(){
        $(this).css(style);
@@ -52,10 +51,10 @@ $(
      })}
      ui(".dial","'background','#575E64'","'background,none'");
      ui("ul.nav li","'color','#575E64'","'background,none'")
-     */
+
     }
-  )
-)
+  ) */
+
 
 function menu() {
   $(".span_large").click(function () {

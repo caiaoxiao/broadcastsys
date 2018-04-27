@@ -1,53 +1,47 @@
 <template>
   <div>
     <div class="content padding">
-      <ul class="nav nav-justified choose" >
-        <li @click="toggle($index, tab.view)" v-for="(tab, $index) in tabs" :class="{on: active == $index}">{{ tab.name}}</li>
+      <ul class="nav nav-justified choose">
+        <router-link v-for="item in routerList" :key="item.path" tag="li" active-class="on" :to="item.path">
+          {{item.name}}
+        </router-link>
       </ul>
       <div>
-        <components :is="currentView"></components>
+        <router-view />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-
-  import {getHeight} from 'utils/height'
-  import {getHeights} from 'utils/page/systemAdmin'
-  import {fileManage, recordManage, callManage, playManage } from './index'
+  import routes from 'router'
+  import { getHeight } from 'utils/height'
+  import { getHeights } from 'utils/page/systemAdmin'
   export default {
     data() {
       return {
-        currentView: 'fileManage',
-        active: 0,
-        tabs: [
-          {name: '文件管理',view: 'fileManage'},
-          {name: '录音管理',view: 'recordManage'},
-          {name: '播放记录',view: 'playManage'},
-          {name: '呼叫记录',view: 'callManage'}
-        ]
+        routerList: []
       }
     },
     created() {
-      this.$nextTick(function() {
+      this.$nextTick(function () {
+        let routerList = routes.options.routes[2].children
+        routerList.forEach((r,i) => {
+          if(r.name === '系统管理') {
+            this.routerList = r.children
+          }
+        })
         getHeight()
         getHeights()
       })
     },
     watch: {
-      'currentView': function() {
-        this.$nextTick(function() {
-          getHeight()
-          getHeights()
-        })
-      }
-    },
-    components: {
-      fileManage,
-      recordManage,
-      callManage,
-      playManage
+      /*   'currentView': function() {
+          this.$nextTick(function() {
+            getHeight()
+            getHeights()
+          })
+        } */
     },
     methods: {
       toggle(i, v) {
@@ -62,5 +56,4 @@
 </script>
 
 <style scoped>
-
 </style>

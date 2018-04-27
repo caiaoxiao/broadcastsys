@@ -1,6 +1,10 @@
 <template>
   <div class="phone left">
-    <div class="phoneTitle"><i class="fa fa-user-circle" aria-hidden="true"></i>左话机</div>
+    <div class="phoneTitle">
+      <i class="fa fa-user-circle" aria-hidden="true"></i>语音
+      <div class="phoneMeeting">
+        <i aria-hidden="true" class="fa fa-plus"></i>进入</div>
+    </div>
     <div class="numList">
       <div>
         <ul class="callNum">
@@ -24,9 +28,9 @@
 
     </div>
     <div class="phoneDial">
-      <div class="numDisplay">
-        <span >{{destination_number}}</span>
-        <img @click="clear" src="../../assets/img/delate.fw.png" />
+      <div class="dial rightdial" v-for="(item,index) in btnData" @mousedown="$btnMousedown" @mouseup="$btnMouseup">
+        <i aria-hidden="true" class="fa fa-2x" :class="item.class"></i>
+        <span>{{item.name}}</span>
       </div>
       <div class="dialDisplay">
         <div @click="keypad('1')" class="dial">1</div>
@@ -53,13 +57,21 @@
 </template>
 
 <script>
-  import { mapGetters,mapActions } from 'vuex'
-  import {getHeight} from 'utils/height'
-
+  const btnData = [
+    { name: '邀请成员', class: 'fa-user-plus' },
+    { name: '允许通话', class: 'fa-microphone' },
+    { name: '排队等待', class: 'fa-spinner' },
+    { name: '踢出会话', class: 'fa-sign-out' },
+    { name: '会话录音', class: 'fa-play-circle' },
+    { name: '结束服务', class: 'fa-window-close-o' },
+    { name: '用户转出', class: '' },
+    { name: '确认转出', class: '' },
+    { name: '取消转出', class: '' },
+  ]
   export default {
     data() {
       return {
-        destination_number: ''
+        btnData
       }
     },
     created() {

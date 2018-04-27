@@ -78,5 +78,7 @@ export default {
   SET_CALL_QUEUE: (state, data) => {
     state.callQueue = data
   },
-
+  SET_USE_LIVEARRAY: (state, data) => {
+    state.use_livearray = data
+  }
 }

@@ -47,15 +47,36 @@ const routes = [
       {
         path: '/systemAdmin',
         name: '系统管理',
+        redirect: '/fileManage',
         component: _import('systemAdmin/index'),
+        children: [
+          {
+            path: '/fileManage',
+            name: '文件管理',
+            component: _import('systemAdmin/fileManage/index')
+          },
+          {
+            path: '/recordManage',
+            name: '录音管理',
+            component: _import('systemAdmin/recordManage/index')
+          },
+          {
+            path: '/playManage',
+            name: '播放记录',
+            component: _import('systemAdmin/playManage/index')
+          },
+          {
+            path: '/callManage',
+            name: '呼叫记录',
+            component: _import('systemAdmin/callManage/index')
+          }
+        ]
       },
       {
         path: '/map',
         name: '地图',
         component: _import('broadOrder/index'),
-      },
-
-
+      }
     ]
   },
   {
@@ -69,10 +90,8 @@ const router = new Router({
   routes,
   mode: 'hash', //default: hash ,history
 })
-
-
-//全局路由配置
-//路由开始之前的操作
+// 全局路由配置
+// 路由开始之前的操作
 /* const whiteList = ['/login']
 router.beforeEach((to, from, next) => {
   NProgress.start()

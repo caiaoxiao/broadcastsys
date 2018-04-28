@@ -43,6 +43,8 @@ export default {
   currentLoginUser: [],
   //  设置通话队列
   callQueue: [],
+  confLeft: [],
+  confAlarm:[],
   // 是否订阅会议回调
   use_livearray: false
 }

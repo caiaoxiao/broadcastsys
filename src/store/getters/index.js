@@ -76,5 +76,11 @@ export default {
   },
   use_livearray: state => {
     return state.use_livearray
+  },
+  confLeft: state=> {
+    return  state.confLeft
+  },
+  confAlarm: state=> {
+    return  state.confAlarm
   }
 }

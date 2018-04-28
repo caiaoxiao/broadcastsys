@@ -70,7 +70,8 @@ export default {
     state.group_users = data
   },
   SET_DEVICE_LIST: (state, data) => {
-    state.deviceList = data
+    state.deviceList = data || []
+    cookieStorage.set('deviceList', data)
   },
   SET_CURRENT_LOGIN_USER: (state, data) => {
     state.currentLoginUser = data

@@ -1,10 +1,11 @@
 <template>
   <div class="bottomTools">
     <div class="userInfo">
-      <div class="userImg"><img src="../../assets/img/ouba.jpg" /></div>
       <div class="userName">
-        <span>张三<a @click="logout">[退出]</a></span>
-        <span class="org">所属机构<a @click="setting()"><i class="fa fa-cogs"></i>系统设置</a></span>
+        <span>张三<a @click="logout">[退出]</a>
+          所属机构
+          <a @click="setting()"><i class="fa fa-cogs"></i>系统设置</a></span>
+
       </div>
     </div>
 
@@ -108,7 +109,6 @@
       <audio ref="audio" ></audio>
       <span class="fa fa-times" @click="close"></span>
       <div class="audio-container">
-        <div class="audio-cover"><i class="fa fa-2x fa-music fa-spin"></i></div>
         <div class="audio-view">
           <div class="audio-title">{{ activeIndex == -1 ? '' : playlist[activeIndex].FileName }}</div>
           <div class="audio-body">

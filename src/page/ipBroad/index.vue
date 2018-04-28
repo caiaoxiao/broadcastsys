@@ -138,6 +138,8 @@
 
   export default {
     data() {
+        debugger
+      this.deviceList
       return {
         selectPhone: [],
         name: '3000' + '-' + window.location.hostname,

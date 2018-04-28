@@ -42,9 +42,8 @@
   </div>
 </template>
 <script>
-  import {mapGetters, mapActions} from 'vuex'
+  import { mapGetters,mapActions } from 'vuex'
   import {GET_USER_INFO} from 'store/getters/type'
-  import parseXML from 'utils/xml_parser'
   import {toolTip} from 'components'
   import {getHeight} from 'utils/height'
   import {getHeights,itemClick} from 'utils/page/deviceGroup'
@@ -57,16 +56,17 @@
         isSelectAll: false, // 是否全选
         dialogShow: false,
         selectDevice:[],
-        deviceList:[]
       }
-      },
+    },
     computed: {
       ...mapGetters({
         get_user_info: GET_USER_INFO,
         pageData: 'pageData',
+        vertoHandle:'vertoHandle',
         deviceList: 'deviceList',    // 所有设备
       })
     },
+
     created() {
       this.$nextTick(function() {
         getHeight()
@@ -74,22 +74,13 @@
         this.refresh()
       })
     },
-    computed: {
-      ...mapGetters({
-        dialogShow: 'dialogShow',
-      }),
-    },
     components: {
       confirmDialog
     },
-    computed: {
-      ...mapGetters([
-        'vertoHandle',
-        'currentLoginUser'
-      ]),
-    },
+
     methods: {
       refresh() {
+          debugger
         this.deviceList
       },
       Devhidden() {
@@ -142,6 +133,8 @@
         }, success_cb, failed_cb);
       },
       open() {
+        debugger
+        this.deviceList
         $(".singleDevice").removeClass("moveRightMiddle").addClass("moveLeftMiddle");
         $(".allDevice").removeClass("moveRightDev").addClass("moveLeftDev");
       },

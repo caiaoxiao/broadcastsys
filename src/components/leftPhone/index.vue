@@ -1,9 +1,9 @@
 <template>
   <div class="phone left">
     <div class="phoneTitle">
-      <i class="fa fa-user-circle" aria-hidden="true"></i>语音
-      <div class="phoneMeeting">
-        <i aria-hidden="true" class="fa fa-plus"></i>进入</div>
+      <div class="cloud"></div>语音
+      <div class="phoneMeeting meetingOut">
+        <i aria-hidden="true" class="fa fa-plus"></i>退出</div>
     </div>
     <div class="numList">
       <div>
@@ -29,7 +29,7 @@
     </div>
     <div class="phoneDial">
       <div class="dial rightdial" v-for="(item,index) in btnData" @mousedown="$btnMousedown" @mouseup="$btnMouseup">
-        <i aria-hidden="true" class="fa fa-2x" :class="item.class"></i>
+        <i aria-hidden="true" class="fa" :class="item.class"></i>
         <span>{{item.name}}</span>
       </div>
 
@@ -48,9 +48,9 @@
     { name: '踢出会话', class: 'fa-sign-out' },
     { name: '会话录音', class: 'fa-play-circle' },
     { name: '结束服务', class: 'fa-window-close-o' },
-    { name: '用户转出', class: '' },
-    { name: '确认转出', class: '' },
-    { name: '取消转出', class: '' },
+    { name: '用户转出', class: 'fa-user-times' },
+    { name: '确认转出', class: 'fa-reply-all' },
+    { name: '取消转出', class: 'fa-remove' },
   ]
   export default {
     data() {

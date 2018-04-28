@@ -38,7 +38,7 @@ export default {
   vertoHandle: null,
   group_users: [],
   // 所有设备列表
-  deviceList: [],
+  deviceList: cookieStorage.get('deviceList'),
   // 当前登录的话机
   currentLoginUser: [],
   //  设置通话队列

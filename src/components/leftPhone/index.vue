@@ -1,7 +1,9 @@
 <template>
   <div class="phone left">
     <div class="phoneTitle">
-      <div class="cloud"></div>语音
+      <div class="onair">
+        <div class="cloud onair"></div>
+      </div>语音
       <div class="phoneMeeting meetingOut">
         <i aria-hidden="true" class="fa fa-plus"></i>退出</div>
     </div>

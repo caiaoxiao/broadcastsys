@@ -70,7 +70,8 @@ export default {
     state.group_users = data
   },
   SET_DEVICE_LIST: (state, data) => {
-    state.deviceList = data
+    state.deviceList = data || []
+    cookieStorage.set('deviceList', data)
   },
   SET_CURRENT_LOGIN_USER: (state, data) => {
     state.currentLoginUser = data
@@ -78,7 +79,10 @@ export default {
   SET_CALL_QUEUE: (state, data) => {
     state.callQueue = data
   },
-  SET_USE_LIVEARRAY: (state, data) => {
-    state.use_livearray = data
-  }
+  SET_CONF_LEFT: (state, data) => {
+    state.confLeft = data
+  },
+  SET_CONF_ALARM: (state, data) => {
+    state.confAlarm = data
+  },
 }

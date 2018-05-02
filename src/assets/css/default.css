@@ -224,14 +224,14 @@ ul.nav li{padding:0px;color:#fff;border-bottom:5px solid transparent;text-align:
   .dialDisplay {width:186.21px;}
   .dialAction {width:63.79px}
   .dial{line-height:63.70px;}
-  .rightdial{height: 103.7px}
+  .rightdial{height: 88px}
   .ring{height:130px;}
 }
 @media(min-width:1400px){
   .dialDisplay {width:224.2px;}
   .dialAction {width:75.8px}
   .dial{line-height:74.5px;}
-  .rightdial{height: 104.5px}
+  .rightdial{height: 101px}
   .ring{height:152px;}
 }
 
@@ -553,20 +553,20 @@ span.totalTime{float:right;display:inline-block;line-height:35px;padding-right:1
   .bottomTools{height:50px;width:100%;background:#070707;position:fixed;z-index:999;bottom:0px;left:0px;}
 }
 @media(min-width:966px){
-  .bottomTools{height:50px;width:100%;background:#070707;position:relative;z-index:999;}
+  .bottomTools{height:28px;width:100%;background:#070707;position:relative;z-index:999;}
 }
 
 .userInfo{position:absolute;top:5px;left:10px;}
 .userImg{width:41px;height:41px;border-radius:41px;background-color:#69C7F9;float:left;}
 .userImg>img{width:35px;height:35px;border-radius:35px;margin:3px;}
-.userName{margin-left:40px;}
+
 .userName>span{display:block;min-width:150px;margin-left:20px;margin-bottom:5px;}
 .userName>span>a{color:#47a3da;}
 .userName>span.org{font-size:12px;color:#6F7882;}
 .userName>span.org>a{margin-left: 10px;font-size: 14px;}
 .userName>span.sys{}
 .happend{position:absolute;top:5px;right:0px;}
-.deviceStatus{position:absolute;bottom:50px;right:0px;box-shadow:-2px -2px 3px #000;
+.deviceStatus{position:absolute;bottom:28px;right:0px;box-shadow:-2px -2px 3px #000;
   background-color: #313439;
   z-index:299999;
   overflow-y:auto;
@@ -720,12 +720,12 @@ position: absolute;top:5px;right: 0px;}
 }
 .audio-body{
   float: left;
-  width: calc(100% - 168px);
+  width: calc(100% - 268px);
   height: 38px;
   padding: 0 10px;
 }
 .audio-title{
-  width: 100%;
+  float:left;
   height: 20px;
   padding-left: 10px;
   margin-top:5px;
@@ -796,7 +796,7 @@ position: absolute;top:5px;right: 0px;}
   cursor: pointer;
 }
 .audio-btn{
-  float: right;
+  float: left;
   width: 148px;
   height: 38px;
 }
@@ -1003,3 +1003,4 @@ ul.orgListPhone>li>span{display:block;float:right;height:100%;width:50px;line-he
   background: #272D33;
   border: none !important;
 }
+.onair{width: 30px;float: left;margin: 16px 5px 0px 0px;color:#B25900}

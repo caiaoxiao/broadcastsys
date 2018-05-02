@@ -35,9 +35,10 @@
         users:'users',
         currentLoginUser:'currentLoginUser',
         deviceList:'deviceList',
-        callQueue:'callQueue'
+        callQueue:'callQueue',
+	conLeft:'confLeft'
       }),
-    },
+    },/*
     watch: {
       'callQueue': function(call) {
         if(call[0].des=='9110');
@@ -51,7 +52,7 @@
         }
         // this.$router.push({path:'/video'});
       }
-    },
+    }*/
     methods: {
       initVertoHandle(status) {
         let _this = this
@@ -137,7 +138,7 @@
 
             onMessage:function(verto, dialog, message, data) {
               console.log('this is a message',message)
-              let _this = this
+	      let arr = _this.$store.getters.confLeft 
               var initLiveArray =  function(verto, dialog, data,pbx,room) {
                 // Set up addtional configuration specific to the call.
                 var config = {subParams: {callID: dialog ? dialog.callID : null},};
@@ -155,16 +156,45 @@
                       // New user joined conference.
                       case "add":
                         console.log('conference user added')
+			console.log('conference user added')
+	          var  data = JSON.parse(args.data[4])
+            arr.push({
+              conf_id : parseInt(args.data[0]).toString(),
+              caller_id_number : args.data[1],
+              muted : data["audio"]["muted"],
+              deaf :  data["audio"]["deaf"],
+              talking : data["audio"]["talking"],
+              key : args.key
+
+            })
+            _this.$store.dispatch('setConfLeft',arr)
                         break;
 
                       // User left conference.
                       case "del":
                         console.log('conference user deleted')
+			arr.forEach(function(a,i){
+              if (a.key == args.key)
+                arr.splice(i,1)
+            })
+            _this.$store.dispatch('setConfLeft',arr)
                         break;
 
                       // Existing user's state changed (mute/unmute, talking, floor, etc)
                       case "modify":
                         console.log('conference user changed')
+			data = JSON.parse(args.data[4])
+	          if(arr.length == 0 ||  arr.every(function(item,index,array){return item.key!=args.key}))
+            {
+                    arr.push({
+                    conf_id : parseInt(args.data[0]).toString(),
+                    caller_id_number : args.data[1],
+                    muted : data["audio"]["muted"],
+                    deaf :  data["audio"]["deaf"],
+                    talking : data["audio"]["talking"],
+                    key : args.key })
+            _this.$store.dispatch('setConfLeft',arr)
+            }    
                         break;
 
                     }

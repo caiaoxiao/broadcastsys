@@ -11,8 +11,8 @@
         <ul id="height01" class="devGroup">
           <li v-for="(item , index) in groupLength">
             <p v-model="groupName">
-              <!--<span v-if="flag" v-model="formData.initialName">设备组{{item.TempName}}</span>
-              <input v-else class="form-control " v-model="formData.TempName" type="text"/>-->
+              <span v-if="flag" v-model="formData.initialName">设备组{{item.TempName}}</span>
+              <input v-else class="form-control " v-model="formData.TempName" type="text"/>
               <span v-if="item.action==1" v-model="formData.TempName">{{item.TempName}}</span>
               <input v-else-if="item.action==0" class="form-control " v-model="formData.TempName" type="text"/>
             </p>

@@ -1,7 +1,7 @@
 <script src="../../utils/page/meeting.js"></script>
 <template>
   <div >
-      <left-phone></left-phone>
+      <leftPhone></leftPhone>
     <div id="media">
       <video width=800 id="webcam" autoplay="autoplay" hidden="true"></video>
     </div>

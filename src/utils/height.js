@@ -6,15 +6,13 @@ export function getHeight() {
   var moduleListHeight;//设备显示区
   var orgList//视频成员列表显示区
   if ($(window).width() > 996) {
-    contentHeight = $(window).height() - 130;
-    numListHeight = contentHeight - $(".phoneTitle").outerHeight() - $(".phoneDial").outerHeight() - 20;
-
+    contentHeight = $(window).height() - 110;
+    numListHeight = contentHeight - $(".phoneTitle").outerHeight() - $(".phoneDial").outerHeight() ;
     orgList = contentHeight - 142;
 
   } else {
     contentHeight = $(window).height() - 50;
     numListHeight = contentHeight - $(".phoneDial").outerHeight() - $(".functionMenu").outerHeight()-50;
-
   }
 
   $(".content").height(contentHeight);

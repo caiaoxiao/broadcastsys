@@ -3,8 +3,8 @@
       <div class="phone right">
         <div class="phoneTitle">
             <i class="fa fa-user-circle" aria-hidden="true"></i>报警
-          <div class="phoneMeeting meetingOut">
-            <i aria-hidden="true" class="fa fa-sign-out"></i>退出
+          <div class="phoneMeeting ">
+            <i aria-hidden="true" class="fa fa-sign-out"></i>进入
           </div>
           </div>
         <div class="numList">

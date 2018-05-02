@@ -24,11 +24,11 @@ const routes = [
         name: '语音通话',
         component: _import('voiceCall/index'),
       },
-      {
+/*      {
         path: '/ipBroad',
         name: 'IP广播',
         component: _import('ipBroad/index'),
-      },
+      },*/
       {
         path: '/video',
         name: '视频',
@@ -72,11 +72,11 @@ const routes = [
           }
         ]
       },
-      {
+   /*   {
         path: '/map',
         name: '地图',
         component: _import('broadOrder/index'),
-      }
+      }*/
     ]
   },
   {

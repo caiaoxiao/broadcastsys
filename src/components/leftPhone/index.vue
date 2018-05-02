@@ -1,9 +1,8 @@
 <template>
   <div class="phone left">
     <div class="phoneTitle">
-      <div class="onair">
-        <div class="cloud onair"></div>
-      </div>语音
+       <i class="fa fa-phone" aria-hidden="true"></i>语音
+       <span class="cloud "></span>
       <div class="phoneMeeting meetingOut">
         <i aria-hidden="true" class="fa fa-plus"></i>退出</div>
     </div>
@@ -45,7 +44,7 @@
     { name: '邀请成员', class: 'fa-user-plus' },
     { name: '允许通话', class: 'fa-microphone' },
     { name: '排队等待', class: 'fa-spinner' },
-    { name: '踢出会话', class: 'fa-sign-out'}, 
+    { name: '踢出会话', class: 'fa-sign-out'},
     { name: '会话录音', class: 'fa-play-circle' },
     { name: '结束服务', class: 'fa-window-close-o' },
     { name: '用户转出', class: 'fa-user-times' },
@@ -133,8 +132,8 @@
             $(target).removeClass().addClass('unselected')
             this.selected.forEach(function(a,i){if(a.conf_id==item.conf_id) _this.selected.splice(i,1)})
         }
-        
-	    },	
+
+	    },
       clear() {
         this.destination_number = this.destination_number.substring(0, this.destination_number.length - 1)
       },

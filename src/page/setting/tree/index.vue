@@ -98,6 +98,8 @@
         let treeName = this.lable.treeName
         let treeID = this.lable.defaultId
         this.$AjaxGet(this.addr, this.id, function(ret) {
+                    debugger
+
           if(ret.result != null) {
             let result = ret.result;
             if(ret.code != 0) {

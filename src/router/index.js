@@ -80,10 +80,38 @@ const routes = [
     ]
   },
   {
-    path:'/setting',
-    name:'系统设置',
-    component:_import('setting/index')
-  },
+    path: '/setting',
+    name: '系统设置',
+    redirect: '/setting/userManage',
+    component: _import('setting/index'),
+    children: [
+      {
+        path: '/setting/userManage',
+        name: '用户管理',
+        component: _import('setting/userManage/index')
+      },
+      {
+        path: '/setting/userGroupManage',
+        name: '用户组管理',
+        component: _import('setting/userGroupManage/index')
+      },
+      {
+        path: '/setting/deviceManage',
+        name: '设备管理',
+        component: _import('setting/deviceManage/index')
+      },
+      {
+        path: '/setting/deviceGroupManage',
+        name: '设备组管理',
+        component: _import('setting/deviceGroupManage/index')
+      },
+      {
+        path: '/setting/organizationManage',
+        name: '机构管理',
+        component: _import('setting/organizationManage/index')
+      }
+    ]
+  }
 ]
 
 const router = new Router({

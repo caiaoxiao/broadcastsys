@@ -36,7 +36,8 @@
         currentLoginUser:'currentLoginUser',
         deviceList:'deviceList',
         callQueue:'callQueue',
-	conLeft:'confLeft'
+	      confLeft:'confLeft',
+        confWarning:'confAlarm'
       }),
     },/*
     watch: {
@@ -90,43 +91,112 @@
                 //do nothing
               }
               else {
+                let arr = _this.$store.getters.callQueue
                 switch (d.state.name) {
                   case "trying":
-                    break;
+                    for(var i =0 ;i < arr.legnth;i++){
+                      if(arr[i].caller==d.params.caller_id_number)
+                            arr[i].state = "trying"
+                            break
+                    }
+                    if(i==arr.length){
+                      arr.push({
+                      curCall: d,
+                      state: d.state.name,
+                      caller: d.params.caller_id_number,
+                      des:d.params.callee_id_number
+                    })
+                    }
+                    _this.$store.dispatch('setCallQueue', arr)
+                    break
                   case "ringing":       // 振铃，装载进队列
+                    for(var i =0 ;i < arr.legnth;i++){
+                      if(arr[i].caller==d.params.caller_id_number)
+                            arr[i].state = "ringing"
+                            break
+                    }
+                    if(i==arr.length){
                     arr.push({
                       curCall: d,
                       state: d.state.name,
                       caller: d.params.caller_id_number,
                       des:d.params.callee_id_number
                     })
+                    }
                     _this.$store.dispatch('setCallQueue', arr)
-                    break;
+                    break
                   case "requesting":
+                    for(var i =0 ;i < arr.legnth;i++){
+                      if(arr[i].caller==d.params.caller_id_number)
+                            arr[i].state = "requesting"
+                            break
+                    }
+                    if(i==arr.length){
                     arr.push({
-                      curCall:d,
+                      curCall: d,
                       state: d.state.name,
                       caller: d.params.caller_id_number,
-                      des:d.params.destination_number
+                      des:d.params.callee_id_number
                     })
-                    _this.$store.dispatch('setCallQueue',arr)
-                    break;
+                    }
+                    _this.$store.dispatch('setCallQueue', arr)
+                    break
                   case "answering":     // 接听电话，改变状态
-                    break;
+                    for(var i =0 ;i < arr.legnth;i++){
+                      if(arr[i].caller==d.params.caller_id_number)
+                            arr[i].state = "answering"
+                            break
+                    }
+                    if(i==arr.length){
+                    arr.push({
+                      curCall: d,
+                      state: d.state.name,
+                      caller: d.params.caller_id_number,
+                      des:d.params.callee_id_number
+                    })
+                    }
+                    _this.$store.dispatch('setCallQueue', arr)
+                    break
                   case "active":
-                    break;
+                    for(var i =0 ;i < arr.legnth;i++){
+                      if(arr[i].caller==d.params.caller_id_number)
+                            arr[i].state = "active"
+                            break
+                    }
+                    if(i==arr.length){
+                    arr.push({
+                      curCall: d,
+                      state: d.state.name,
+                      caller: d.params.caller_id_number,
+                      des:d.params.callee_id_number
+                    })
+                    }
+                    _this.$store.dispatch('setCallQueue', arr)
+                    break
                   case "hangup":        //  拒接，改变状态
-                    arr = _this.$store.getters.callQueue
+                    for(var i =0 ;i < arr.legnth;i++){
+                      if(arr[i].caller==d.params.caller_id_number)
+                            arr[i].state = "hangup"
+                            break
+                    }
+                    if(i==arr.length){
+                    arr.push({
+                      curCall: d,
+                      state: d.state.name,
+                      caller: d.params.caller_id_number,
+                      des:d.params.callee_id_number
+                    })
+                    }
+                    _this.$store.dispatch('setCallQueue', arr)
+                    break
+                  case "destroy":
                     arr.forEach(function(a, i){
-                      if(a.caller == d.params.caller_id_number &&  (a.des == d.params.destination_number || a.des==d.params.callee_id_number)) {
-                        arr.splice(i,1);
-                      }
+                    if(a.caller == d.params.caller_id_number) {
+                      arr.splice(i,1);
+                    }
                     })
                     _this.$store.dispatch('setCallQueue', arr)
                     console.log("Call ended with cause: " + d.cause);
-                    break;
-                  case "destroy":
-                    // Some kind of client side cleanup...
                     break;
                   default:
                     console.log(d.state.name);
@@ -136,9 +206,7 @@
 
             },
 
-            onMessage:function(verto, dialog, message, data) {
-              console.log('this is a message',message)
-	      let arr = _this.$store.getters.confLeft 
+            onMessage:function(verto, dialog, message, data) { 
               var initLiveArray =  function(verto, dialog, data,pbx,room) {
                 // Set up addtional configuration specific to the call.
                 var config = {subParams: {callID: dialog ? dialog.callID : null},};
@@ -147,6 +215,8 @@
                 // Subscribe to live array changes.
                 _this.liveArray.onChange = function(liveArrayObj, args) {
                   try {
+                    if(liveArrayObj.name == '9100-scc.ieyeplus.com'){
+                    var arr = _this.$store.getters.confLeft
                     switch (args.action) {
 
                       // Initial list of existing conference users.
@@ -156,9 +226,10 @@
                       // New user joined conference.
                       case "add":
                         console.log('conference user added')
-			console.log('conference user added')
+			      console.log('conference user added')
 	          var  data = JSON.parse(args.data[4])
             arr.push({
+
               conf_id : parseInt(args.data[0]).toString(),
               caller_id_number : args.data[1],
               muted : data["audio"]["muted"],
@@ -197,7 +268,67 @@
             }    
                         break;
 
+                    }}
+                  else if(liveArrayObj.name=='9110-scc.ieyeplus.com')
+                  {
+                    var arr = _this.$store.getters.confAlarm
+                    switch (args.action) {
+
+                      // Initial list of existing conference users.
+                      case "bootObj":
+                        break;
+
+                      // New user joined conference.
+                      case "add":
+                        console.log('conference user added')
+			      console.log('conference user added')
+	          var  data = JSON.parse(args.data[4])
+            arr.push({
+
+              conf_id : parseInt(args.data[0]).toString(),
+              caller_id_number : args.data[1],
+              muted : data["audio"]["muted"],
+              deaf :  data["audio"]["deaf"],
+              talking : data["audio"]["talking"],
+              key : args.key
+
+            })
+            _this.$store.dispatch('setConfAlarm',arr)
+                        break;
+
+                      // User left conference.
+                      case "del":
+                        console.log('conference user deleted')
+			arr.forEach(function(a,i){
+              if (a.key == args.key)
+                arr.splice(i,1)
+            })
+            _this.$store.dispatch('setConfAlarm',arr)
+                        break;
+
+                      // Existing user's state changed (mute/unmute, talking, floor, etc)
+                      case "modify":
+                        console.log('conference user changed')
+			data = JSON.parse(args.data[4])
+	          if(arr.length == 0 ||  arr.every(function(item,index,array){return item.key!=args.key}))
+            {
+                    arr.push({
+                    conf_id : parseInt(args.data[0]).toString(),
+                    caller_id_number : args.data[1],
+                    muted : data["audio"]["muted"],
+                    deaf :  data["audio"]["deaf"],
+                    talking : data["audio"]["talking"],
+                    key : args.key })
+            _this.$store.dispatch('setConfAlarm',arr)
+            }    
+                        break;
+
                     }
+
+
+
+
+                  }
                   } catch (err) {
                     console.error("ERROR: " + err);
                   }
@@ -218,7 +349,6 @@
                         break;
                       // This client has left the live array for the conference.
                       case "conference-liveArray-part":
-                        console.log('part')
                         // Some kind of client-side wrapup...
                         break;
                     }

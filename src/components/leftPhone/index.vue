@@ -94,7 +94,7 @@
 	      console.log('kick clicked')
               if(this.selected.length > 0)
                 this.selected.forEach(function(a,i){
-                  _this.fsAPI('conference',"9110-scc.ieyeplus.com"+" "+"kick"+" "+a.conf_id)
+                  _this.fsAPI('conference',"9110-scc.ieyeplus.com"+" "+"hup"+" "+a.conf_id)
                 })
                 console.log('please select before click')
 		break
@@ -116,6 +116,13 @@
 	            else
                 console.log('please select before unmute')
 		break
+	  case '结束服务':
+              console.log('killing clicked')
+	      console.log(_this.fsAPI('conference',"9110-scc.ieyeplus.com"+" "+"list"))
+              this.confLeft.forEach(function(a,i){
+              _this.fsAPI('conference',"9110-scc.ieyeplus.com"+" "+"kick"+" "+a.conf_id)
+	        }) 
+	        break
         }
 
       },

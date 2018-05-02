@@ -16,7 +16,7 @@ const routes = [
   },
   {
     path: '/',
-    redirect: '/video',
+    redirect: '/voiceCall',
     component: _import('home/index'),
     children: [
       {
@@ -24,16 +24,16 @@ const routes = [
         name: '语音通话',
         component: _import('voiceCall/index'),
       },
-/*      {
+      {
         path: '/ipBroad',
         name: 'IP广播',
         component: _import('ipBroad/index'),
-      },*/
-      {
+      },
+     /* {
         path: '/video',
         name: '视频',
         component: _import('video/index'),
-      },
+      }, */
       {
         path: '/meeting',
         name: '会议',

@@ -7,13 +7,13 @@
       <div class="sysName">
         <div><i class="fa fa-cogs"></i>系统管理</div>
       </div>
-        <ul class="settingMenu" @tab-click="tabClick">
-          <li class="li-tab"
-              v-for="(item,index) in tabsParam"
-              @click="toggleTabs(index)"
-              :class="{selected:index==nowIndex}">
-            <div>{{item}}</div></li>
-        </ul>
+      <ul class="settingMenu" @tab-click="tabClick">
+        <li class="li-tab"
+            v-for="(item,index) in tabsParam"
+            @click="toggleTabs(index)"
+            :class="{selected:index==nowIndex}">
+          <div>{{item}}</div></li>
+      </ul>
     </header>
     <user v-show="nowIndex===0"></user>
     <userGroup v-show="nowIndex===1"></userGroup>
@@ -30,10 +30,10 @@
   import Organization from './Organization/index.vue'
   export default {
     data() {
-        return{
-          nowIndex:0,
-          tabsParam:['用户管理','用户组管理','设备管理','设备组管理','机构管理']
-        }
+      return{
+        nowIndex:0,
+        tabsParam:['用户管理','用户组管理','设备管理','设备组管理','机构管理']
+      }
     },
     components: {
       user,

@@ -1,6 +1,6 @@
 <template>
   <!--新增用户至用户组-->
-  <div :visible.sync="dialog" :before-close="update">
+  <div :visible.sync="dialog">
     <div class="popUpbig" id="add" STYLE="display: block">
       <div class="groupName"><i class="fa fa-user-plus" ></i>新增用户组</div>
       <div class="orgDisplay">
@@ -13,31 +13,15 @@
           </button>
         </form>
         <div class="orgList">
-
-          <ul class="dept">
-            <li><i class="fa fa-caret-right"></i><a>一级机构</a>
-              <ul>
-                <li><i class="fa fa-caret-down"></i><a class="selected">二级机构</a>
-                  <ul>
-                    <li><a>三级机构</a></li>
-                  </ul>
-                </li>
-              </ul>
-            </li>
-            <li><a>一级机构</a></li>
-          </ul>
+          <tree :addr="OrgUrl" ref="tree" :lable="labels" @initData="initDatas"></tree>
         </div>
         <div class="orgMember">
-
           <ul class="userList">
-            <li class="selected"><i class="fa fa-user" ></i>马大哈<span class="fa fa-check-circle"></span></li>
-            <li><i class="fa fa-user" ></i>马中哈<span class="fa fa-check-circle"></span></li>
-            <li><i class="fa fa-user" ></i>马小哈<span class="fa fa-check-circle"></span></li>
-            <li><i class="fa fa-user" ></i>admin<span class="fa fa-check-circle"></span></li>
-            <li><i class="fa fa-user" ></i>cools<span class="fa fa-check-circle"></span></li>
-            <li><i class="fa fa-user" ></i>嗯哼<span class="fa fa-check-circle"></span></li>
-            <li><i class="fa fa-user" ></i>吴亦凡<span class="fa fa-check-circle"></span></li>
-            <li><i class="fa fa-user" ></i>嘻哈哥<span class="fa fa-check-circle"></span></li>
+            <li class="selected" v-for="item in this.user">
+              <i class="fa fa-user" ></i>
+              {{item.UserName}}
+              <span class="fa fa-check-circle"></span>
+            </li>
           </ul>
           <div class="selectAll">全选</div>
         </div>
@@ -53,7 +37,7 @@
 
       <div class="btnDiv">
         <button type="submit" class="btn btn-sm btn-info">确定</button>
-        <button type="submit" class="btn btn-sm btn-default" @click="update">取消</button>
+        <button type="submit" class="btn btn-sm btn-default" @click="close">取消</button>
       </div>
     </div>
   </div>
@@ -65,6 +49,7 @@
   import {getHeights,itemClick} from 'utils/page/deviceGroup'
   import tree from "../structureTree/index.vue"
   export default {
+    props: ['user'],
     computed: {
       ...mapGetters({
         get_user_info: GET_USER_INFO,
@@ -75,6 +60,7 @@
     },
     data(){
       return {
+        OrgUrl: 'Organization/TreeRoot/'+this.$store.state.user_info.user.OrganizationID,
         labels: {
           defaultId: "OrganizationID",
           treeName: "OrgName"
@@ -85,31 +71,12 @@
         },
         //请求时的loading效果
         loading: true,
-        //批量选择数组
-        batch_select: [],
-        orgData: {
-          pid:0,
-          OrganizationID: this.$store.state.user_info.user.OrganizationID,
-          orgId: '',
-        },
-        departlist:[],
-        rolelist:[],
-        OrgUrl: 'Organization/TreeRoot/'+this.$store.state.user_info.user.OrganizationID,
-        chanOrg:false,
         changeTitle:'',
         targetMenu:{},
-        roleId:'',
-        deptId:'',
         self: this,
       }
     },
     watch:{
-      'deptId':function () {
-        this.refresh();
-      },
-      'roleId':function () {
-        this.refresh();
-      },
       'pageData.pageSize':function () {
         this.refresh();
       },
@@ -142,37 +109,9 @@
       tree,
     },
     created(){
-      this.initSelectData()
-      this.refresh()
+
     },
     methods: {
-      changeOrg(Id){
-        this.orgData.userId=Id;
-        this.changeTitle='分配';
-        this.chanOrg=true;
-      },
-      initSelectData() {
-        var request = {
-          pageSize: this.pageData.pageSize,
-          pageIndex: this.pageData.pageIndex
-        }
-        this.departlist = []
-        this.rolelist = []
-        this.$AjaxPost('Department/List',request, function(ret) {
-          if(ret.code == 1) {
-            this.departlist = ret.result
-          }
-        }.bind(this))
-        this.$AjaxPost('Role/List',request, function(ret) {
-          if(ret.code == 1) {
-            this.rolelist = ret.result;
-            this.rolelist.unshift({
-              RoleName: "请选择角色",
-              RoleID: ''
-            })
-          }
-        }.bind(this));
-      },
       initDatas (data) {
         if(!this.targetMenu.hasOwnProperty("OrganizationID") && data) {
           this.orgData = data
@@ -182,23 +121,11 @@
       },
       //获取数据
       refresh(){
-        var request = {
-          pageSize: this.pageData.pageSize,
-          pageIndex: this.pageData.pageIndex,
-          organizationID:this.orgData.OrganizationID
-        };
-        this.$AjaxPost("User/List",request, function(ret) {
-          if(ret.code == 1){
-            let result = ret.result
-            this.pageData.total=ret.total
-            this.userData= result
-            this.loading = false
-          }
-        }.bind(this));
+
       },
       //选中行
       selectClick(index, user) {
-        let target = $(".table>tbody>tr").eq(index)
+        let target = $(".selectedMember>ul>li").eq(index)
         if(target.hasClass('selected')) {
           this.selectUser.forEach(function(s, i) {
             if(s.roleID == user.roleID) {
@@ -210,13 +137,12 @@
         }
         this.selectUser
         target.toggleClass("selected")
-
       },
       //批量选择
       on_batch_select(val){
         this.batch_select = val
       },
-      //批量删除
+      //全部删除
       on_batch_del(){
         var batchArr=[];
         for(var i=0;i<this.batch_select.length;i++){
@@ -244,14 +170,10 @@
               }
             })
           })
-
       },
       close(){
-        if(this.dialogFormVisible){
-          this.$store.state.dialogFormVisible = false;
-          this.$refs.tree.refresh(this.targetMenu);
+        this.$emit('close')
           this.refresh();
-        }
       },
       closeChange(){
         if(this.chanOrg){

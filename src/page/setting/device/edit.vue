@@ -96,27 +96,28 @@
       }),
     },
     created(){
-        debugger
-      let $this=this;
-      this.pid = this.data.pid;
-      if(this.data.pid != 0){
-        //修改
-        this.$AjaxGet("Feature/Detail/", this.data.FeatureBaseID, function(ret) {
-          let result = ret.result;
-          if(ret.code != 0) {
-            $this.formData= result;
-            $this.formData.FeatureCode=result.featureCode;
-            $this.formData.FeatureName=result.featureName;
-            $this.formData.FeatureType = result.featureType;
-            $this.formData.CameraIp = result.cameraIp;
-          }
-        });
-      }
+      this.refresh();
     },
     methods: {
       ...mapActions([
         'update',
       ]),
+      refresh(){
+        this.pid = this.data.pid;
+        if(this.data.pid != 0){
+          //修改
+          this.$AjaxGet("Feature/Detail/", this.data.FeatureBaseID, function(ret) {
+            let result = ret.result;
+            if(ret.code != 0) {
+              $this.formData= result;
+              $this.formData.FeatureCode=result.featureCode;
+              $this.formData.FeatureName=result.featureName;
+              $this.formData.FeatureType = result.featureType;
+              $this.formData.CameraIp = result.cameraIp;
+            }
+          });
+        }
+      },
     }
   }
 </script>

@@ -1,15 +1,20 @@
 <template>
   <div class="content">
-    <tree :addr="OrgUrl" ref="tree" :data="labels" @initData="initDatas"></tree>
+    <div class="groupList">
+      <div class="menuType">
+        <i class="fa fa-list-ul" aria-hidden="true"></i>组织机构
+      </div>
+      <tree :addr="OrgUrl" ref="tree" :lable="labels" @initData="initDatas"></tree>
+    </div>
     <div class="singleDevice">
       <div class="tableTool">
         <div class="operate">
           <button type="primary" class="btn btn-sm btn-info"  @click="openModal(0)">
             <i class="fa fa-search" aria-hidden="true"></i>新增用户
           </button>
-          <button type="danger" class="btn btn-sm btn-info" :disabled="batch_select.length === 0">
+          <!--<button type="danger" class="btn btn-sm btn-info" :disabled="batch_select.length === 0">
             <i class="fa fa-search" aria-hidden="true"></i>批量删除
-          </button>
+          </button>-->
         </div>
       </div>
       <div class="table">
@@ -22,7 +27,7 @@
           </tr>
           </thead>
           <tbody v-if="dataAll.length != 0">
-          <tr @click="selectClick(index, org)" v-for="(org, index) in dataAll">
+          <tr v-for="(org, index) in dataAll">
             <td >{{ org.OrgName }}</td>
             <td >{{ org.OrgCode }}</td>
             <td width="170">
@@ -136,29 +141,6 @@
           this.$store.state.dialogFormVisible = false;
           this.$refs.tree.refresh(this.targetMenu);
           this.refresh();
-        }
-      },
-      //选中行
-      selectClick(index, org) {
-        let target = $(".table>tbody>tr").eq(index)
-        if(target.hasClass('selected')) {
-          this.selectOrg.forEach(function(s, i) {
-            if(s.ChildNum == org.ChildNum) {
-              this.selectOrg.splice(i, 1)
-            }
-          }.bind(this))
-        }else {
-          this.selectOrg.push(org)
-        }
-        this.selectOrg
-        target.toggleClass("selected")
-
-      },
-      selectToggle(row) {
-        if (row.ChildNum == 0) {
-          return true;
-        } else {
-          return false;
         }
       },
       // 组织机构初始化

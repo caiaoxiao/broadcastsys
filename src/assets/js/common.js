@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import axios from 'axios'
-let api = 'https://scc.ieyeplus.com:8443/IpBc/'
+let api = 'https://192.168.1.102:8443/IpBc/'
 axios.defaults.baseURL = api
 
 Vue.Api =  api
@@ -147,7 +147,7 @@ Vue.prototype.$FindByValue = function (attr, val, attributeName) {
 // 单个删除
 /* 接收一个api 和 id 回调为true时刷新，反之不操作 */
 Vue.prototype.deleteItems = (( self, api, formData, updateState) => {
-  debugger
+
   formData.LoginId = self.$store.getters.LoginId
   self.$confirm('此操作将删除所选数据, 是否继续?', '提示', {
     confirmButtonText: '确定',

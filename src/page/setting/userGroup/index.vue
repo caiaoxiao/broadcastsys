@@ -54,11 +54,11 @@
       </div>
     </div>
   </div>
-  <div v-if="dialogShow">
+  <div v-if="dialogFormVisible">
     <modal :data="orgData" @close="close"></modal>
   </div>
   <div v-if="dialog">
-    <popUp :data="orgData" @close="close"></popUp>
+    <popUp :user="userData" @close="close"></popUp>
   </div>
 </div>
 </template>
@@ -83,14 +83,14 @@
         selectUser: [],
         departData:[],
         groupLength:[],
-        userData:{
-          OrganizationID:''
-        },
+        TempGroup:{},
+        userData:{},
         orgData: {
           pid:0,
           OrganizationID: this.$store.state.user_info.user.OrganizationID,
           orgId: '',
-          DepartmentID:''
+          DepartmentID:'',
+          TempGroupID:''
         },
         //请求时的loading效果
         loading: true,
@@ -130,7 +130,8 @@
     methods: {
       openModal(id) {
         //  编辑或新增
-        this.dialogShow =  !this.dialogShow
+        /*this.dialogShow =  !this.dialogShow*/
+        this.$store.state.dialogFormVisible = true
 
         if(id == 0) {
           this.orgData.orgId = 0
@@ -144,7 +145,7 @@
         this.dialog =  !this.dialog
       },
       initSelectData() {
-        this.$AjaxGet('Department/Detail/',this.orgData.OrganizationID, function(ret) {
+        this.$AjaxGet('Department/Detail/',this.orgData.OrganizationID, function(ret){
           if(ret.code == 1) {
             let result = ret.result
             this.departData = result
@@ -167,6 +168,23 @@
             this.loading = false
           }
         }.bind(this));
+        this.$AjaxPost("User/List",request, function(ret) {
+          if(ret.code == 1){
+            let result = ret.result
+            this.pageData.total=ret.total
+            this.userData= result
+            this.loading = false
+          }
+        }.bind(this));
+        this.$ajax.post('Plan/List')
+          .then(res => {
+            if(res.data.code == 1) {
+              this.TempGroup = res.data.result
+              for(let i in this.TempGroup){
+                this.orgData.TempGroupID = this.TempGroup[i].PlanID;
+              }
+            }
+          });
       },
       //批量选择
       on_batch_select(val){
@@ -202,6 +220,7 @@
           })
       },
       close(){
+          this.dialog = false;
         if(this.dialogFormVisible){
           this.$store.state.dialogFormVisible = false;
           this.$refs.tree.refresh(this.targetMenu);

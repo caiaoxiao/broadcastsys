@@ -35,7 +35,6 @@
                @click="selectItem(device)">{{device.userID}}
           </div>
         </div>
-
       </div>
       <div class="sidder" @click="Devhidden();"><i class="fa fa-2x fa-angle-double-right"></i><span>收起</span></div>
     </div>
@@ -57,7 +56,6 @@
         isSelectAll: false, // 是否全选
         dialogShow: false,
         selectDevice:[],
-        deviceList:[]
       }
       },
     computed: {
@@ -90,7 +88,6 @@
     },
     methods: {
       refresh() {
-        this.deviceList
       },
       Devhidden() {
         $(".singleDevice").removeClass("moveLeftMiddle").addClass("moveRightMiddle");
@@ -142,6 +139,7 @@
         }, success_cb, failed_cb);
       },
       open() {
+        this.deviceList
         $(".singleDevice").removeClass("moveRightMiddle").addClass("moveLeftMiddle");
         $(".allDevice").removeClass("moveRightDev").addClass("moveLeftDev");
       },

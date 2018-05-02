@@ -223,7 +223,6 @@
       },
       // 查询所有设备 以及事件初始化
       refresh() {
-          debugger
 //        let xuiUsername = localStorage.getItem('xui.username')
         let xuiUsername = 9000 // 过滤掉登陆者
         this.$store.dispatch('setCurrentLoginUser',{

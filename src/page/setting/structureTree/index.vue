@@ -1,20 +1,15 @@
 <template>
-  <div class="groupList">
-    <div class="menuType">
-      <i class="fa fa-list-ul" aria-hidden="true"></i>组织机构
-    </div>
-    <div class="dept">
-      <el-tree
-        ref="tree"
-        :data="data"
-        :props="defaultProps"
-        :default-expanded-keys="defaultExpanded"
-        node-key="OrganizationID"
-        :highlight-current="true"
-        @node-click="handleNodeClick"
-      >
-      </el-tree>
-    </div>
+  <div class="dept">
+    <el-tree
+      ref="tree"
+      :data="data"
+      :props="defaultProps"
+      :default-expanded-keys="defaultExpanded"
+      node-key="OrganizationID"
+      :highlight-current="true"
+      @node-click="handleNodeClick"
+    >
+    </el-tree>
   </div>
 </template>
 

@@ -1,6 +1,11 @@
 <template>
     <div class="content" >
-      <tree :addr="OrgUrl" ref="tree" :lable="labels" @initData="initDatas"></tree>
+      <div class="groupList">
+        <div class="menuType">
+          <i class="fa fa-list-ul" aria-hidden="true"></i>组织机构
+        </div>
+        <tree :addr="OrgUrl" ref="tree" :lable="labels" @initData="initDatas"></tree>
+      </div>
       <div class="singleDevice">
         <div class="tableTool">
           <div class="operate">
@@ -22,7 +27,7 @@
                 <td>操作</td>
               </tr>
             </thead>
-            <tbody v-if="userData.length != 0">
+            <tbody >
               <tr @click="selectClick(index, user)" v-for="(user, index) in userData">
                 <td >{{ user.UserName }}</td>
                 <td >{{ user.DepartName }}</td>
@@ -187,6 +192,7 @@
         };
         this.$AjaxPost("User/List",request, function(ret) {
           if(ret.code == 1){
+            debugger
             let result = ret.result
             this.pageData.total=ret.total
             this.userData= result

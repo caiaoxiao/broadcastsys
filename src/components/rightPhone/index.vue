@@ -10,11 +10,9 @@
         <div class="numList">
           <div>
             <ul class="callNum">
-              <li v-for="(item, index) in callQueue" :key="item.caller" @click="answerCall(item, index)">
-                <i v-if="item.state == 'answering'" class="fa fa-circle red" aria-hidden="true"></i>
-                <i v-if="item.state == 'ringing'" class="fa fa-circle orange" aria-hidden="true"></i>
-                <i v-if="item.state == 'hangup'" class="fa fa-clock-o" aria-hidden="true"></i>
-                {{item.caller}}
+              <li v-for="(item, index) in confAlarm" :key="item.caller" @click="answerCall(item, index)">
+		<i class="fa fa-circle red" aria-hidden="true"></i>
+		{{ item.caller_id_number + ' id : ' + item.conf_id }}
               </li>
               <!--<li><i class="fa fa-clock-o" aria-hidden="true"></i>1005</li>-->
             </ul>
@@ -84,7 +82,8 @@
         group_users: "group_users",
         users: "users",
         currentLoginUser: "currentLoginUser",
-        callQueue: "callQueue"
+        callQueue: "callQueue",
+	confAlarm: "confAlarm"
       })
     },
     watch: {

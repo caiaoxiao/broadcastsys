@@ -1,7 +1,7 @@
 <script src="../../utils/page/meeting.js"></script>
 <template>
   <div >
-      <leftPhone></leftPhone>
+     <left-phone  :select-phone="selectPhone" ></left-phone>
     <div id="media">
       <video width=800 id="webcam" autoplay="autoplay" hidden="true"></video>
     </div>
@@ -158,12 +158,6 @@
 
 
   export default {
-    components: {
-      leftPhone,
-      rightPhone,
-      deviceList,
-      switchs
-    },
     data() {
       return {
         inputValue: '',
@@ -174,8 +168,14 @@
         selectNowCall: [],
         selectPhone: [],
         selectRingCall: [],
-        num : 0
+        num : 0,
        }
+    },
+    components: {
+      leftPhone,
+      rightPhone,
+      deviceList,
+      switchs
     },
     created() {
       this.$nextTick(function() {
@@ -197,9 +197,6 @@
       ]),
     },
     watch: {
-      'callqueue': function() {
-
-     }
     },
     methods: {
       itemClick(e, row) {
@@ -243,6 +240,7 @@
              this.selectRingCall.push(row)
            }
          }
+	if(this.selectPhone.length>0)
          this.destination_number = this.selectPhone[0].userID;
       },
       fsAPI(cmd, arg, success_cb, failed_cb) {

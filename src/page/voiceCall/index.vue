@@ -202,7 +202,6 @@
       itemClick(e, row) {
         let target = e.currentTarget
         let _this = this
-
         if($(target).hasClass('online')) {
           if($(target).hasClass("onlineSelected")) {
             $(target).removeClass("onlineSelected")
@@ -412,7 +411,7 @@
          console.log(this.selectPhone[0]);
          console.log(this.deviceList[0]);
          console.log("1234567890");
-         this.fsAPI("uuid_deflect",this.selectNowCall[0].channelUUID+" "+"sip:"+this.selectPhone[0].userID+"@"+this.selectPhone[0].networkIP+":"+this.selectPhone[0].networkPort,function(res) {console.log("call traverse")}.bind(this));
+         this.fsAPI("uuid_transfer",this.selectNowCall[0].channelUUID+" "+"sip:"+this.selectPhone[0].userID+"@"+this.selectPhone[0].networkIP+":"+this.selectPhone[0].networkPort,function(res) {console.log("call traverse")}.bind(this));
          this.selectPhone = [];
          this.selectNowCall = [];
       },

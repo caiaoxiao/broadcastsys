@@ -12,7 +12,7 @@
             <ul class="callNum">
               <li v-for="(item, index) in confAlarm" :key="item.caller" @click="answerCall(item, index)">
 		<i class="fa fa-circle red" aria-hidden="true"></i>
-		{{ item.caller_id_number + ' id : ' + item.conf_id }}
+		{{ item.caller_id_number}}
               </li>
               <!--<li><i class="fa fa-clock-o" aria-hidden="true"></i>1005</li>-->
             </ul>

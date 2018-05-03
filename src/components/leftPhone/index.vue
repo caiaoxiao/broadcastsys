@@ -4,8 +4,8 @@
       <div class="onair">
         <div class="cloud onair"></div>
       </div>语音
-      <div class="phoneMeeting meetingOut">
-        <i aria-hidden="true" class="fa fa-plus"></i>退出</div>
+      <div class="phoneMeeting meetingOut" @click="toggle_enter">
+        <i aria-hidden="true" class="fa fa-plus"></i>{{status}}</div>
     </div>
     <div class="numList">
       <div>
@@ -15,9 +15,9 @@
           <!--1005-->
           <!--<span>00:00:01</span>-->
           <!--</li>-->
-          <li class ="unselected" v-for="item in confLeft" @click.stop="select($event,item)">
+          <li class ="unselected" v-if="item.caller_id_number!='9000'" v-for="item in confLeft" @click.stop="select($event,item)">
           <i class="fa fa-circle orange" aria-hidden="true"></i>
-		             {{ item.caller_id_number + ' id : ' + item.conf_id }}
+		             {{ item.caller_id_number}}
           </li>
           <!--<li><i class="fa fa-clock-o" aria-hidden="true"></i>1005</li>-->
         </ul>
@@ -174,7 +174,7 @@
 	      break
 	   case '确认转出':
 	      if(this.userDeflect && this.selectPhone.length > 0){
-		 _this.fsAPI('uuid_deflect',this.userDeflect.channel_uuid+ " "+"sip:"+this.selectPhone[0].userID+"@"+this.selectPhone[0].networkIP+":"+this.selectPhone[0].networkPort)	
+		 _this.fsAPI('uuid_transfer',this.userDeflect.channel_uuid+ " "+"sip:"+this.selectPhone[0].userID+"@"+this.selectPhone[0].networkIP+":"+this.selectPhone[0].networkPort)	
 	      }
               else
                 console.log('please select brfore deflect')
@@ -192,9 +192,7 @@
                  this.selectPhone.forEach(function(a,i){
                   _this.fsAPI('conference',"9100-scc.ieyeplus.com"+" "+"bgdial"+" "+"user/"+  a.userID)
                 })	
-           	$('.selected').removeClass().addClass('unselected')
-           	this.selected = []}
-		
+           	}
                     else
                 console.log('please select before invite')
                 break

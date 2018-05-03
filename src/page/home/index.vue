@@ -214,8 +214,7 @@
                 _this.liveArray = new $.verto.liveArray(verto,pbx,room, config);
                 // Subscribe to live array changes.
                 _this.liveArray.onChange = function(liveArrayObj, args) {
-		            let uuid = null 
-		            for(var id in liveArrayObj.hash())  uuid = id
+		let uuid = Object.keys(liveArrayObj.hash())[0] 
                 let  arr = liveArrayObj.name == '9100-scc.ieyeplus.com'?_this.$store.getters.confLeft:_this.$store.getters.confAlarm
 		let action = liveArrayObj.name == '9100-scc.ieyeplus.com'? 'setConfLeft': 'setConfAlarm'
                   try {
@@ -227,7 +226,7 @@
 
                       // New user joined conference.
                       case "add":
-			                  console.log('conference user added')
+			      console.log('conference user added')
 	                      var  data = JSON.parse(args.data[4])
                         arr.push({
                           conf_id : parseInt(args.data[0]).toString(),

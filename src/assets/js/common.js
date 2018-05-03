@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import axios from 'axios'
-let api = 'https://192.168.1.102:8443/IpBc/'
+let api = 'https://scc.ieyeplus.com:8443/IpBc/'
 axios.defaults.baseURL = api
 
 Vue.Api =  api

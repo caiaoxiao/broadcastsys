@@ -214,9 +214,11 @@
                 _this.liveArray = new $.verto.liveArray(verto,pbx,room, config);
                 // Subscribe to live array changes.
                 _this.liveArray.onChange = function(liveArrayObj, args) {
+		            let uuid = null 
+		            for(var id in liveArrayObj.hash())  uuid = id
+                let  arr = liveArrayObj.name == '9100-scc.ieyeplus.com'?_this.$store.getters.confLeft:_this.$store.getters.confAlarm
+		let action = liveArrayObj.name == '9100-scc.ieyeplus.com'? 'setConfLeft': 'setConfAlarm'
                   try {
-                    if(liveArrayObj.name == '9100-scc.ieyeplus.com'){
-                    var arr = _this.$store.getters.confLeft
                     switch (args.action) {
 
                       // Initial list of existing conference users.
@@ -225,113 +227,53 @@
 
                       // New user joined conference.
                       case "add":
-                        console.log('conference user added')
-			      console.log('conference user added')
-	          var  data = JSON.parse(args.data[4])
-            arr.push({
+			                  console.log('conference user added')
+	                      var  data = JSON.parse(args.data[4])
+                        arr.push({
+                          conf_id : parseInt(args.data[0]).toString(),
+                          caller_id_number : args.data[1],
+                          muted : data["audio"]["muted"],
+                          deaf :  data["audio"]["deaf"],
+                          talking : data["audio"]["talking"],
+                          channel_uuid : uuid,
+                          key : args.key
 
-              conf_id : parseInt(args.data[0]).toString(),
-              caller_id_number : args.data[1],
-              muted : data["audio"]["muted"],
-              deaf :  data["audio"]["deaf"],
-              talking : data["audio"]["talking"],
-              key : args.key
-
-            })
-            _this.$store.dispatch('setConfLeft',arr)
+                        })
+                        _this.$store.dispatch(action,arr)
                         break;
 
                       // User left conference.
                       case "del":
                         console.log('conference user deleted')
-			arr.forEach(function(a,i){
-              if (a.key == args.key)
-                arr.splice(i,1)
-            })
-            _this.$store.dispatch('setConfLeft',arr)
+			                  arr.forEach(function(a,i){
+                          if (a.key == args.key)
+                            arr.splice(i,1)
+                        })
+                        _this.$store.dispatch(action,arr)
                         break;
 
                       // Existing user's state changed (mute/unmute, talking, floor, etc)
                       case "modify":
                         console.log('conference user changed')
-			data = JSON.parse(args.data[4])
-	          if(arr.length == 0 ||  arr.every(function(item,index,array){return item.key!=args.key}))
-            {
-                    arr.push({
-                    conf_id : parseInt(args.data[0]).toString(),
-                    caller_id_number : args.data[1],
-                    muted : data["audio"]["muted"],
-                    deaf :  data["audio"]["deaf"],
-                    talking : data["audio"]["talking"],
-                    key : args.key })
-            _this.$store.dispatch('setConfLeft',arr)
-            }    
-                        break;
-
-                    }}
-                  else if(liveArrayObj.name=='9110-scc.ieyeplus.com')
-                  {
-                    var arr = _this.$store.getters.confAlarm
-                    switch (args.action) {
-
-                      // Initial list of existing conference users.
-                      case "bootObj":
-                        break;
-
-                      // New user joined conference.
-                      case "add":
-                        console.log('conference user added')
-			      console.log('conference user added')
-	          var  data = JSON.parse(args.data[4])
-            arr.push({
-
-              conf_id : parseInt(args.data[0]).toString(),
-              caller_id_number : args.data[1],
-              muted : data["audio"]["muted"],
-              deaf :  data["audio"]["deaf"],
-              talking : data["audio"]["talking"],
-              key : args.key
-
-            })
-            _this.$store.dispatch('setConfAlarm',arr)
-                        break;
-
-                      // User left conference.
-                      case "del":
-                        console.log('conference user deleted')
-			arr.forEach(function(a,i){
-              if (a.key == args.key)
-                arr.splice(i,1)
-            })
-            _this.$store.dispatch('setConfAlarm',arr)
-                        break;
-
-                      // Existing user's state changed (mute/unmute, talking, floor, etc)
-                      case "modify":
-                        console.log('conference user changed')
-			data = JSON.parse(args.data[4])
-	          if(arr.length == 0 ||  arr.every(function(item,index,array){return item.key!=args.key}))
-            {
-                    arr.push({
-                    conf_id : parseInt(args.data[0]).toString(),
-                    caller_id_number : args.data[1],
-                    muted : data["audio"]["muted"],
-                    deaf :  data["audio"]["deaf"],
-                    talking : data["audio"]["talking"],
-                    key : args.key })
-            _this.$store.dispatch('setConfAlarm',arr)
-            }    
+			                  var data = JSON.parse(args.data[4])
+                        if(arr.length == 0 ||  arr.every(function(item,index,array){return item.key!=args.key}))
+                        {
+                                arr.push({
+                                conf_id : parseInt(args.data[0]).toString(),
+                                caller_id_number : args.data[1],
+                                muted : data["audio"]["muted"],
+                                deaf :  data["audio"]["deaf"],
+                                talking : data["audio"]["talking"],
+                                channel_uuid : uuid,
+                                key : args.key })
+                        _this.$store.dispatch(action,arr)
+                        }    
                         break;
 
                     }
-
-
-
-
-                  }
-                  } catch (err) {
-                    console.error("ERROR: " + err);
-                  }
+                 
+                  } 
+                    catch (err) { console.error("ERROR: " + err);}
                 };
                 // Called if the live array throws an error.
                 _this.liveArray.onErr = function (obj, args) {

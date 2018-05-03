@@ -1,7 +1,7 @@
 <script src="../../utils/page/meeting.js"></script>
 <template>
   <div >
-     <left-phone :key="moveUp.a" :value="moveUp.b"></left-phone>
+     <left-phone  :select-phone="selectPhone" ></left-phone>
     <div id="media">
       <video width=800 id="webcam" autoplay="autoplay" hidden="true"></video>
     </div>
@@ -169,7 +169,6 @@
         selectPhone: [],
         selectRingCall: [],
         num : 0,
-	'moveUp' :{a:11,b:[11,11,11]}
        }
     },
     components: {
@@ -201,8 +200,6 @@
     },
     methods: {
       itemClick(e, row) {
-	this.moveUp= new Object({a:this.moveUp.a+1})
-	console.log(this.moveUp)
         let target = e.currentTarget
         let _this = this
 

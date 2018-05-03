@@ -2,8 +2,8 @@
   <div class="phone left">
     <div class="phoneTitle">
       <i class="fa fa-user-circle" aria-hidden="true"></i>语音
-      <div class="phoneMeeting">
-        <i aria-hidden="true" class="fa fa-plus"></i>进入</div>
+      <div class="phoneMeeting" @click="toggle_enter">
+        <i aria-hidden="true" class="fa fa-plus"></i>{{status}}</div>
     </div>
     <div class="numList">
       <div>
@@ -17,6 +17,7 @@
           <i class="fa fa-circle orange" aria-hidden="true"></i>
 		             {{ item.caller_id_number + ' id : ' + item.conf_id }}
           </li>
+          <li v-for="item in value">{[item}}</li>
           <!--<li><i class="fa fa-clock-o" aria-hidden="true"></i>1005</li>-->
         </ul>
       </div>
@@ -51,21 +52,21 @@
     { name: '取消转出', class: '' },
   ]
   export default {
+    props:['key','value'],
     data() {
       return {
         btnData,
-	selected:[]
+	selected:[],
+	status:"进入",
       }
     },
     created() {
       this.$nextTick(function () {
         // getHeight()
-        //        $.verto.init({}, this.bootstrap);
+        // $.verto.init({}, this.bootstrap);
       })
     },
-    watch(){
-
-
+    mounted(){
     },
     computed: {
       ...mapGetters({
@@ -74,10 +75,49 @@
         users: 'users',
         currentLoginUser: 'currentLoginUser',
         callQueue: 'callQueue',
-	confLeft : 'confLeft'
+	confLeft : 'confLeft',
       }),
+	key:'key',
+	value:'value'
+    },
+    watch:{
+      'value': function(val){
+	console.log('***********************',val)}
     },
     methods: {
+    toggle_enter(){
+      var end = this.confLeft.length
+      for(var i = 0 ; i< this.confLeft.length ; i++){
+      if(this.confLeft[i].caller_id_number=='9000')
+                  {        
+                  this.fsAPI('conference',"9100-scc.ieyeplus.com"+" "+"hup"+" "+this.confLeft[i].conf_id)
+		  this.status = "进入"
+	          break	
+		  }
+      } 
+      if(i==end)
+		  {
+			
+                  this.vertoHandle.newCall({
+          		destination_number: "9100",
+            		caller_id_name: "LegalHigh",
+          		caller_id_number: "9000",
+          		outgoingBandwidth: "default",
+          		incomingBandwidth: "default",
+          		useStereo: true,
+          		dedEnc: false,
+          		tag: "video-container",
+          		deviceParams: {
+            		useMic: "any",
+            		useSpeak: "any",
+            		useCamera: "any"
+          		}
+        		})
+		  this.status = "离开"
+
+
+		  }
+      },
       fsAPI(cmd, arg, success_cb, failed_cb) {
         this.vertoHandle.sendMethod("jsapi", {
           command: "fsapi",
@@ -94,7 +134,7 @@
 	      console.log('kick clicked')
               if(this.selected.length > 0)
                 this.selected.forEach(function(a,i){
-                  _this.fsAPI('conference',"9110-scc.ieyeplus.com"+" "+"hup"+" "+a.conf_id)
+                  _this.fsAPI('conference',"9100-scc.ieyeplus.com"+" "+"hup"+" "+a.conf_id)
                 })
                 console.log('please select before click')
 		break
@@ -102,7 +142,7 @@
 	      console.log('permission clicked')
               if(this.selected.length > 0)
                 this.selected.forEach(function(a,i){
-                  _this.fsAPI('conference',"9110-scc.ieyeplus.com"+" "+"unmute"+" "+a.conf_id)
+                  _this.fsAPI('conference',"9100-scc.ieyeplus.com"+" "+"unmute"+" "+a.conf_id)
                 })
 	            else
                 console.log('please select before unmute')
@@ -111,16 +151,16 @@
 	      console.log('waiting clicked')
               if(this.selected.length > 0)
                 this.selected.forEach(function(a,i){
-                  _this.fsAPI('conference',"9110-scc.ieyeplus.com"+" "+"mute"+" "+a.conf_id)
+                  _this.fsAPI('conference',"9100-scc.ieyeplus.com"+" "+"mute"+" "+a.conf_id)
                 })
 	            else
                 console.log('please select before unmute')
 		break
 	  case '结束服务':
               console.log('killing clicked')
-	      console.log(_this.fsAPI('conference',"9110-scc.ieyeplus.com"+" "+"list"))
+	      console.log(_this.fsAPI('conference',"9100-scc.ieyeplus.com"+" "+"list"))
               this.confLeft.forEach(function(a,i){
-              _this.fsAPI('conference',"9110-scc.ieyeplus.com"+" "+"kick"+" "+a.conf_id)
+              _this.fsAPI('conference',"9100-scc.ieyeplus.com"+" "+"kick"+" "+a.conf_id)
 	        }) 
 	        break
         }

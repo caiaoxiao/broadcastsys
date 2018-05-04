@@ -1,7 +1,6 @@
 <template>
   <div >
-    <left-phone></left-phone>
-
+<left-phone  :select-phone="selectPhone" ></left-phone>
     <div class="middleCon">
 
       <div class="module">
@@ -138,7 +137,6 @@
 
   export default {
     data() {
-        debugger
       this.deviceList
       return {
         selectPhone: [],

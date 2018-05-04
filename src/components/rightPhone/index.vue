@@ -10,9 +10,9 @@
         <div class="numList">
           <div>
             <ul class="callNum">
-              <li v-for="(item, index) in confAlarm" :key="item.caller" @click="answerCall(item, index)">
+              <li v-for="(item, index) in callQueue" :key="item.caller" @click="answerCall(item, index)">
 		<i class="fa fa-circle red" aria-hidden="true"></i>
-		{{ item.caller_id_number}}
+		{{ item.caller}}
               </li>
               <!--<li><i class="fa fa-clock-o" aria-hidden="true"></i>1005</li>-->
             </ul>
@@ -36,8 +36,13 @@
           </div>
           <div class="dialAction">
             <div class="dial" @click="callDivert" @mousedown="$btnMousedown" @mouseup="$btnMouseup">呼叫转移</div>
-            <div class="dial ring" @click="makeCall" @mousedown="$btnMousedown" @mouseup="$btnMouseup">
-              <i class="fa fa-phone fa-2x" aria-hidden="true"></i>
+            <div 
+              :class ="!(flag_confleft || flag_callqueue)?'dial ring active':'dial ring disable'"
+	      @click ="!(flag_confleft || flag_callqueue)? makeCall():''" 
+	      @mouseup = "!(flag_confleft || flag_callqueue)? $btnMouseup($event) : ''" 
+	      @mousedown = "!(flag_confleft || flag_callqueue)? $btnMousedown($event) : ''" 
+		 >
+              <i :class="!(flag_confleft || flag_callqueue)? 'fa fa-phone fa-2x' : 'fa fa-microphone fa-2x'" aria-hidden="true"></i>
             </div>
             <div class="dial hangup" @click="hangupCall" @mousedown="$btnMousedown" @mouseup="$btnMouseup">挂断</div>
           </div>
@@ -67,13 +72,15 @@
           {name: '*'},
           {name: 0},
           {name: '#'},
-        ]
+        ],
+	flag_callqueue:false,
+	flag_confleft:false
       };
     },
     created() {
       this.$nextTick(function () {
         getHeight();
-        //        $.verto.init({}, this.bootstrap);
+        //$.verto.init({}, this.bootstrap);
       });
     },
     computed: {
@@ -82,12 +89,34 @@
         group_users: "group_users",
         users: "users",
         currentLoginUser: "currentLoginUser",
+	confLeft: "confLeft",
         callQueue: "callQueue",
 	confAlarm: "confAlarm"
       })
     },
     watch: {
-      callQueue: function () { }
+	callQueue:function(callqueue)
+	{
+	if(callqueue.length>0){
+         if(callqueue[0].caller =='9000' || callqueue[0].des =='9000')
+                this.flag_callqueue = true
+	 else
+		this.flag_callqueue = false
+	}
+	else 
+		this.flag_callqueue = false
+	},
+	confLeft:function(confleft)
+	{
+	for(var i = 0;i < confleft.length;i++)
+		  if(confleft[i].caller_id_number == '9000')
+			{   this.flag_confleft = true 
+			    break
+	                }
+	if(i==confleft.length)
+	     this.flag_confleft = false	
+
+	}
     },
     methods: {
       clear() {
@@ -112,6 +141,8 @@
       },
       callDivert() {
         // 呼叫转移
+	console.log(this.flag_confleft)
+	console.log(this.flag_callqueue)
         if (this.destination_number != "") {
           this.$store.dispatch("CallDivert", {
             type: true,
@@ -144,7 +175,7 @@
         let target = event.currentTarget
         $(target).css('background','#575E64');
       },
-      btnMouseup() {
+      btnMouseup(event) {
         let target = event.currentTarget
         $(target).css('background','none');
       }

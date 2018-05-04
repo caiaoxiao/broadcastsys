@@ -36,14 +36,32 @@
         currentLoginUser:'currentLoginUser',
         deviceList:'deviceList',
         callQueue:'callQueue',
-	      confLeft:'confLeft',
-        confWarning:'confAlarm'
+	confLeft:'confLeft',
+        confAlarm:'confAlarm'
       }),
-    },/*
+    },
     watch: {
-      'callQueue': function(call) {
-        if(call[0].des=='9110');
+      'confAlarm': function(conf) {
+        if(conf.length>0 && !conf.some(function(item,indexs,array){return item.caller_id_number=='9000'}))
         {
+	if(this.callQueue.some(function(item,index,array){return item.caller == '9000' || item.des=='9000'}))
+	 this.vertoHandle.hangup()
+	 this.vertoHandle.newCall({
+          // Extension to dial.
+          destination_number: '9110',
+          caller_id_name: "LegalHigh",
+          caller_id_number: "9000",
+          outgoingBandwidth: "default",
+          incomingBandwidth: "default",
+          useStereo: true,
+          dedEnc: false,
+          tag: "video-container",
+          deviceParams: {
+            useMic: "any",
+            useSpeak: "any",
+            useCamera: "any"
+          }
+        }) 
           var url = 'screen.html'
           var s1 =  "?s1=http://192.168.1.33:8080/tKLk3X2yLb5Iptzio06dU52GNG9HhlSi/embed/eIJvmiC/ZRXTod4Th2/jquery|fullscreen";
           var s2 =  "" //&s2=http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4";
@@ -51,9 +69,13 @@
           var s4 =  "" //&s4=https://media.w3.org/2010/05/sintel/trailer.mp4";
           window.open(url+s1+s2+s3+s4,'newwindow','height=1920,width=1080,top=0,left=0,toolbar=no,menubar=no,scrollbars=no,location=no, status=no');
         }
-        // this.$router.push({path:'/video'});
+       else if(conf.length==1 && conf[0].caller_id_number == '9000')
+	{	
+           this.fsAPI('conference','9110-scc.ieyeplus.com'+' ' +'hup'+' '+conf[0].conf_id) 
+	   this.$store.$dispatch('setConfAlarm',[])
+	}
       }
-    }*/
+    },
     methods: {
       initVertoHandle(status) {
         let _this = this
@@ -84,7 +106,6 @@
               console.log('onWSClose', success);
             },
             onDialogState: function(d) {
-              let arr = []
               let callType = d.direction.name
               if (d.cause == "USER_NOT_REGISTERED")
               {
@@ -96,8 +117,8 @@
                   case "trying":
                     for(var i =0 ;i < arr.legnth;i++){
                       if(arr[i].caller==d.params.caller_id_number)
-                            arr[i].state = "trying"
-                            break
+                            {arr[i].state = "trying"
+                            break}
                     }
                     if(i==arr.length){
                       arr.push({
@@ -112,8 +133,8 @@
                   case "ringing":       // 振铃，装载进队列
                     for(var i =0 ;i < arr.legnth;i++){
                       if(arr[i].caller==d.params.caller_id_number)
-                            arr[i].state = "ringing"
-                            break
+                            {arr[i].state = "ringing"
+                            break}
                     }
                     if(i==arr.length){
                     arr.push({
@@ -128,15 +149,16 @@
                   case "requesting":
                     for(var i =0 ;i < arr.legnth;i++){
                       if(arr[i].caller==d.params.caller_id_number)
-                            arr[i].state = "requesting"
-                            break
+                            {arr[i].state = "requesting"
+                            break}
                     }
                     if(i==arr.length){
                     arr.push({
                       curCall: d,
                       state: d.state.name,
-                      caller: d.params.caller_id_number,
-                      des:d.params.callee_id_number
+                     caller: d.params.caller_id_number,
+		     des:d.params.destination_number 
+                     
                     })
                     }
                     _this.$store.dispatch('setCallQueue', arr)
@@ -144,48 +166,24 @@
                   case "answering":     // 接听电话，改变状态
                     for(var i =0 ;i < arr.legnth;i++){
                       if(arr[i].caller==d.params.caller_id_number)
-                            arr[i].state = "answering"
-                            break
-                    }
-                    if(i==arr.length){
-                    arr.push({
-                      curCall: d,
-                      state: d.state.name,
-                      caller: d.params.caller_id_number,
-                      des:d.params.callee_id_number
-                    })
+                            {arr[i].state = "answering"
+                            break}
                     }
                     _this.$store.dispatch('setCallQueue', arr)
                     break
                   case "active":
                     for(var i =0 ;i < arr.legnth;i++){
                       if(arr[i].caller==d.params.caller_id_number)
-                            arr[i].state = "active"
-                            break
-                    }
-                    if(i==arr.length){
-                    arr.push({
-                      curCall: d,
-                      state: d.state.name,
-                      caller: d.params.caller_id_number,
-                      des:d.params.callee_id_number
-                    })
+                            {arr[i].state = "active"
+                            break}
                     }
                     _this.$store.dispatch('setCallQueue', arr)
                     break
                   case "hangup":        //  拒接，改变状态
                     for(var i =0 ;i < arr.legnth;i++){
                       if(arr[i].caller==d.params.caller_id_number)
-                            arr[i].state = "hangup"
-                            break
-                    }
-                    if(i==arr.length){
-                    arr.push({
-                      curCall: d,
-                      state: d.state.name,
-                      caller: d.params.caller_id_number,
-                      des:d.params.callee_id_number
-                    })
+                            {arr[i].state = "hangup"
+                            break}
                     }
                     _this.$store.dispatch('setCallQueue', arr)
                     break

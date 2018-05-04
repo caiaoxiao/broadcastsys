@@ -242,7 +242,8 @@ ul.nav li{padding:0px;color:#fff;border-bottom:5px solid transparent;text-align:
 .dialAction .dial{width:100%;border-right:none;}
 .rightdial{}
 .rightdial>span{display: block;line-height: 0.0;}
-.ring{color:#008C00}
+.ring.active{color:#008C00}
+.ring.disable{color:#FF0000}
 .ring>i{margin-top:60px;}
 .hangup{color:#DB1313;}
 @media(min-width:200px){

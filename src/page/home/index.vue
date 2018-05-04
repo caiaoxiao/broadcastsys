@@ -446,7 +446,7 @@
         let _this = this;
         if (callerNumber == "0000000000") return;
 
-        if (channelCallState == "RINGING") {
+        if (channelCallState == "RINGING" || channelCallState == "EARLY") {
           channelCallState = "ringing";
         } else if (channelCallState == "ACTIVE") {
           channelCallState = "active";
@@ -470,11 +470,6 @@
               }
               else if (user.operationState == 3) {
                 user.operationState = 0
-                console.log(user.userID);
-                console.log(channelUUID);
-                console.log(user.channelUUID);
-                console.log(user.oppoChannelUUID);
-                console.log("99999999999999");
                 _this.fsAPI("uuid_bridge", user.oppoChannelUUID + " " + channelUUID, function(res) {console.log("daijie")}.bind(this))
                 usersChanged = true;
               }

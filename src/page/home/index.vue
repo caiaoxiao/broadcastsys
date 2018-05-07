@@ -63,8 +63,8 @@
           }
         }) 
           var url = 'screen.html'
-          var s1 =  "?s1=http://192.168.1.33:8080/tKLk3X2yLb5Iptzio06dU52GNG9HhlSi/embed/eIJvmiC/ZRXTod4Th2/jquery|fullscreen";
-          var s2 =  "" //&s2=http://clips.vorwaerts-gmbh.de/big_buck_bunny.mp4";
+          var s1 =  "?s1=http://scc.ieyeplus.com:8080/qVYGpk4yKa1n3BuTbdTsUgwYfonzmW8z/embed/lQ4oMZ7/qsbPsvr7PJ/jquery|fullscreen";
+          var s2 =  "&s2=http://scc.ieyeplus.com:8080";
           var s3 =  "" // &s3=http://www.w3school.com.cn/example/html5/mov_bbb.mp4";
           var s4 =  "" //&s4=https://media.w3.org/2010/05/sintel/trailer.mp4";
           window.open(url+s1+s2+s3+s4,'newwindow','height=1920,width=1080,top=0,left=0,toolbar=no,menubar=no,scrollbars=no,location=no, status=no');

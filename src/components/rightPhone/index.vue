@@ -138,7 +138,7 @@
      methods: {
       toggle_enter(){
       let _this = this
-      if(this.flag_confalarm==true)
+      if(this.flag_confalarm ==true)
  	this.confAlarm.forEach(function(item,index,array){
 	if(item.caller_id_number=='9000')
           _this.fsAPI('conference',"9110-scc.ieyeplus.com"+" "+"hup"+" "+item.conf_id)

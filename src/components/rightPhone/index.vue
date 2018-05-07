@@ -3,16 +3,16 @@
       <div class="phone right">
         <div class="phoneTitle">
             <i class="fa fa-user-circle" aria-hidden="true"></i>报警
-          <div class="phoneMeeting ">
-            <i aria-hidden="true" class="fa fa-sign-out"></i>进入
+          <div class="phoneMeeting" @click.stop="toggle_enter">
+            <i aria-hidden="true" class="fa fa-sign-out"></i>{{this.flag_confalarm?'离开':'进入'}}
           </div>
           </div>
         <div class="numList">
           <div>
             <ul class="callNum">
-              <li v-for="(item, index) in callQueue" :key="item.caller" @click="answerCall(item, index)">
+                <li class ="unselected" v-if="item.caller_id_number!='9000'" v-for="item in confAlarm" @click.stop="select($event,item)">	
 		<i class="fa fa-circle red" aria-hidden="true"></i>
-		{{ item.caller}}
+		{{ item.caller_id_number}}
               </li>
               <!--<li><i class="fa fa-clock-o" aria-hidden="true"></i>1005</li>-->
             </ul>
@@ -59,6 +59,7 @@
     data() {
       return {
         destination_number: "",
+	status:"进入",
         btnData: [
           {name: '1'},
           {name: '2'},
@@ -74,7 +75,9 @@
           {name: '#'},
         ],
 	flag_callqueue:false,
-	flag_confleft:false
+	flag_confleft:false,
+	flag_confalarm:false,
+
       };
     },
     created() {
@@ -91,10 +94,12 @@
         currentLoginUser: "currentLoginUser",
 	confLeft: "confLeft",
         callQueue: "callQueue",
-	confAlarm: "confAlarm"
+	confAlarm: "confAlarm",
+	selectedAlarm: "selectedAlarm",
       })
     },
     watch: {
+	
 	callQueue:function(callqueue)
 	{
 	if(callqueue.length>0){
@@ -116,9 +121,59 @@
 	if(i==confleft.length)
 	     this.flag_confleft = false	
 
-	}
+	},
+	confAlarm:function(confalarm)
+        {
+        for(var i = 0;i < confalarm.length;i++)
+                  if(confalarm[i].caller_id_number == '9000')
+                        {   this.flag_confalarm = true
+                            break
+                        }
+        if(i==confalarm.length)
+             this.flag_confalarm = false
+
+        },
+
     },
-    methods: {
+     methods: {
+      toggle_enter(){
+      let _this = this
+      if(this.flag_confalarm==true)
+ 	this.confAlarm.forEach(function(item,index,array){
+	if(item.caller_id_number=='9000')
+          _this.fsAPI('conference',"9110-scc.ieyeplus.com"+" "+"hup"+" "+item.conf_id)
+	})
+      else
+               this.vertoHandle.newCall({
+                        destination_number: "9110",
+                        caller_id_name: "LegalHigh",
+                        caller_id_number: "9000",
+                        outgoingBandwidth: "default",
+                        incomingBandwidth: "default",
+                        useStereo: true,
+                        dedEnc: false,
+                        tag: "video-container",
+                        deviceParams: {
+                        useMic: "any",
+                        useSpeak: "any",
+                        useCamera: "any"
+                        }
+                        })
+      },
+	select(e,item){
+        let _this = this
+        let target = e.currentTarget
+              if($(target).hasClass('unselected')){
+            $(target).removeClass().addClass('selected')
+            if(this.selectedAlarm.findIndex(function(caller,index,array){return caller.conf_id==item.conf_id})==-1 ){
+          this.selectedAlarm.push(item)}
+        }
+        else if ($(target).hasClass('selected')){
+            $(target).removeClass().addClass('unselected')
+            this.selectedAlarm.forEach(function(a,i){if(a.conf_id==item.conf_id) _this.selected.splice(i,1)})
+        }
+
+            },
       clear() {
         this.destination_number = this.destination_number.substring(
           0,
@@ -178,6 +233,15 @@
       btnMouseup(event) {
         let target = event.currentTarget
         $(target).css('background','none');
+      },
+      fsAPI(cmd, arg, success_cb, failed_cb) {
+        this.vertoHandle.sendMethod("jsapi",{
+          command: "fsapi",
+          data: {
+            cmd: cmd,
+            arg: arg
+          },
+        }, success_cb, failed_cb);
       }
     }
   };

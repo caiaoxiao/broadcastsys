@@ -72,7 +72,7 @@
        else if(conf.length==1 && conf[0].caller_id_number == '9000')
 	{	
            this.fsAPI('conference','9110-scc.ieyeplus.com'+' ' +'hup'+' '+conf[0].conf_id) 
-	   this.$store.$dispatch('setConfAlarm',[])
+	   this.$store.dispatch('setConfAlarm',[])
 	}
       }
     },

@@ -12,7 +12,32 @@
           <li>分组</li>
         </ul>
         <div data-name="con">
-          <div class="moduleList" id="height01">
+          <div class="moduleList " id="height01">
+            <div class="singleM "><!--video-camera：视频终端，phone：语音终端，left:被叫 right：主叫-->
+              <div class="moduleStyle  calling01 "><!--通话中-->
+                <div class="moduleNum"><i class="fa fa-video-camera" aria-hidden="true"></i>8001<i class="fa fa-arrow-left"></i><p>襄十分中心哎哟哎哟3车道</p></div>
+                <div class="moduleNum"><i class="fa fa-phone" aria-hidden="true"></i>7001<i class="fa fa-arrow-right"></i><p>襄十分中心哎哟哎哟3车道</p> </div>
+                <div class="moduleState">00:00:01<span class="fa fa-phone" aria-hidden="true"></span></div>
+              </div>
+            </div>
+            <div class="singleM ">
+              <div class="moduleStyle online"><!--在线-->
+                <div class="moduleNum"><i class="fa fa-video-camera" aria-hidden="true"></i>8001</div>
+                <div class="moduleNum">襄十分中心哎哟哎哟3车道 </div>
+              </div>
+            </div>
+            <div class="singleM ">
+              <div class="moduleStyle waitting"><!--振铃中-->
+                <div class="moduleNum"><i class="fa fa-video-camera" aria-hidden="true"></i>8001<i class="fa fa-arrow-left"></i><p>襄十分中心哎哟哎哟3车道</p></div>
+                <div class="moduleNum"><i class="fa fa-phone" aria-hidden="true"></i>7001<i class="fa fa-arrow-right"></i><p>襄十分中心哎哟哎哟3车道</p> </div>
+              </div>
+            </div>
+            <div class="singleM ">
+              <div class="moduleStyle offline"><!--离线-->
+                <div class="moduleNum"><i class="fa fa-phone" aria-hidden="true"></i>8001</div>
+                <div class="moduleNum">襄十分中心哎哟哎哟3车道 </div>
+              </div>
+            </div>
             <div class="singleM" v-for="item in deviceList">
               <div class="moduleStyle"
                    :class="returnClass(item.deviceState)"
@@ -39,13 +64,6 @@
             <div class="rightDetailList" data-name="con">
               <div class="departDetail">
                 <div class="detailCon">
-                  <div class="singleM">
-                    <div class="moduleStyle online ">
-                      <div class="moduleNum">800</div>
-                      <div class="moduleKind">视频终端</div>
-                      <div class="moduleState">在线</div>
-                    </div>
-                  </div>
                   <div class="singleM">
                     <div class="moduleStyle online ">
                       <div class="moduleNum">600</div>
@@ -109,15 +127,16 @@
                   </div>
                   <div class="singleM">
                     <div class="moduleStyle online ">
-                      <div class="moduleNum">600</div>
-                      <div class="moduleKind">视频终端</div>
-                      <div class="moduleState">在线</div>
+                      <div class="moduleNum"><i class="fa fa-file-video-o" aria-hidden="true"></i>800[主叫]</div>
+                      <div class="moduleKind">襄十分中心哎哟哎哟3车道</div>
+                      <div class="moduleNum"><i class="fa fa-file-video-o" aria-hidden="true"></i>800[主叫]</div>
+                      <div class="moduleKind">襄十分中心哎哟哎哟3车道</div>
                     </div>
                   </div>
                   <div class="singleM">
                     <div class="moduleStyle online ">
-                      <div class="moduleNum">600</div>
-                      <div class="moduleKind">视频终端</div>
+                      <div class="moduleNum"><i class="fa fa-phone-square" aria-hidden="true"></i> 600</div>
+                      <div class="moduleKind">襄十分中心3车道</div>
                       <div class="moduleState">在线</div>
                     </div>
                   </div>

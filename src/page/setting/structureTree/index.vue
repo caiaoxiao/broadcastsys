@@ -1,20 +1,15 @@
 <template>
-  <div class="groupList">
-    <div class="menuType">
-      <i class="fa fa-list-ul" aria-hidden="true"></i>组织机构
-    </div>
-    <div class="dept">
-      <el-tree
-        ref="tree"
-        :data="data"
-        :props="defaultProps"
-        :default-expanded-keys="defaultExpanded"
-        node-key="OrganizationID"
-        :highlight-current="true"
-        @node-click="handleNodeClick"
-      >
-      </el-tree>
-    </div>
+  <div class="dept">
+    <el-tree
+      ref="tree"
+      :data="data"
+      :props="defaultProps"
+      :default-expanded-keys="defaultExpanded"
+      node-key="OrganizationID"
+      :highlight-current="true"
+      @node-click="handleNodeClick"
+    >
+    </el-tree>
   </div>
 </template>
 
@@ -56,11 +51,10 @@
         'TreeChange',
         'setInitData'
       ]),
-      refresh() {
-        let data;
-        this.$ajax.get(this.Api + 'Organization/Data/' + this.$store.state.user_info.user.OrganizationID)
+      refresh () {
+        this.$ajax.get(this.Api + 'Organization/Data/' + this.$store.state.user_info.user.organizationID)
           .then((res) => {
-            data = res.data.result
+            let data = res.data.result
             this.data = data
             // 初始化树对象
             this.$emit('setInitData', data[0])
@@ -74,7 +68,6 @@
           });
       },
       handleNodeClick(data, node, event) {
-          debugger
         if(event) {                           // 判断点击的是否为默认选中的树节点，如果不是，取消默认选中
           if(node.id != this.$refs.tree.$children[0].node.id) {
             this.$refs.tree.$children[0].$el.className = 'el-tree-node'

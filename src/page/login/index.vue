@@ -86,11 +86,11 @@
           this.showTip('密码不能为空')
           return
         }
-        this.$ajax.get('User/Login', this.formData)
+        this.$ajax.get('User/Login', {params:this.formData})
           .then((res) => {
-            if (res.code != 0) {
+            if (res.data.code == 1) {
               this.set_user_info({
-                user: res.result,
+                user: res.data.result,
                 login: true
               })
               this.showTip('登录成功')
@@ -99,10 +99,6 @@
               this.showTip('账号或密码错误')
             }
           })
-          .then(() => {
-            this.showTip('登录失败，请联系管理员')
-          })
-
       },
       showTip(tipContent) {
         this.$notify.info({

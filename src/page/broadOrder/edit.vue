@@ -380,7 +380,6 @@
                 s.FeatureCode = s.userID
               }.bind(this))
               this.formData.FeatureBases = this.selectDevice
-
               debugger
               this.fsAPI(`sched_api +10 bgapi originate`, `user/1002 &playback(${this.formData.Files[0].Files[0].MediaPath})`,()=>{
                 this.$ajax.post('Plan/Create', this.formData)
@@ -392,7 +391,6 @@
                     }
                   })
               })
-
 
             }
           }

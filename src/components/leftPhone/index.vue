@@ -2,9 +2,9 @@
   <div class="phone left">
     <div class="phoneTitle">
        <i class="fa fa-phone" aria-hidden="true"></i>语音
-       <span class="cloud "></span>
+       <span class="cloud "></span><!--正在语音中-->
       <div class="phoneMeeting meetingOut">
-        <i aria-hidden="true" class="fa fa-plus"></i>退出</div>
+        <i aria-hidden="true" class="fa fa-sign-out"></i>退出</div>
     </div>
     <div class="numList">
       <div>

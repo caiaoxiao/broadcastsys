@@ -3,8 +3,11 @@
       <div class="phone right">
         <div class="phoneTitle">
             <i class="fa fa-fire" aria-hidden="true"></i>报警
+
+           <i class="fa  fa-volume-control-phone fixed-nav" aria-hidden="true"></i>
+
           <div class="phoneMeeting ">
-            <i aria-hidden="true" class="fa fa-sign-out"></i>进入
+            <i aria-hidden="true" class="fa fa-plus"></i>进入
           </div>
           </div>
         <div class="numList">
@@ -37,11 +40,11 @@
             class="dial">{{item.name}}</div>
           </div>
           <div class="dialAction">
-            <div class="dial" @click="callDivert" @mousedown="$btnMousedown" @mouseup="$btnMouseup">呼叫转移</div>
+
             <div class="dial ring" @click="makeCall" @mousedown="$btnMousedown" @mouseup="$btnMouseup">
-              <i class="fa fa-phone fa-2x" aria-hidden="true"></i>
+               <i class="fa fa-phone fa-2x call" aria-hidden="true"></i><!--拨出是call，挂断换成callOff-->
             </div>
-            <div class="dial hangup" @click="hangupCall" @mousedown="$btnMousedown" @mouseup="$btnMouseup">挂断</div>
+            <!--<div class="dial hangup" @click="hangupCall" @mousedown="$btnMousedown" @mouseup="$btnMouseup">挂断</div>-->
           </div>
         </div>
         </div>

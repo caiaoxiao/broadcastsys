@@ -63,11 +63,13 @@
           }
         }) 
           var url = 'screen.html'
-          var s1 =  "?s1=http://scc.ieyeplus.com:8080/qVYGpk4yKa1n3BuTbdTsUgwYfonzmW8z/embed/lQ4oMZ7/qsbPsvr7PJ/jquery|fullscreen";
-          var s2 =  "&s2=http://scc.ieyeplus.com:8080";
+          var s1 =  "?s1=https://scc.ieyeplus.com:8432/qVYGpk4yKa1n3BuTbdTsUgwYfonzmW8z/embed/lQ4oMZ7/qsbPsvr7PJ/jquery|fullscreen";
+          var s2 =  "&s2=https://scc.ieyeplus.com:8432";
           var s3 =  "" // &s3=http://www.w3school.com.cn/example/html5/mov_bbb.mp4";
           var s4 =  "" //&s4=https://media.w3.org/2010/05/sintel/trailer.mp4";
-          window.open(url+s1+s2+s3+s4,'newwindow','height=1920,width=1080,top=0,left=0,toolbar=no,menubar=no,scrollbars=no,location=no, status=no');
+         // window.open(url+s1+s2+s3+s4,'newwindow','height=1920,width=1080,top=0,left=0,toolbar=no,menubar=no,scrollbars=no,location=no, status=no');
+          window.open("https://scc.ieyeplus.com:8432/qVYGpk4yKa1n3BuTbdTsUgwYfonzmW8z/grid/lQ4oMZ7",'newwindow','height=1920,width=1080,top=0,left=0,toolbar=no,menubar=no,scrollbars=no,location=no, status=no');
+          
         }
        else if(conf.length==1 && conf[0].caller_id_number == '9000')
 	{	

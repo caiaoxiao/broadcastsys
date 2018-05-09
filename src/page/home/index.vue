@@ -237,6 +237,8 @@
 
                         })
                         _this.$store.dispatch(action,arr)
+			if(liveArrayObj.name == '9100-scc.ieyeplus.com')
+			_this.fsAPI('conference','9100-scc.ieyeplus.com'+' '+'play'+' '+'/usr/local/freeswitch/sounds/music/8000/danza-espanola-op-37-h-142-xii-arabesca.wav'+ ' '+ parseInt(args.data[0]).toString()) 
                         break;
 
                       // User left conference.

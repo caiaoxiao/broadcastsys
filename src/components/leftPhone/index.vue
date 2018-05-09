@@ -133,8 +133,11 @@
         this.confLeft.forEach(function(item,index,array){
         if(item.caller_id_number=='9000')
           _this.fsAPI('conference',"9100-scc.ieyeplus.com"+" "+"hup"+" "+item.conf_id)
+	_this.fsAPI('conference',"9100-scc.ieyeplus.com"+" "+"mute"+" "+item.conf_id)
+	_this.fsAPI('conference',"9100-scc.ieyeplus.com"+" "+"deaf"+" "+item.conf_id)
         })
       else			
+	{
                this.vertoHandle.newCall({
           		destination_number: "9100",
             		caller_id_name: "LegalHigh",
@@ -150,6 +153,10 @@
             		useCamera: "any"
           		}
         		})
+	_this.fsAPI('conference',"9100-scc.ieyeplus.com"+" "+"unmute"+" "+_this.confLeft[0].conf_id)
+	_this.fsAPI('conference',"9100-scc.ieyeplus.com"+" "+"undeaf"+" "+_this.confLeft[0].conf_id)
+	_this.fsAPI('conference',"9100-scc.ieyeplus.com"+" "+"stop"+" current "+_this.confLeft[0].conf_id)
+	}
       },
       fsAPI(cmd, arg, success_cb, failed_cb) {
         this.vertoHandle.sendMethod("jsapi", {
@@ -206,11 +213,11 @@
 		}
 		break
 	  case '结束服务':
-	      if(this.flag_confleft)
+	      if(this.confLeft)
               this.confLeft.forEach(function(a,i){
               _this.fsAPI('conference',"9100-scc.ieyeplus.com"+" "+"kick"+" "+a.conf_id)
 	        }) 
-	      if(this.flag_confalarm)
+	      if(this.confAlarm)
               this.confAlarm.forEach(function(a,i){
               _this.fsAPI('conference',"9110-scc.ieyeplus.com"+" "+"kick"+" "+a.conf_id)
                 })

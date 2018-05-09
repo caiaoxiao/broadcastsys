@@ -82,5 +82,8 @@ export default {
   },
   confAlarm: state=> {
     return  state.confAlarm
+  },
+  selectedAlarm: state=> {
+    return  state.selectedAlarm
   }
 }

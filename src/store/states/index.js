@@ -45,6 +45,7 @@ export default {
   callQueue: [],
   confLeft: [],
   confAlarm:[],
+  selectedAlarm:[],
   // 是否订阅会议回调
   use_livearray: false
 }

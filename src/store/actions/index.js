@@ -83,4 +83,7 @@ export default {
   setConfAlarm({ commit }, data) {
     commit('SET_CONF_ALARM', data)
   },
+  setSelectedAlarm({ commit }, data) {
+    commit('SET_SELECTED_ALARM', data)
+  },
 }

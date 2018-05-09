@@ -6,18 +6,16 @@
 
            <i class="fa  fa-volume-control-phone fixed-nav" aria-hidden="true"></i>
 
-          <div class="phoneMeeting ">
-            <i aria-hidden="true" class="fa fa-plus"></i>进入
+          <div class="phoneMeeting" @click.stop="toggle_enter">
+            <i aria-hidden="true" class="fa fa-sign-out"></i>{{this.flag_confalarm?'离开':'进入'}}
           </div>
           </div>
         <div class="numList">
           <div>
             <ul class="callNum">
-              <li v-for="(item, index) in callQueue" :key="item.caller" @click="answerCall(item, index)">
-                <i v-if="item.state == 'answering'" class="fa fa-circle red" aria-hidden="true"></i>
-                <i v-if="item.state == 'ringing'" class="fa fa-circle orange" aria-hidden="true"></i>
-                <i v-if="item.state == 'hangup'" class="fa fa-clock-o" aria-hidden="true"></i>
-                {{item.caller}}
+                <li class ="unselected" v-if="item.caller_id_number!='9000'" v-for="item in confAlarm" @click.stop="select($event,item)">	
+		<i class="fa fa-circle red" aria-hidden="true"></i>
+		{{ item.caller_id_number}}
               </li>
               <!--<li><i class="fa fa-clock-o" aria-hidden="true"></i>1005</li>-->
             </ul>
@@ -41,8 +39,13 @@
           </div>
           <div class="dialAction">
 
-            <div class="dial ring" @click="makeCall" @mousedown="$btnMousedown" @mouseup="$btnMouseup">
-               <i class="fa fa-phone fa-2x call" aria-hidden="true"></i><!--拨出是call，挂断换成callOff-->
+            <div 
+              :class ="!(flag_confleft || flag_callqueue)?'dial ring active':'dial ring disable'"
+	      @click ="!(flag_confleft || flag_callqueue)? makeCall():''" 
+	      @mouseup = "!(flag_confleft || flag_callqueue)? $btnMouseup($event) : ''" 
+	      @mousedown = "!(flag_confleft || flag_callqueue)? $btnMousedown($event) : ''" 
+		 >
+              <i :class="!(flag_confleft || flag_callqueue)? 'fa fa-phone fa-2x' : 'fa fa-microphone fa-2x'" aria-hidden="true"></i>
             </div>
             <!--<div class="dial hangup" @click="hangupCall" @mousedown="$btnMousedown" @mouseup="$btnMouseup">挂断</div>-->
           </div>
@@ -59,6 +62,7 @@
     data() {
       return {
         destination_number: "",
+	status:"进入",
         btnData: [
           {name: '1'},
           {name: '2'},
@@ -72,13 +76,17 @@
           {name: '*'},
           {name: 0},
           {name: '#'},
-        ]
+        ],
+	flag_callqueue:false,
+	flag_confleft:false,
+	flag_confalarm:false,
+
       };
     },
     created() {
       this.$nextTick(function () {
         getHeight();
-        //        $.verto.init({}, this.bootstrap);
+        //$.verto.init({}, this.bootstrap);
       });
     },
     computed: {
@@ -87,13 +95,88 @@
         group_users: "group_users",
         users: "users",
         currentLoginUser: "currentLoginUser",
-        callQueue: "callQueue"
+	confLeft: "confLeft",
+        callQueue: "callQueue",
+	confAlarm: "confAlarm",
+	selectedAlarm: "selectedAlarm",
       })
     },
     watch: {
-      callQueue: function () { }
+	
+	callQueue:function(callqueue)
+	{
+	if(callqueue.length>0){
+         if(callqueue[0].caller =='9000' || callqueue[0].des =='9000')
+                this.flag_callqueue = true
+	 else
+		this.flag_callqueue = false
+	}
+	else 
+		this.flag_callqueue = false
+	},
+	confLeft:function(confleft)
+	{
+	for(var i = 0;i < confleft.length;i++)
+		  if(confleft[i].caller_id_number == '9000')
+			{   this.flag_confleft = true 
+			    break
+	                }
+	if(i==confleft.length)
+	     this.flag_confleft = false	
+
+	},
+	confAlarm:function(confalarm)
+        {
+        for(var i = 0;i < confalarm.length;i++)
+                  if(confalarm[i].caller_id_number == '9000')
+                        {   this.flag_confalarm = true
+                            break
+                        }
+        if(i==confalarm.length)
+             this.flag_confalarm = false
+
+        },
+
     },
-    methods: {
+     methods: {
+      toggle_enter(){
+      let _this = this
+      if(this.flag_confalarm ==true)
+ 	this.confAlarm.forEach(function(item,index,array){
+	if(item.caller_id_number=='9000')
+          _this.fsAPI('conference',"9110-scc.ieyeplus.com"+" "+"hup"+" "+item.conf_id)
+	})
+      else
+               this.vertoHandle.newCall({
+                        destination_number: "9110",
+                        caller_id_name: "LegalHigh",
+                        caller_id_number: "9000",
+                        outgoingBandwidth: "default",
+                        incomingBandwidth: "default",
+                        useStereo: true,
+                        dedEnc: false,
+                        tag: "video-container",
+                        deviceParams: {
+                        useMic: "any",
+                        useSpeak: "any",
+                        useCamera: "any"
+                        }
+                        })
+      },
+	select(e,item){
+        let _this = this
+        let target = e.currentTarget
+              if($(target).hasClass('unselected')){
+            $(target).removeClass().addClass('selected')
+            if(this.selectedAlarm.findIndex(function(caller,index,array){return caller.conf_id==item.conf_id})==-1 ){
+          this.selectedAlarm.push(item)}
+        }
+        else if ($(target).hasClass('selected')){
+            $(target).removeClass().addClass('unselected')
+            this.selectedAlarm.forEach(function(a,i){if(a.conf_id==item.conf_id) _this.selected.splice(i,1)})
+        }
+
+            },
       clear() {
         this.destination_number = this.destination_number.substring(
           0,
@@ -116,6 +199,8 @@
       },
       callDivert() {
         // 呼叫转移
+	console.log(this.flag_confleft)
+	console.log(this.flag_callqueue)
         if (this.destination_number != "") {
           this.$store.dispatch("CallDivert", {
             type: true,
@@ -148,9 +233,18 @@
         let target = event.currentTarget
         $(target).css('background','#575E64');
       },
-      btnMouseup() {
+      btnMouseup(event) {
         let target = event.currentTarget
         $(target).css('background','none');
+      },
+      fsAPI(cmd, arg, success_cb, failed_cb) {
+        this.vertoHandle.sendMethod("jsapi",{
+          command: "fsapi",
+          data: {
+            cmd: cmd,
+            arg: arg
+          },
+        }, success_cb, failed_cb);
       }
     }
   };

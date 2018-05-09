@@ -1,6 +1,6 @@
 <template>
   <div>
-    <leftPhone></leftPhone>
+    <left-phone  :select-phone="selectPhone" ></left-phone>
     <div class="middleCon">
       <div class="memberList">
         <div class="module">

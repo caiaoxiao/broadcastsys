@@ -1,7 +1,7 @@
 <script src="../../utils/page/meeting.js"></script>
 <template>
   <div >
-      <leftPhone></leftPhone>
+     <left-phone  :select-phone="selectPhone" ></left-phone>
     <div id="media">
       <video width=800 id="webcam" autoplay="autoplay" hidden="true"></video>
     </div>
@@ -156,7 +156,6 @@
           <li id="a5" @click="observe"  @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-headphones fa-2x" aria-hidden="true"></i><span>监听</span></li>
           <li id="a6" @click="daiJie"  @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-phone-square fa-2x" aria-hidden="true"></i><span>代接</span></li>
           <li id="a7" @click="callTraverse"  @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-reply fa-2x" aria-hidden="true" onclick="$('#noNum').show();"></i><span>转到</span></li>
-          <li id="a8" @click="startRecording" @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-play fa-2x" aria-hidden="true"></i><span>录音</span></li>
 
         </ul>
       </div>
@@ -177,24 +176,22 @@
 
 
   export default {
-    components: {
-      leftPhone,
-      rightPhone,
-      deviceList,
-      switchs
-    },
     data() {
       return {
         inputValue: '',
         deviceAll: [],
         currentCall: null,
-        destination_number: '',
         nowCall: [],
         selectNowCall: [],
         selectPhone: [],
         selectRingCall: [],
-        num : 0
        }
+    },
+    components: {
+      leftPhone,
+      rightPhone,
+      deviceList,
+      switchs
     },
     created() {
       this.$nextTick(function() {
@@ -216,15 +213,11 @@
       ]),
     },
     watch: {
-      'callqueue': function() {
-
-     }
     },
     methods: {
       itemClick(e, row) {
         let target = e.currentTarget
         let _this = this
-
         if($(target).hasClass('online')) {
           if($(target).hasClass("onlineSelected")) {
             $(target).removeClass("onlineSelected")
@@ -262,7 +255,6 @@
              this.selectRingCall.push(row)
            }
          }
-         this.destination_number = this.selectPhone[0].userID;
       },
       fsAPI(cmd, arg, success_cb, failed_cb) {
         this.vertoHandle.sendMethod("jsapi", {
@@ -272,13 +264,6 @@
             arg: arg
           },
         }, success_cb, failed_cb);
-      },
-
-     // 对指定话机进行的通话录音
-      startRecording() {
-        this.fsAPI("uuid_record",this.selectNowCall[0].channelUUID + " " + "start" +" " +"/tmp/record"+this.num+".wav",function(res) {console.log("start record")}.bind(this));
-        this.selectNowCall = [];
-        this.num++;
       },
 
      // 实现管理员和指定话机的强行通话
@@ -318,39 +303,8 @@
 
      // 实现管理员对指定通话的强拆
        strongDelete() {
-         let users = this.deviceList
-         let userChanged = false
-         let select = this.selectNowCall[0]
-
-         users.forEach(function(user) {
-           if (user.userID == select.userID) {
-            user.operationState = 2
-            userChanged = true
-           }
-          }
-         )
-
-         if(userChanged) this.$store.dispatch('setDeviceList',users)
-
-          this.vertoHandle.newCall({
-           destination_number: '9001',
-           caller_id_name: '9000',
-           caller_id_number: '9000',
-           outgoingBandwidth: 'default',
-           incomingBandwidth: 'default',
-           useStereo: true,
-           dedEnc: false,
-           tag: "video-container",
-           deviceParams: {
-            useMic: "any",
-            useSpeak: "any",
-            useCamera: "any",
-           }
-         })
-
+         this.fsAPI("uuid_kill",this.selectNowCall[0].channelUUID,function(res) {console.log("qiang delete")}.bind(this));
          this.selectNowCall = [];
-        // this.fsAPI("uuid_kill",this.selectNowCall[0].channelUUID,function(res) {console.log(qiang delete)}.bind(this));
-        // this.selectNowCall = [];
       },
 
      // 实现管理员对指定通话的强插
@@ -433,27 +387,15 @@
          console.log(this.selectPhone[0]);
          console.log(this.deviceList[0]);
          console.log("1234567890");
-         this.fsAPI("uuid_deflect",this.selectNowCall[0].channelUUID+" "+"sip:"+this.selectPhone[0].userID+"@"+this.selectPhone[0].networkIP+":"+this.selectPhone[0].networkPort,function(res) {console.log("call traverse")}.bind(this));
+         this.fsAPI("uuid_transfer",this.selectNowCall[0].channelUUID+" "+"sip:"+this.selectPhone[0].userID+"@"+this.selectPhone[0].networkIP+":"+this.selectPhone[0].networkPort,function(res) {console.log("call traverse")}.bind(this));
          this.selectPhone = [];
          this.selectNowCall = [];
       },
 
-      clear() {
-           this.destination_number = this.destination_number.substring(0, this.destination_number.length-1)
-      },
-      keypad(value) {
-           this.destination_number = this.destination_number + value
-      },
-      answerCall(item) {
-           this.callQueue[0].curCall.answer();
-      },
-      callDivert() {
-           this.$store.dispatch('CallDivert', {type: true, num: this.destination_number})
-      },
       // call
       call() {
        this.vertoHandle.newCall({
-        destination_number : this.destination_number,
+        destination_number : this.selectPhone[0].userID,
         caller_id_name: '9000',
         caller_id_number: '9000',
         outgoingBandwidth: 'default',

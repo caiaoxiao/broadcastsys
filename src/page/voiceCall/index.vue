@@ -1,7 +1,12 @@
 <script src="../../utils/page/meeting.js"></script>
 <template>
+<<<<<<< HEAD
   <div>
     <leftPhone></leftPhone>
+=======
+  <div >
+     <left-phone  :select-phone="selectPhone" ></left-phone>
+>>>>>>> c99741b2d68af58b8abaa784fd46714dd955ac9f
     <div id="media">
       <video width=800 id="webcam" autoplay="autoplay" hidden="true"></video>
     </div>
@@ -142,6 +147,7 @@
       </div>
       <div class="functionMenu">
         <ul class="nav nav-justified menuList">
+<<<<<<< HEAD
           <li id="a1" @click="call" @mousedown="$btnMousedown" @mouseup="$btnMouseup">
             <i class="fa fa-phone fa-2x" aria-hidden="true"></i>
             <span>呼叫</span>
@@ -174,6 +180,15 @@
             <i class="fa fa-play fa-2x" aria-hidden="true"></i>
             <span>录音</span>
           </li>
+=======
+          <li id="a1" @click="call"  @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-phone fa-2x" aria-hidden="true"></i><span>呼叫</span></li>
+          <li id="a2" @click="strongCall"  @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-volume-control-phone fa-2x" aria-hidden="true"></i><span>强行通话</span></li>
+          <li id="a3" @click="strongDelete"  @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-window-close fa-2x" aria-hidden="true" onclick="$('#eeee').show();"></i><span>强拆</span></li>
+          <li id="a4" @click="strongJoin"  @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-deaf fa-2x" aria-hidden="true"></i><span>强插</span></li>
+          <li id="a5" @click="observe"  @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-headphones fa-2x" aria-hidden="true"></i><span>监听</span></li>
+          <li id="a6" @click="daiJie"  @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-phone-square fa-2x" aria-hidden="true"></i><span>代接</span></li>
+          <li id="a7" @click="callTraverse"  @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-reply fa-2x" aria-hidden="true" onclick="$('#noNum').show();"></i><span>转到</span></li>
+>>>>>>> c99741b2d68af58b8abaa784fd46714dd955ac9f
 
         </ul>
       </div>
@@ -234,6 +249,7 @@ export default {
   watch: {
     'callqueue': function () {
 
+<<<<<<< HEAD
     }
   },
   methods: {
@@ -306,6 +322,32 @@ export default {
         }
       }
       this.destination_number = this.selectPhone[0].userID;
+=======
+  export default {
+    data() {
+      return {
+        inputValue: '',
+        deviceAll: [],
+        currentCall: null,
+        nowCall: [],
+        selectNowCall: [],
+        selectPhone: [],
+        selectRingCall: [],
+       }
+    },
+    components: {
+      leftPhone,
+      rightPhone,
+      deviceList,
+      switchs
+    },
+    created() {
+      this.$nextTick(function() {
+        getHeight()
+        getHeights()
+
+      })
+>>>>>>> c99741b2d68af58b8abaa784fd46714dd955ac9f
     },
     fsAPI (cmd, arg, success_cb, failed_cb) {
       this.vertoHandle.sendMethod("jsapi", {
@@ -316,6 +358,7 @@ export default {
         },
       }, success_cb, failed_cb);
     },
+<<<<<<< HEAD
 
     // 对指定话机进行的通话录音
     startRecording () {
@@ -329,6 +372,67 @@ export default {
       let users = this.deviceList
       let userChanged = false
       let select = this.selectNowCall[0]
+=======
+    watch: {
+    },
+    methods: {
+      itemClick(e, row) {
+        let target = e.currentTarget
+        let _this = this
+        if($(target).hasClass('online')) {
+          if($(target).hasClass("onlineSelected")) {
+            $(target).removeClass("onlineSelected")
+            this.selectPhone.forEach(function(s,i) {
+               if(s.userID == row.userID) {
+                 _this.selectPhone.splice(i, 1)
+               }
+            })
+          }else {
+            $(target).addClass("onlineSelected");
+            this.selectPhone.push(row)
+          }
+         }else if ($(target).hasClass("calling")) {
+           if($(target).hasClass("callingSelected")) {
+             $(target).removeClass("callingSelected");
+             this.selectNowCall.forEach(function(s,i) {
+               if(s.userID == row.userID) {
+                 _this.selectNowCall.splice(i, 1)
+               }
+             })
+           }else {
+             $(target).addClass("callingSelected");
+             this.selectNowCall.push(row)
+           }
+         }else if($(target).hasClass("waitting")) {
+           if($(target).hasClass("waittingSelected")) {
+             $(target).removeClass("waittingSelected");
+             this.selectRingCall.forEach(function(s,i) {
+               if(s.userID == row.userID) {
+                 _this.selectRingCall.splice(i,1)
+               }
+             })
+           }else {
+             $(target).addClass("waittingSelected");
+             this.selectRingCall.push(row)
+           }
+         }
+      },
+      fsAPI(cmd, arg, success_cb, failed_cb) {
+        this.vertoHandle.sendMethod("jsapi", {
+          command: "fsapi",
+          data: {
+            cmd: cmd,
+            arg: arg
+          },
+        }, success_cb, failed_cb);
+      },
+
+     // 实现管理员和指定话机的强行通话
+       strongCall() {
+         let users = this.deviceList
+         let userChanged = false
+         let select = this.selectNowCall[0]
+>>>>>>> c99741b2d68af58b8abaa784fd46714dd955ac9f
 
       users.forEach(function (user) {
         if (user.userID == select.userID) {
@@ -359,6 +463,7 @@ export default {
       this.selectNowCall = [];
     },
 
+<<<<<<< HEAD
     // 实现管理员对指定通话的强拆
     strongDelete () {
       let users = this.deviceList
@@ -395,6 +500,13 @@ export default {
       // this.fsAPI("uuid_kill",this.selectNowCall[0].channelUUID,function(res) {console.log(qiang delete)}.bind(this));
       // this.selectNowCall = [];
     },
+=======
+     // 实现管理员对指定通话的强拆
+       strongDelete() {
+         this.fsAPI("uuid_kill",this.selectNowCall[0].channelUUID,function(res) {console.log("qiang delete")}.bind(this));
+         this.selectNowCall = [];
+      },
+>>>>>>> c99741b2d68af58b8abaa784fd46714dd955ac9f
 
     // 实现管理员对指定通话的强插
     strongJoin () {
@@ -467,6 +579,7 @@ export default {
       this.selectRingCall = [];
     },
 
+<<<<<<< HEAD
     // 实现呼叫转移
     callTraverse () {
       console.log(this.selectNowCall[0].channelUUID);
@@ -497,6 +610,26 @@ export default {
     call () {
       this.vertoHandle.newCall({
         destination_number: this.destination_number,
+=======
+     // 实现呼叫转移
+       callTraverse() {
+         console.log(this.selectNowCall[0].channelUUID);
+         console.log(this.selectPhone[0].userID);
+         console.log(this.selectPhone[0].networkIP);
+         console.log(this.selectPhone[0].networkPort);
+         console.log(this.selectPhone[0]);
+         console.log(this.deviceList[0]);
+         console.log("1234567890");
+         this.fsAPI("uuid_transfer",this.selectNowCall[0].channelUUID+" "+"sip:"+this.selectPhone[0].userID+"@"+this.selectPhone[0].networkIP+":"+this.selectPhone[0].networkPort,function(res) {console.log("call traverse")}.bind(this));
+         this.selectPhone = [];
+         this.selectNowCall = [];
+      },
+
+      // call
+      call() {
+       this.vertoHandle.newCall({
+        destination_number : this.selectPhone[0].userID,
+>>>>>>> c99741b2d68af58b8abaa784fd46714dd955ac9f
         caller_id_name: '9000',
         caller_id_number: '9000',
         outgoingBandwidth: 'default',

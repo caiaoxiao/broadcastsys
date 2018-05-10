@@ -101,10 +101,7 @@
           })
       },
       showTip(tipContent) {
-        this.$notify.info({
-          title: '温馨提示',
-          message: tipContent
-        })
+        this.$message.success(tipContent)
       }
     }
   }

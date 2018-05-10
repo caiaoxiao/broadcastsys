@@ -51,7 +51,7 @@
                   <button type="button" class="btn btn-sm btn-danger" @click="(() => {formData.selectDeviceGroup = []})">全部移除</button>
                 </div>
                 <ol class="menuItem clearfix">
-                  <li>设备组名</li>
+                  <li v-for="item in formData.selectDeviceGroup" :key="item.deviceGroupId">{{ item.name}}</li>
                 </ol>
               </div>
             </div>
@@ -60,7 +60,7 @@
       </div>
       <div class="btnDiv">
         <button type="submit" class="btn btn-sm btn-info" @click="submitFrom">确定</button>
-        <button type="submit" class="btn btn-sm btn-default" @click="update">取消</button>
+        <button type="submit" class="btn btn-sm btn-default" @click="close">取消</button>
       </div>
     </div>
   </div>
@@ -107,18 +107,6 @@ export default {
       $('.popUpbig').css('height', documentHeight * 0.5 + 'px')
       $('.popUpbig').css('top', documentHeight * 0.4 + 'px')
       $('.selectedMember').css('height', documentHeight * 0.8 - 89 + 'px !important')
-
-      if (this.modolType !== 0) {
-        debugger
-        this.$ajax.get(`Role/Detail/${this.targetGroup.roleID}`)
-          .then((res) => {
-            if (res.data.code === 1) {
-              let result = res.data.result
-              this.formData = Object.assign(this.formData, result)
-            }
-          })
-      }
-
       this.initData()
     })
   },
@@ -143,12 +131,47 @@ export default {
               r.selected = false
             })
             this.deviceGroup = result
+            this.refresh()
           }
         })
     },
+    refresh () {
+      if (this.modolType !== 0) {
+        this.$ajax.get(`Role/Detail/${this.targetGroup.roleID}`)
+          .then((res) => {
+            if (res.data.code === 1) {
+              let result = res.data.result
+              this.formData = Object.assign(this.formData, result)
+            }
+          })
+        this.$ajax.get(`Role/getDeviceGroup/${this.targetGroup.roleID}`)
+          .then((res) => {
+            if (res.data.code === 1) {
+              let result = res.data.result
+              this.deviceGroup.forEach((d, i) => {
+                result.map((r, s) => {
+                  if (d.deviceGroupId === r.deviceGroupId) {
+                    d.selected = true
+                  }
+                })
+              })
+              debugger
+              this.formData.selectDeviceGroup = result
+            }
+          })
+      }
+    },
     selectDeviceGroup (item) {
       if (!item.selected) {
-        this.formData.selectDeviceGroup.push(item)
+        let isreal = this.formData.selectDeviceGroup.every((s, i) => {
+          if (s.deviceGroupId === item.deviceGroupId) {
+            return false
+          }
+          return true
+        })
+        if (isreal) {
+          this.formData.selectDeviceGroup.push(item)
+        }
       }
       item.selected = !item.selected
     },
@@ -163,11 +186,10 @@ export default {
       this.deviceGroup.forEach((d) => {
         d.selected = this.isCheckedAll
       })
-      debugger
       this.formData.selectDeviceGroup = this.formData.selectDeviceGroup.concat(this.deviceGroup)
     },
-    close (type) {
-      this.$emit('close', type)
+    close () {
+      this.$emit('close')
     },
     submitFrom () {  // 提交当前表单
       let request = {
@@ -177,12 +199,13 @@ export default {
       this.$ajax.post('Role/Create', request)
         .then(res => {
           if (res.data.code === 1) {
-            debugger
             let result = res.data.result
-            if (this.selectMenuList.length !== 0) {
-              this.$ajax.post(`Role/opRoleDevice/${result.roleID}`, this.selectDeviceGroup)
+            if (this.formData.selectDeviceGroup.length !== 0) {
+              this.$ajax.post(`Role/opRoleDevice/${result.roleID}`, this.formData.selectDeviceGroup)
                 .then(res => {
-                  debugger
+                  if (res.data.code === 1) {
+                    this.close()
+                  }
                 })
             }
           }

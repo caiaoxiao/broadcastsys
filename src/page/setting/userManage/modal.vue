@@ -58,7 +58,7 @@ export default {
       formData: {
         userName: '',
         password: '',
-        OrganizationID: '',
+        organizationID: '',
         userRoles: []
       },
       groupList: [],

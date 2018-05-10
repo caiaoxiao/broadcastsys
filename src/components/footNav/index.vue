@@ -156,7 +156,7 @@
 
 <script>
   import { mapGetters,mapActions } from 'vuex'
-
+  import {SET_USER_INFO} from 'store/actions/type'
   export default {
     data() {
       return {
@@ -182,9 +182,6 @@
           this.now = this.transformTime(this.$refs.audio.currentTime)
           $('.audio-backs-btn').css('right', this.transformSeconds(this.now )*speed * - 1 +'px')
         }, 1000);
-
-
-
       }.bind(this), false)
 
       this.$refs.audio.addEventListener('ended', function () {
@@ -231,6 +228,9 @@
       },
     },
     methods: {
+       ...mapActions({
+        set_user_info: SET_USER_INFO
+      }),
       transformSeconds(total) {
         // 秒数转换
         let arr = total.split(':').reverse()
@@ -243,8 +243,16 @@
         return time
       },
       logout() {
-        this.$store.dispatch('LogOut').then(() => {
-          location.reload()  // 为了重新实例化vue-router对象 避免bug
+        this.$confirm('此操作将退出登录, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$message.success("退出成功")
+          this.set_user_info(null)
+          setTimeout(this.$router.replace({name: "login"}), 500)
+        }).catch(() => {
+
         })
       },
       setting(){

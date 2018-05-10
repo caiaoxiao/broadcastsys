@@ -5,6 +5,13 @@
     color: #fff;
 }
 
+input:-webkit-autofill,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+    -webkit-box-shadow: 0 0 0px 1000px white inset !important;
+    border: 1px solid #CCC!important;
+}
+
 ul,
 ol,
 li {
@@ -2242,8 +2249,8 @@ ul.orgListPhone>li>span {
 /*来电动画*/
 
 .fixed-nav {
-  color:#c9302c;
-  margin-left: 10px;
+    color: #c9302c;
+    margin-left: 10px;
     animation: msClock 1.2s linear infinite;
     animation: msClock 1.2s linear infinite;
     -moz-animation: msClock 1.2s linear infinite;
@@ -2260,11 +2267,11 @@ ul.orgListPhone>li>span {
     20%,
     40% {
         transform: rotate(-20deg) scale(1.1);
-      -moz-transform:rotate(-20deg) scale(1.1);
+        -moz-transform: rotate(-20deg) scale(1.1);
     }
     30%,
     50% {
         transform: rotate(20deg) scale(1.1);
-      -moz-transform:rotate(20deg) scale(1.1);
+        -moz-transform: rotate(20deg) scale(1.1);
     }
 }

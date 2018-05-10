@@ -41,7 +41,7 @@
     </div>
 
     <div class="btnDiv">
-      <button type="button" class="btn btn-sm btn-info" @click="submitForm('')">确定</button>
+      <button type="button" class="btn btn-sm btn-info" @click="submitForm()">确定</button>
       <button type="button" class="btn btn-sm btn-default" @click="(() => $emit('close', 1))">取消</button>
     </div>
   </div>
@@ -74,7 +74,7 @@ export default {
       OrgUrl: 'Organization/TreeRoot/' + this.$store.state.user_info.user.OrganizationID,
       labels,
       ungroupedUser: [], //  每个组织机构对应未分组的用户
-      targetGroupUser: [],// 已分组的用户
+      targetGroupUser: [], // 已分组的用户
       userData: {
         OrganizationID: ''
       },
@@ -212,6 +212,18 @@ export default {
     // 移除全部已分组用户
     removeAllGroupUser () {
       this.targetGroupUser = []
+    },
+    submitForm () {
+      this.targetGroupUser.forEach((t) => {
+        t.roleID = this.targetGroup.roleID
+      })
+      this.$ajax.post('Role/addUserRoles', this.targetGroupUser)
+        .then((res) => {
+          if (res.data.code === 1) {
+            this.$store.dispatch('update', 1)
+            this.removeAllGroupUser()
+          }
+        })
     }
   }
 }

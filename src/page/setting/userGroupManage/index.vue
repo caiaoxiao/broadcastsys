@@ -14,12 +14,12 @@
         </form>
         <ul id="height01" class="devGroup">
           <li v-for="item in groupList" :key='item.roleID' :class="[ (targetGroup.roleID && item.roleID == targetGroup.roleID) ? 'selected' : '' ]">
-            <p>{{item.roleName}}</p>
+            <p @click="queryTable(item)">{{item.roleName}}</p>
             <ul>
-              <li @click="openModal(item.OrganizationID)">
+              <li @click="openModal(item)">
                 <i class="fa fa-edit"></i>
               </li>
-              <li>
+              <li @click="deleteItems(item)">
                 <i class="fa fa-times"></i>
               </li>
             </ul>
@@ -53,7 +53,7 @@
                 <td>{{item.orgName}}</td>
                 <td width="170">
                   <button type="button" class="btn btn-sm btn-info">移动到</button>
-                  <button type="button" class="btn btn-sm btn-default" @click="deleteItems(self, 'Department/Remove', item.FeatureBaseID)">删除</button>
+                  <button type="button" class="btn btn-sm btn-default" @click="deleteGroupUser(item)">删除</button>
                 </td>
               </tr>
             </tbody>
@@ -141,7 +141,7 @@ export default {
         this.modolType = 0
       } else {
         this.modolType = 1
-        this.targetGroup.userGroupID = id
+        this.targetGroup = id
       }
     },
     initData () {
@@ -155,18 +155,45 @@ export default {
         })
     },
     // 获取数据
-    refresh () {
-      this.$ajax.post('User/List', { roleID: this.targetGroup.roleID })
+    refresh (item) {
+      let request = {
+        roleID: item ? item.roleID : this.targetGroup.roleID
+      }
+      this.$ajax.post('User/List', request)
         .then((res) => {
           if (res.data.code === 1) {
             this.dataAll = res.data.result
           }
         })
     },
-    close () {
-      this.modolType = null
+    queryTable (item) {
+      this.targetGroup = item
+      this.refresh(item)
+    },
+    close (type) {
+      if (type === 1) {
+        this.dialog = false
+      } else {
+        this.modolType = null
+      }
+    },
+    deleteItems (item) {
+      this.$ajax.delete(`Role/Remove/${item.roleID}`)
+        .then(res => {
+          if (res.data.code === 1) {
+            this.initData()
+          }
+        })
+    },
+    deleteGroupUser (item) {
+      this.$ajax.post('User/EditRelation', item)
+        .then(res => {
+          if (res.data.code === 1) {
+            this.initData()
+          }
+        })
     }
-
   }
 }
 </script>
+roleID

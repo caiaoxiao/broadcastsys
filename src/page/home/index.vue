@@ -368,7 +368,7 @@
                 deviceList.push(user)
               }
             })
-            if (deviceList.length) this.$store.dispatch('setDeviceList',deviceList)
+            this.$store.dispatch('setDeviceList',deviceList)
 
           }.bind(this),function(data) {
             console.log("error:"+data)

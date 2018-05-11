@@ -3,8 +3,13 @@
     <div class="phoneTitle">
        <i class="fa fa-phone" aria-hidden="true"></i>语音
        <span class="cloud "></span><!--正在语音中-->
-      <div class="phoneMeeting meetingOut" @click="toggle_enter"><!--进入为phoneMeeting 离开添加meetingOut-->
-        <i aria-hidden="true" class="fa fa-volume-control-phone fixed-nav"></i>{{this.flag_confleft?'离开':'进入'}}</div><!--进入为fa-plus 离开为fa-sign-out 有语音呼入为fa-volume-control-phone fixed-nav-->
+      <div 
+		:class="(!this.flag_confleft)&&(this.confLeft.length>0)?'phoneMeeting meetingOut':'phoneMeeting'" 
+		@click="toggle_enter"><!--进入为phoneMeeting 离开添加meetingOut-->
+        <i aria-hidden="true" 	
+		:class="this.flag_confleft ? 'fa fa-sign-out fixed-nav' :(this.confLeft.length>0?'fa fa-volume-control-phone fixed-nav':'fa fa-plus fixed-nav')"></i>
+		{{this.flag_confleft?'离开':'进入'}}
+		</div><!--进入为fa-plus 离开为fa-sign-out 有语音呼入为fa-volume-control-phone fixed-nav-->
     </div>
     <div class="numList">
       <div>

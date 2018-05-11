@@ -3,8 +3,8 @@
     <div class="phoneTitle">
        <i class="fa fa-phone" aria-hidden="true"></i>语音
        <span class="cloud "></span><!--正在语音中-->
-      <div class="phoneMeeting meetingOut" @click="toggle_enter">
-        <i aria-hidden="true" class="fa fa-plus"></i>{{this.flag_confleft?'离开':'进入'}}</div>
+      <div class="phoneMeeting meetingOut" @click="toggle_enter"><!--进入为phoneMeeting 离开添加meetingOut-->
+        <i aria-hidden="true" class="fa fa-volume-control-phone fixed-nav"></i>{{this.flag_confleft?'离开':'进入'}}</div><!--进入为fa-plus 离开为fa-sign-out 有语音呼入为fa-volume-control-phone fixed-nav-->
     </div>
     <div class="numList">
       <div>
@@ -45,7 +45,7 @@
     { name: '允许通话', class: 'fa-microphone' },
     { name: '排队等待', class: 'fa-spinner' },
     { name: '踢出会话', class: 'fa-sign-out'},
-    { name: '会话录音', class: 'fa-play-circle' },
+    { name: '成员静音', class: 'fa-microphone-slash' },
     { name: '结束服务', class: 'fa-window-close-o' },
     { name: '用户转出', class: 'fa-user-times' },
     { name: '确认转出', class: 'fa-reply-all' },

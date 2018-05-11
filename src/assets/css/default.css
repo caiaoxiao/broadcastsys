@@ -421,10 +421,10 @@ ul.nav li {
         height: 88px
     }
     .ring {
-        height: 262.60px;
+        height: 197.0px;
     }
     .ring>i {
-        margin-top: 120px;
+        margin-top: 90px;
         color: #008C00
     }
 }
@@ -443,10 +443,10 @@ ul.nav li {
         height: 101px
     }
     .ring {
-        height: 305px;
+        height: 229px;
     }
     .ring>i {
-        margin-top: 140px;
+        margin-top: 100px;
         color: #008C00
     }
 }
@@ -574,7 +574,7 @@ i.callOff {
 }
 
 .meetingOut {
-    background-color: #c9302c;
+    background-color: #962421;
 }
 
 @media(min-width:200px) {
@@ -2249,7 +2249,7 @@ ul.orgListPhone>li>span {
 /*来电动画*/
 
 .fixed-nav {
-    color: #c9302c;
+    color: #ff0000;
     margin-left: 10px;
     animation: msClock 1.2s linear infinite;
     animation: msClock 1.2s linear infinite;

@@ -4,7 +4,6 @@
         <div class="phoneTitle">
             <i class="fa fa-fire" aria-hidden="true"></i>报警
 
-           <i class="fa  fa-volume-control-phone fixed-nav" aria-hidden="true"></i>
 
           <div class="phoneMeeting" @click.stop="toggle_enter">
             <i aria-hidden="true" class="fa fa-sign-out"></i>{{this.flag_confalarm?'离开':'进入'}}
@@ -47,7 +46,7 @@
 		 >
               <i :class="!(flag_confleft || flag_callqueue)? 'fa fa-phone fa-2x' : 'fa fa-microphone fa-2x'" aria-hidden="true"></i>
             </div>
-            <!--<div class="dial hangup" @click="hangupCall" @mousedown="$btnMousedown" @mouseup="$btnMouseup">挂断</div>-->
+            <div class="dial hangup" @click="hangupCall" @mousedown="$btnMousedown" @mouseup="$btnMouseup">挂断</div>
           </div>
         </div>
         </div>

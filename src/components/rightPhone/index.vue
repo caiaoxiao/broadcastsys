@@ -148,7 +148,7 @@
 	if(item.caller_id_number=='9000')
           _this.fsAPI('conference',"9110-scc.ieyeplus.com"+" "+"hup"+" "+item.conf_id)
 	})
-      else
+      else if(this.confAlarm.length>0){
                this.vertoHandle.newCall({
                         destination_number: "9110",
                         caller_id_name: "LegalHigh",
@@ -164,6 +164,7 @@
                         useCamera: "any"
                         }
                         })
+	}
       },
 	select(e,item){
         let _this = this

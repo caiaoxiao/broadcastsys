@@ -298,6 +298,7 @@
       allOver() {
         // 结束全部喊话和播放
 
+	this.fsAPI('conference','3000-scc.ieyeplus.com'+' '+'hup'+' '+'all')
       }
     }
   }

@@ -211,6 +211,7 @@
         }
       },
       makeCall() {
+	if(this.destination_number){
         this.vertoHandle.newCall({
           // Extension to dial.
           destination_number: this.destination_number,
@@ -227,6 +228,7 @@
             useCamera: "any"
           }
         });
+	}
       },
       hangupCall() {
         this.vertoHandle.hangup();

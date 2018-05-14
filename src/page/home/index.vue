@@ -270,8 +270,27 @@
                                 talking : data["audio"]["talking"],
                                 channel_uuid : uuid,
                                 key : args.key })
-                        _this.$store.dispatch(action,arr)
                         }    
+			else
+			{
+				arr.forEach(function(item,index){	
+                                 if(item.key == args.key){
+				arr[index].conf_id  =  parseInt(args.data[0]).toString(),
+                                arr[index].caller_id_number =  args.data[1],
+                                arr[index].muted =  data["audio"]["muted"],
+                                arr[index].deaf =   data["audio"]["deaf"],
+                                arr[index].talking =  data["audio"]["talking"],
+                                arr[index].channel_uuid =  uuid,
+                                arr[index].key =  args.key 	
+				}
+
+
+				})
+
+
+
+			}
+                        _this.$store.dispatch(action,arr)
                         break;
 
                     }

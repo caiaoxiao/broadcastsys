@@ -71,9 +71,12 @@
           window.open("https://scc.ieyeplus.com:8432/qVYGpk4yKa1n3BuTbdTsUgwYfonzmW8z/grid/lQ4oMZ7",'newwindow','height=1920,width=1080,top=0,left=0,toolbar=no,menubar=no,scrollbars=no,location=no, status=no');
           
         }
-       else if(conf.length==1 && conf[0].caller_id_number == '9000')
+       else if(conf.length>0 && conf.every(function(item,index,array){return item.caller_id_number=='9000'}))
 	{	
-           this.fsAPI('conference','9110-scc.ieyeplus.com'+' ' +'hup'+' '+conf[0].conf_id) 
+	   let _this = this
+	   conf.forEach(function(item){
+           _this.fsAPI('conference','9110-scc.ieyeplus.com'+' ' +'hup'+' '+item.conf_id) 
+		})
 	   this.$store.dispatch('setConfAlarm',[])
 	}
       }

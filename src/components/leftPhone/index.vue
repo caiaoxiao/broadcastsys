@@ -197,9 +197,8 @@
 		if(this.selectedAlarm.length > 0){
                 this.selectedAlarm.forEach(function(a,i){
                   _this.fsAPI('conference',"9110-scc.ieyeplus.com"+" "+"unmute"+" "+a.conf_id)})
-                this.selectedAlarm.forEach(function(a,i){
-                  _this.fsAPI('conference',"9110-scc.ieyeplus.com"+" "+"undeaf"+" "+a.conf_id)})
-
+                //this.selectedAlarm.forEach(function(a,i){
+                //  _this.fsAPI('conference',"9110-scc.ieyeplus.com"+" "+"undeaf"+" "+a.conf_id)})
                 $('.selected').removeClass().addClass('unselected')
 		this.$store.dispatch('setSelectedAlarm',[])
                 }
@@ -217,8 +216,8 @@
 		if(this.selectedAlarm.length > 0){
                 this.selectedAlarm.forEach(function(a,i){
                   _this.fsAPI('conference',"9110-scc.ieyeplus.com"+" "+"mute"+" "+a.conf_id)})
-                 this.selectedAlarm.forEach(function(a,i){
-                  _this.fsAPI('conference',"9110-scc.ieyeplus.com"+" "+"deaf"+" "+a.conf_id)})
+                // this.selectedAlarm.forEach(function(a,i){
+                //  _this.fsAPI('conference',"9110-scc.ieyeplus.com"+" "+"deaf"+" "+a.conf_id)})
 
                 $('.selected').removeClass().addClass('unselected')
                 this.$store.dispatch('setSelectedAlarm',[])

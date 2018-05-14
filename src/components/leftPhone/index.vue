@@ -157,9 +157,9 @@
             		useCamera: "any"
           		}
         		})
+	_this.fsAPI('conference',"9100-scc.ieyeplus.com"+" "+"stop"+" current "+_this.confLeft[0].conf_id)
 	_this.fsAPI('conference',"9100-scc.ieyeplus.com"+" "+"unmute"+" "+_this.confLeft[0].conf_id)
 	_this.fsAPI('conference',"9100-scc.ieyeplus.com"+" "+"undeaf"+" "+_this.confLeft[0].conf_id)
-	_this.fsAPI('conference',"9100-scc.ieyeplus.com"+" "+"stop"+" current "+_this.confLeft[0].conf_id)
 	}
       },
       fsAPI(cmd, arg, success_cb, failed_cb) {

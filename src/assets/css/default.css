@@ -573,8 +573,11 @@ i.callOff {
     padding: 5px;
 }
 
+.meetingIn {
+    background-color:#008C00;
+}
 .meetingOut {
-    background-color: #962421;
+    background-color:#962421;
 }
 
 @media(min-width:200px) {

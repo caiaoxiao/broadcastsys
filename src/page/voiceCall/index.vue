@@ -200,7 +200,6 @@ export default {
       this.groupShow = item.deviceGroupId
     },
     itemClick (e, row) {
-      console.log(row)
       let target = e.currentTarget
       let _this = this
 
@@ -241,7 +240,7 @@ export default {
           this.selectRingCall.push(row)
         }
       }
-      this.destination_number =this.selectPhone?this.selectPhone[0].userID:'';
+      this.destination_number =this.selectPhone.length>0?this.selectPhone[0].userID:'';
 
     },
     fsAPI (cmd, arg, success_cb, failed_cb) {

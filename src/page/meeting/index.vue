@@ -150,7 +150,6 @@
       this.$nextTick(function() {
         getHeight()
         getHeights()
-        console.log(this)
       })
     },
     methods: {

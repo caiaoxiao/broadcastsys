@@ -3,7 +3,7 @@
     <header>
       <div class="user">
         <span @click="returnSystem()">
-          <i class="fa fa-reply"></i> 返回系统
+          <i  class="fa fa-reply"></i> 返回系统
         </span>
       </div>
       <div class="sysName">
@@ -43,6 +43,7 @@
     methods: {
       returnSystem() {
         this.$router.push('/');
+	window.location.reload()
       },
     }
   }

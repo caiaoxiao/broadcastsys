@@ -15,16 +15,18 @@
     data () {
       return {
         liveArray:{},
-        vertoConf:{}
+        vertoConf:{},
+        group_list:[],
+	      usermap:{}
       }
     },
     created() {
       this.$nextTick(function() {
         // 初始化vertoHandle
-        if(this.vertoHandle==null)
+        //if(this.vertoHandle==null)
           $.verto.init({}, this.initVertoHandle);
-        else
-          console.log('verto aleray not null')
+        //else
+        //console.log('verto aleray not null')
 
       })
     },
@@ -35,9 +37,10 @@
         users:'users',
         currentLoginUser:'currentLoginUser',
         deviceList:'deviceList',
+        deviceGroup:'deviceGroup',
         callQueue:'callQueue',
-	confLeft:'confLeft',
-        confAlarm:'confAlarm'
+	      confLeft:'confLeft',
+        confAlarm:'confAlarm',
       }),
     },
     watch: {
@@ -348,7 +351,7 @@
       },
       // 查询所有设备 以及事件初始化
       refresh() {
-//        let xuiUsername = localStorage.getItem('xui.username')
+//      let xuiUsername = localStorage.getItem('xui.username')
         let xuiUsername = 9000 // 过滤掉登陆者
         this.$store.dispatch('setCurrentLoginUser',{
           deviceState: "registered",
@@ -376,9 +379,9 @@
                 registrations.push(msg);
               }
             }
-            registrations.forEach(function(r) {
+      registrations.forEach(function(r) {
               let user = {}
-              if(r.reg_user != xuiUsername) {
+              if(r.reg_user != xuiUsername){ //(!deviceList.some((item)=>{return item.userID == r.reg_user})) 
                 user.deviceState = "registered"
                 user.userID = r.reg_user
                 user.callDirection = null
@@ -387,11 +390,73 @@
                 user.networkPort = r.network_port
                 user.operationState = 0
                 user.oppoChannelUUID = null
+                user.groupid = []//this.usermap.hasOwnProperty(user.userID)?usermap[userID]:null
                 deviceList.push(user)
-              }
-            })
-            this.$store.dispatch('setDeviceList',deviceList)
+              }/*
+              else{
+                deviceList.forEach((item,index)=>{ if(item.userID == r.reg_user)
+                        deviceList[index].deviceState = "registered"
+                        deviceList[index].userID = r.reg_user
+                        deviceList[index].callDirection = null
+                        deviceList[index].channelUUID = null
+                        deviceList[index].networkIP = r.network_ip
+                        deviceList[index].networkPort = r.network_port
+                        deviceList[index].operationState = 0
+                        deviceList[index].oppoChannelUUID = null
+                        deviceList[index].groupid = this.usermap.hasOwnProperty(user.userID)?usermap[userID]:null
+                        })
 
+                }*/
+            })	
+	    this.$ajax.post('DeviceGroup/List')
+        .then(res => {
+          if (res.data.code === 1) {
+            this.group_list = res.data.result
+            for(let g in this.group_list)
+              this.group_list[g].selected = false
+            this.$store.dispatch('setUserGroup',this.group_list)
+            this.group_list.forEach((item,index) => {
+            this.$ajax.get(`DeviceGroup/Detail/${item.deviceGroupId}`)
+            .then(res => {
+              if (res.data.code === 1) {
+                  let group  = res.data.result
+                  group.forEach((r,i)=>{
+                    if(this.usermap.hasOwnProperty(r.deviceCode)){
+                      this.usermap[r.deviceCode].list.push(r.deviceGroupId)
+                      this.usermap[r.deviceCode].type =r.type
+                    }
+                    else{
+                      this.usermap[r.deviceCode] = {}
+                      this.usermap[r.deviceCode].list = [r.deviceGroupId]
+                      this.usermap[r.deviceCode].type =r.type
+                    }
+                  })
+                }
+             for(let index in deviceList){
+              if(this.usermap.hasOwnProperty(deviceList[index].userID)){
+                deviceList[index].groupid =  this.usermap[deviceList[index].userID].list
+                deviceList[index].type =  this.usermap[deviceList[index].userID].type
+                delete this.usermap[deviceList[index].userID] }
+             }
+             for(let item in this.usermap){
+               let user = {}
+                user.deviceState = "unregistered"
+                user.userID = item
+                user.callDirection = null
+                user.channelUUID = null
+                user.networkIP = null
+                user.networkPort = null
+                user.operationState = 0
+                user.oppoChannelUUID = null
+                user.groupid = this.usermap[item].list
+                user.type = this.usermap[item].type
+                deviceList.push(user)
+              }   
+          })
+       })
+    }
+})
+          this.$store.dispatch('setDeviceList',deviceList)
           }.bind(this),function(data) {
             console.log("error:"+data)
           }.bind(this))
@@ -409,6 +474,7 @@
           let isContinue = true
           deviceList.forEach(function(d, i) {
             if(d.userID == e.data.username) {
+              deviceList[i].deviceState = "registered"
               isContinue=false
               return;
             }
@@ -420,6 +486,8 @@
             user.userID = e.data['to-user']
             user.callDirection = null
             user.channelUUID = null
+            user.groupid = this.usermap.hasOwnProperty(user.userID)?usermap[userID].list:[]
+            user.type = this.usermap.hasOwnProperty(user.userID)?usermap[userID].type:""
             deviceList.push(user)
 
           }
@@ -427,7 +495,7 @@
         }else if( e.eventChannel =='FSevent.custom::sofia::unregister') {
           deviceList.forEach(function(d, i) {
             if (d.userID == e.data.username) {
-              deviceList.splice(i,1)
+              deviceList[i].deviceState = "unregistered"
             }
           })
         }
@@ -462,7 +530,8 @@
         let callerNumber = e.data["Caller-Caller-ID-Number"];    //主叫号码
         let calleeNumber = e.data["Caller-Destination-Number"];  //被叫号码
         let channelUUID = e.data["Unique-ID"];                   //id
-        let channelCallState = e.data["Channel-Call-State"];     //通话状态
+        let channelCallState = e.data["Channel-Call-State"];  
+        console.log(channelCallState)   //通话状态
         let currentLoginUser = this.currentLoginUser;
         let users = this.deviceList;
         let currentLoginUserChanged = false;

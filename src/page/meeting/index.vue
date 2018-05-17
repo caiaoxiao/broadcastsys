@@ -41,7 +41,7 @@
         <div class="module">
           <ul class="nav nav-justified choose" data-name="title">
             <li class="on">全部</li>
-            <li>分组</li>
+            <li @click="refresh(userGroup[0])">分组</li>
           </ul>
           <div data-name="con">
             <div class="moduleList"  >
@@ -62,67 +62,25 @@
             <div class="grouping">
               <div class="department">
                 <ul data-name="title">
-                  <li class="on">部门一</li>
-                  <li>部门二</li>
+			<li
+                @click="refresh(item)"
+		:class="{on: item.selected}"
+                 v-for='item in userGroup'>{{ item.name }}</li>
                 </ul>
               </div>
               <div class="rightDetailList" data-name="con">
                 <div class="departDetail">
                   <div class="detailCon">
-                    <div class="singleM">
-                      <div class="moduleStyle online ">
-                        <div class="moduleNum">600</div>
-                        <div class="moduleKind">视频终端</div>
-                        <div class="moduleState">在线</div>
-                      </div>
-                    </div>
-                    <div class="singleM">
-                      <div class="moduleStyle online ">
-                        <div class="moduleNum">600</div>
-                        <div class="moduleKind">视频终端</div>
-                        <div class="moduleState">在线</div>
-                      </div>
-                    </div>
-                    <div class="singleM">
-                      <div class="moduleStyle online ">
-                        <div class="moduleNum">600</div>
-                        <div class="moduleKind">视频终端</div>
-                        <div class="moduleState">在线</div>
-                      </div>
+		  <div class="singleM" v-show="returnGroup(item)" v-for="item in deviceList">
+                    <div 
+                      class = "moduleStyle"
+                      :class="returnClass(item.deviceState)" 
+                      @click.stop="itemClick($event, item)" >
+                      <div class="moduleNum">{{ item.userID }}</div>
+                      <div class="moduleKind">{{item.type == 1 ? "话机设备" : "视频设备" }}</div>
+                      <div class="moduleState">{{ returnState(item.deviceState)}}</div>
                     </div>
                   </div>
-                  <div class="selectAll">全部选择</div>
-                </div>
-                <div class="departDetail">
-                  <div class="detailCon">
-                    <div class="singleM">
-                      <div class="moduleStyle online ">
-                        <div class="moduleNum">800</div>
-                        <div class="moduleKind">视频终端</div>
-                        <div class="moduleState">在线</div>
-                      </div>
-                    </div>
-                    <div class="singleM">
-                      <div class="moduleStyle online ">
-                        <div class="moduleNum">6001</div>
-                        <div class="moduleKind">视频终端</div>
-                        <div class="moduleState">在线</div>
-                      </div>
-                    </div>
-                    <div class="singleM">
-                      <div class="moduleStyle online ">
-                        <div class="moduleNum">600</div>
-                        <div class="moduleKind">视频终端</div>
-                        <div class="moduleState">在线</div>
-                      </div>
-                    </div>
-                    <div class="singleM">
-                      <div class="moduleStyle online ">
-                        <div class="moduleNum">600</div>
-                        <div class="moduleKind">视频终端</div>
-                        <div class="moduleState">在线</div>
-                      </div>
-                    </div>
                   </div>
                   <div class="selectAll">全部选择</div>
                 </div>
@@ -169,7 +127,8 @@
         name: 3800+ '-' + window.location.hostname,
         nowSession: [],       // 正在开会的话机
         selectNowSession: [], // 会议中选中的话机
-        selectPhone: []       // 选中待会议的话机
+        selectPhone: [],
+	groupShow:""       // 选中待会议的话机
       }
     },
     computed: {
@@ -178,6 +137,7 @@
         'vertoHandle',           // verto初始化
         'deviceList',           // 分组设备(不包括当前用户)
         'phoneShow',             // 话机显示或隐藏
+	'userGroup'
       ]),
     },
     components: {
@@ -194,7 +154,54 @@
       })
     },
     methods: {
-
+      returnGroup(item){
+      return item.groupid.some((it)=>{return it==this.groupShow})
+    },
+    returnClass(status){
+      switch(status){
+        case "registered":
+          return "online"
+          break
+        case "unregistered":
+          return "offline"
+          break
+        case "ringing":
+          return "waitting"
+          break
+        case "active":
+          return "calling01"
+          break
+        case "register":
+          return "online"
+          break
+      }
+    },
+    returnState(status){
+      switch(status){
+        case "registered":
+          return "在线"
+          break
+        case "unregistered":
+          return "离线"
+          break
+        case "ringing":
+          return "振铃"
+          break
+        case "active":
+          return "通话中"
+          break
+        case "register":
+          return "在线"
+          break
+      }
+    },
+    refresh (item) {
+      this.userGroup.forEach((r, i) => {
+              r.selected = false
+            })
+      item.selected = true
+      this.groupShow = item.deviceGroupId
+    },
       itemClick(e, row) {
         let target = e.currentTarget
         let _this = this

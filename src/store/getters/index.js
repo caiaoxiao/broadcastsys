@@ -85,5 +85,8 @@ export default {
   },
   selectedAlarm: state=> {
     return  state.selectedAlarm
-  }
+  },
+  userGroup: state=> {
+    return  state.userGroup
+  },
 }

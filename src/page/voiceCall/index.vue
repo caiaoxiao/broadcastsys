@@ -9,60 +9,10 @@
       <div class="module">
         <ul class="nav nav-justified choose" data-name="title">
           <li class="on">全部</li>
-          <li>分组</li>
+          <li @click="refresh(userGroup[0])">分组</li>
         </ul>
         <div data-name="con">
           <div class="moduleList " id="height01">
-            <div class="singleM ">
-              <!--video-camera：视频终端，phone：语音终端，left:被叫 right：主叫-->
-              <div class="moduleStyle  calling01 ">
-                <!--通话中-->
-                <div class="moduleNum">
-                  <i class="fa fa-video-camera" aria-hidden="true"></i>8001
-                  <i class="fa fa-arrow-left"></i>
-                  <p>襄十分中心哎哟哎哟3车道</p>
-                </div>
-                <div class="moduleNum">
-                  <i class="fa fa-phone" aria-hidden="true"></i>7001
-                  <i class="fa fa-arrow-right"></i>
-                  <p>襄十分中心哎哟哎哟3车道</p>
-                </div>
-                <div class="moduleState">00:00:01
-                  <span class="fa fa-phone" aria-hidden="true"></span>
-                </div>
-              </div>
-            </div>
-            <div class="singleM ">
-              <div class="moduleStyle online">
-                <!--在线-->
-                <div class="moduleNum">
-                  <i class="fa fa-video-camera" aria-hidden="true"></i>8001</div>
-                <div class="moduleNum">襄十分中心哎哟哎哟3车道 </div>
-              </div>
-            </div>
-            <div class="singleM ">
-              <div class="moduleStyle waitting">
-                <!--振铃中-->
-                <div class="moduleNum">
-                  <i class="fa fa-video-camera" aria-hidden="true"></i>8001
-                  <i class="fa fa-arrow-left"></i>
-                  <p>襄十分中心哎哟哎哟3车道</p>
-                </div>
-                <div class="moduleNum">
-                  <i class="fa fa-phone" aria-hidden="true"></i>7001
-                  <i class="fa fa-arrow-right"></i>
-                  <p>襄十分中心哎哟哎哟3车道</p>
-                </div>
-              </div>
-            </div>
-            <div class="singleM ">
-              <div class="moduleStyle offline">
-                <!--离线-->
-                <div class="moduleNum">
-                  <i class="fa fa-phone" aria-hidden="true"></i>8001</div>
-                <div class="moduleNum">襄十分中心哎哟哎哟3车道 </div>
-              </div>
-            </div>
             <div class="singleM" v-for="item in deviceList">
               <div class="moduleStyle" :class="returnClass(item.deviceState)" @click.stop="itemClick($event, item)">
                 <div class="moduleNum">{{ item.userID }}
@@ -74,7 +24,6 @@
                 <div class="moduleState">{{ returnState(item.deviceState) }}</div>
               </div>
             </div>
-
           </div>
           <div class="moduleList">
             <div class="department">
@@ -82,57 +31,23 @@
                 <li
                 @click="refresh(item)"
                 :class="{on: item.selected}"
-                 v-for='item in deviceGroupList'>{{ item.name }}</li>
+                 v-for='item in userGroup'>{{ item.name }}</li>
               </ul>
             </div>
             <div class="rightDetailList" data-name="con">
               <div class="departDetail">
                 <div class="detailCon">
-                  <div class="singleM" v-for="item in deviceGroup">
-                    <div class="moduleStyle online ">
-                      <div class="moduleNum">{{ item.deviceCode }}</div>
+                  <div class="singleM" v-show="returnGroup(item)" v-for="item in deviceList">
+                    <div 
+                      class = "moduleStyle"
+                      :class="returnClass(item.deviceState)" 
+                      @click.stop="itemClick($event, item)" >
+                      <div class="moduleNum">{{ item.userID }}</div>
                       <div class="moduleKind">{{item.type == 1 ? "话机设备" : "视频设备" }}</div>
-                      <div class="moduleState">在线</div>
+                      <div class="moduleState">{{ returnState(item.deviceState)}}</div>
                     </div>
                   </div>
 
-                </div>
-                <div class="selectAll">全部选择</div>
-              </div>
-              <div class="departDetail">
-                <div class="detailCon">
-                  <div class="singleM">
-                    <div class="moduleStyle online ">
-                      <div class="moduleNum">800</div>
-                      <div class="moduleKind">视频终端</div>
-                      <div class="moduleState">在线</div>
-                    </div>
-                  </div>
-                  <div class="singleM">
-                    <div class="moduleStyle online ">
-                      <div class="moduleNum">6001</div>
-                      <div class="moduleKind">视频终端</div>
-                      <div class="moduleState">在线</div>
-                    </div>
-                  </div>
-                  <div class="singleM">
-                    <div class="moduleStyle online ">
-                      <div class="moduleNum">
-                        <i class="fa fa-file-video-o" aria-hidden="true"></i>800[主叫]</div>
-                      <div class="moduleKind">襄十分中心哎哟哎哟3车道</div>
-                      <div class="moduleNum">
-                        <i class="fa fa-file-video-o" aria-hidden="true"></i>800[主叫]</div>
-                      <div class="moduleKind">襄十分中心哎哟哎哟3车道</div>
-                    </div>
-                  </div>
-                  <div class="singleM">
-                    <div class="moduleStyle online ">
-                      <div class="moduleNum">
-                        <i class="fa fa-phone-square" aria-hidden="true"></i> 600</div>
-                      <div class="moduleKind">襄十分中心3车道</div>
-                      <div class="moduleState">在线</div>
-                    </div>
-                  </div>
                 </div>
                 <div class="selectAll">全部选择</div>
               </div>
@@ -205,14 +120,15 @@ export default {
       selectRingCall: [],
       deviceGroupList: [],
       deviceGroup: [],
-      num: 0
+      num: 0,
+      groupShow:""
     }
   },
   created () {
     this.$nextTick(function () {
       getHeight()
       getHeights()
-      this.initData()
+      //this.initData()
     })
   },
   computed: {
@@ -223,7 +139,8 @@ export default {
       'group_users',
       'users',
       'deviceList',
-      'currentLoginUser'
+      'currentLoginUser',
+      'userGroup'
     ])
   },
   watch: {
@@ -234,33 +151,56 @@ export default {
   },
   methods: {
     // 获取设备分组数据
-    initData () {
-      this.$ajax.post('DeviceGroup/List')
-        .then(res => {
-          if (res.data.code === 1) {
-            let result = res.data.result
-            result.forEach((r, i) => {
-              r.selected = false
-            })
-            this.deviceGroupList = result
-            this.refresh(result[0])
-          }
-        })
+    returnGroup(item){
+      return item.groupid.some((it)=>{return it==this.groupShow})
     },
-    // new promise
+    returnClass(status){
+      switch(status){
+        case "registered":
+          return "online"
+          break
+        case "unregistered":
+          return "offline"
+          break
+        case "ringing":
+          return "waitting"
+          break
+        case "active":
+          return "calling01"
+          break
+        case "register":
+          return "online"
+          break
+      }
+    },
+    returnState(status){
+      switch(status){
+        case "registered":
+          return "在线"
+          break
+        case "unregistered":
+          return "离线"
+          break
+        case "ringing":
+          return "振铃"
+          break
+        case "active":
+          return "通话中"
+          break
+        case "register":
+          return "在线"
+          break
+      }
+    },
     refresh (item) {
-      this.deviceGroupList.forEach((r, i) => {
+      this.userGroup.forEach((r, i) => {
               r.selected = false
             })
       item.selected = true
-      this.$ajax.get(`DeviceGroup/Detail/${item.deviceGroupId}`)
-        .then(res => {
-          if (res.data.code === 1) {
-            this.deviceGroup = res.data.result
-          }
-        })
+      this.groupShow = item.deviceGroupId
     },
     itemClick (e, row) {
+      console.log(row)
       let target = e.currentTarget
       let _this = this
 
@@ -301,7 +241,7 @@ export default {
           this.selectRingCall.push(row)
         }
       }
-      this.destination_number = this.selectPhone[0].userID;
+      this.destination_number =this.selectPhone?this.selectPhone[0].userID:'';
 
     },
     fsAPI (cmd, arg, success_cb, failed_cb) {

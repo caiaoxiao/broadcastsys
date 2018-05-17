@@ -86,4 +86,7 @@ export default {
   setSelectedAlarm({ commit }, data) {
     commit('SET_SELECTED_ALARM', data)
   },
+  setUserGroup({ commit }, data) {
+    commit('SET_USER_GROUP', data)
+  },
 }

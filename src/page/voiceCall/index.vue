@@ -21,7 +21,7 @@
                   </span>
                 </div>
                 <div class="moduleKind">视频终端</div>
-                <div class="moduleState">{{ returnState(item.deviceState) }}</div>
+                <div class="moduleState">{{ returnState(item.deviceState)  + ((item.timer.s>0 || item.timer.m>0 || item.timer.h>0)?" 持续"+item.timer.m+"m" +Math.floor(item.timer.s)+"s":"")}}</div>
               </div>
             </div>
           </div>
@@ -44,7 +44,7 @@
                       @click.stop="itemClick($event, item)" >
                       <div class="moduleNum">{{ item.userID }}</div>
                       <div class="moduleKind">{{item.type == 1 ? "话机设备" : "视频设备" }}</div>
-                      <div class="moduleState">{{ returnState(item.deviceState)}}</div>
+		      <div class="moduleState">{{ returnState(item.deviceState)  + ((item.timer.s>0 || item.timer.m>0 || item.timer.h>0)?" 持续"+item.timer.m+"m" +Math.floor(item.timer.s)+"s":"")}}</div>
                     </div>
                   </div>
 
@@ -121,13 +121,14 @@ export default {
       deviceGroupList: [],
       deviceGroup: [],
       num: 0,
-      groupShow:""
+      groupShow:"",
     }
   },
   created () {
     this.$nextTick(function () {
       getHeight()
       getHeights()
+      console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",this.timer)
       //this.initData()
     })
   },
@@ -140,14 +141,13 @@ export default {
       'users',
       'deviceList',
       'currentLoginUser',
-      'userGroup'
+      'userGroup',
+      'timer'
     ])
   },
   watch: {
-    'callqueue': function () {
-
-
-    }
+    'timer': function (timer) {
+	}
   },
   methods: {
     // 获取设备分组数据
@@ -185,9 +185,9 @@ export default {
           return "振铃"
           break
         case "active":
-          return "通话中"
-          break
-        case "register":
+            return "通话中"
+            break
+	case "register":
           return "在线"
           break
       }

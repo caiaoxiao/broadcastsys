@@ -141,12 +141,9 @@ export default {
       'deviceList',
       'currentLoginUser',
       'userGroup',
-      'timer'
     ])
   },
   watch: {
-    'timer': function (timer) {
-	}
   },
   methods: {
     // 获取设备分组数据

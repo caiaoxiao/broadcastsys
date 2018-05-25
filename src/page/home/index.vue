@@ -408,6 +408,7 @@
                 user.operationState = 0
                 user.oppoChannelUUID = null
                 user.groupid = []//this.usermap.hasOwnProperty(user.userID)?usermap[userID]:null
+                user.timer = {s:0,m:0,h:0,id:[]}
                 deviceList.push(user)
               }/*
               else{
@@ -467,6 +468,7 @@
                 user.oppoChannelUUID = null
                 user.groupid = this.usermap[item].list
                 user.type = this.usermap[item].type
+                user.timer = {s:0,m:0,h:0,id:[]}
                 deviceList.push(user)
               }   
           })
@@ -560,7 +562,43 @@
           channelCallState = "ringing";
         } else if (channelCallState == "ACTIVE") {
           channelCallState = "active";
+          users.forEach(function(user) {
+              if(user.userID == callerNumber) {
+	      var t = setInterval(()=>{
+              user.timer.s+=0.5
+	      if(user.timer.s>59.5){
+		      user.timer.s=0
+		      user.timer.m+=1}
+	      if(user.timer.s>59.5 || user.timer.m>59){
+          user.timer.m=0
+          user.timer.h+=1}
+          },1000)
+	      user.timer.id.push(t) 
+              }
+	      else  if(user.userID == calleeNumber) {
+              var t = setInterval(()=>{
+               user.timer.s+=0.5
+	       if(user.timer.s>59.5 && user.timer.m<=59){
+                user.timer.s=0
+                user.timer.m+=1}
+	      if(user.timer.s>59.5 && user.timer.m>59){
+                user.timer.m=0
+                user.timer.h+=1}
+          },1000)
+	      user.timer.id.push(t) 
+              }
+	})
         } else if (channelCallState == "HANGUP") {
+          	  users.forEach(function(user) {
+              if(user.userID == callerNumber || user.userID == calleeNumber) {
+		user.timer.s=0
+		user.timer.m=0
+		user.timer.h=0
+		user.timer.id.forEach((id)=>{
+                 clearInterval(id)	
+		})
+		}
+		})
           channelCallState = "register";
         }
         // 入栈

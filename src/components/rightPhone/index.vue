@@ -29,6 +29,9 @@
         <div class="phoneDial">
           <div class="numDisplay">
             <span>{{destination_number}}</span>
+          </div>
+	 <div class="numDisplay">
+	    <span>{{this.nowCalling}}</span>
             <img @click="clear" src="../../assets/img/delate.fw.png" />
           </div>
           <div class="dialDisplay">
@@ -60,6 +63,8 @@
   import { getHeight } from "utils/height";
 
   export default {
+    props:{
+       },
     data() {
       return {
         destination_number: "",
@@ -81,6 +86,7 @@
 	flag_callqueue:false,
 	flag_confleft:false,
 	flag_confalarm:false,
+	nowCalling:""
 
       };
     },
@@ -106,6 +112,10 @@
 	
 	callQueue:function(callqueue)
 	{
+	if(callqueue.length>0 && (callqueue[callqueue.length-1].des=='9000') )
+           this.nowCalling = callqueue[0].des+"正在呼叫您，请及时接听"
+        else 
+	   this.nowCalling = ""
 	if(callqueue.length>0){
          if(callqueue[0].caller =='9000' || callqueue[0].des =='9000')
                 this.flag_callqueue = true

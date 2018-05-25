@@ -49,7 +49,7 @@
     { name: '允许通话', class: 'fa-microphone' },
     { name: '排队等待', class: 'fa-spinner' },
     { name: '踢出会话', class: 'fa-sign-out'},
-    { name: '成员静音', class: 'fa-microphone-slash' },
+    { name: '只听不说', class: 'fa-microphone-slash' },
     { name: '结束服务', class: 'fa-window-close-o' },
     { name: '用户转出', class: 'fa-user-times' },
     { name: '确认转出', class: 'fa-reply-all' },
@@ -78,13 +78,17 @@
       this.$nextTick(function () {
         // getHeight()
         // $.verto.init({}, this.bootstrap);
-        if(this.$router.history.current.fullPath=="/voiceCall" || this.$router.history.current.fullPath=="/meeting"){
+        if(this.$router.history.current.fullPath=="/voiceCall"){
           this.conf = this.confLeft
           this.confname = {name:'confleft',num:'9100'}
         }
         else if(this.$router.history.current.fullPath=="/ipBroad") {
           this.conf = this.$store.getters.confIpBoard
-          this.confname = {name:'confipboard',num:'3002'}
+          this.confname = {name:'confipboard',num:'9111'}
+        }
+	else if(this.$router.history.current.fullPath=="/meeting") {
+          this.conf = this.$store.getters.confMeeting
+          this.confname = {name:'confmeeting',num:'9112'}
         }
 	      else	{
 	        this.conf = this.confLeft 
@@ -280,6 +284,17 @@
                 })
                 }
                 break
+	   case '只听不说':
+		if(this.selected.length > 0){
+                this.selected.forEach(function(a,i){
+                  _this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"mute"+" "+a.conf_id)})
+                this.selected.forEach(function(a,i){
+                  _this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"undeaf"+" "+a.conf_id)})
+
+                $('.selected').removeClass().addClass('unselected')
+                this.selected = []
+                }
+		break
         }
 
       },

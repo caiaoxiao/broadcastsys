@@ -21,7 +21,11 @@
                   </span>
                 </div>
                 <div class="moduleKind">视频终端</div>
-                <div class="moduleState">{{ returnState(item.deviceState)  + ((item.timer.s>0 || item.timer.m>0 || item.timer.h>0)?" 持续"+item.timer.m+"m" +Math.floor(item.timer.s)+"s":"")}}</div>
+<div class="moduleState">{{ returnState(item.deviceState)  + "   " + ((item.timer.s>0 || item.timer.m>0 || item.timer.h>0)?
+                        ((item.timer.h/10<1?"0"+item.timer.h+":":item.timer.h+":")+
+                        (item.timer.m/10<1?"0"+item.timer.m+":":item.timer.m+":")+
+			(item.timer.s/10<1?"0"+Math.floor(item.timer.s):Math.floor(item.timer.s))):"")}}
+              </div>
               </div>
             </div>
           </div>
@@ -44,7 +48,11 @@
                       @click.stop="itemClick($event, item)" >
                       <div class="moduleNum">{{ item.userID }}</div>
                       <div class="moduleKind">{{item.type == 1 ? "话机设备" : "视频设备" }}</div>
-		      <div class="moduleState">{{ returnState(item.deviceState)  + ((item.timer.s>0 || item.timer.m>0 || item.timer.h>0)?" 持续"+item.timer.m+"m" +Math.floor(item.timer.s)+"s":"")}}</div>
+		      <div class="moduleState">{{ returnState(item.deviceState)  + "   " + ((item.timer.s>0 || item.timer.m>0 || item.timer.h>0)?
+                        ((item.timer.h/10<1?"0"+item.timer.h+":":item.timer.h+":")+
+                        (item.timer.m/10<1?"0"+item.timer.m+":":item.timer.m+":")+
+			(item.timer.s/10<1?"0"+Math.floor(item.timer.s):Math.floor(item.timer.s))):"")}}
+              </div>
                     </div>
                   </div>
 

@@ -48,7 +48,7 @@
       'confAlarm': function(conf) {
         if(conf.length>0 && !conf.some(function(item,indexs,array){return item.caller_id_number=='9000'}))
         {
-	if(this.callQueue.some(function(item,index,array){return item.caller == '9000' || item.des=='9000'}))
+	if(this.callQueue.some(function(item,index,array){return  item.des=='9000'}))
 	 this.vertoHandle.hangup()
 	 this.vertoHandle.newCall({
           // Extension to dial.
@@ -234,11 +234,16 @@
 				arr = _this.$store.getters.confAlarm
 				action = 'setConfAlarm'
 				}
-			else if(liveArrayObj.name =='3002-scc.ieyeplus.com')
+			else if(liveArrayObj.name =='9111-scc.ieyeplus.com')
 				{
 				arr = _this.$store.getters.confIpBoard
 				action = 'setConfIpBoard'
 				}
+			else if(liveArrayObj.name =='9112-scc.ieyeplus.com')
+                                {
+                                arr = _this.$store.getters.confMeeting
+                                action = 'setConfMeeting'
+                                }
                   try {
                     switch (args.action) {
 
@@ -261,8 +266,8 @@
 
                         })
                         _this.$store.dispatch(action,arr)
-			if((liveArrayObj.name == '9100-scc.ieyeplus.com' || liveArrayObj.name == '3002-scc.ieyeplus.com' )&& args.data[1]!='9000' )
-			_this.fsAPI('conference',liveArrayObj.name+' '+'play'+' '+'/usr/local/freeswitch/sounds/music/8000/danza-espanola-op-37-h-142-xii-arabesca.wav'+ ' '+ parseInt(args.data[0]).toString()) 
+			if((liveArrayObj.name == '9100-scc.ieyeplus.com' || liveArrayObj.name == '9111-scc.ieyeplus.com' )&& args.data[1]!='9000' )
+			//_this.fsAPI('conference',liveArrayObj.name+' '+'play'+' '+'/usr/local/freeswitch/sounds/music/8000/danza-espanola-op-37-h-142-xii-arabesca.wav'+ ' '+ parseInt(args.data[0]).toString()) 
                         break;
 
                       // User left conference.
@@ -353,7 +358,8 @@
                   // sessions that were re-attached.
                   initLiveArray(verto, dialog, data,"conference-liveArray.9100-scc.ieyeplus.com@scc.ieyeplus.com","9100-scc.ieyeplus.com");
                   initLiveArray(verto, dialog, data,"conference-liveArray.9110-scc.ieyeplus.com@scc.ieyeplus.com","9110-scc.ieyeplus.com");
-                  initLiveArray(verto, dialog, data,"conference-liveArray.3002-scc.ieyeplus.com@scc.ieyeplus.com","3002-scc.ieyeplus.com");
+                  initLiveArray(verto, dialog, data,"conference-liveArray.9111-scc.ieyeplus.com@scc.ieyeplus.com","9111-scc.ieyeplus.com");
+                  initLiveArray(verto, dialog, data,"conference-liveArray.9112-scc.ieyeplus.com@scc.ieyeplus.com","9112-scc.ieyeplus.com");
                   console.log('verto channel ready')
                   break;
               }

@@ -89,6 +89,9 @@ export default {
   setConfIpBoard({ commit }, data) {
     commit('SET_CONF_IP_BOARD', data)
   },
+  setConfMeeting({ commit }, data) {
+    commit('SET_CONF_MEETING', data)
+  },
   setUserGroup({ commit }, data) {
     commit('SET_USER_GROUP', data)
   },

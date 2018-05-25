@@ -21,7 +21,11 @@
                   </span>
                 </div>
                 <div class="moduleKind">语音终端</div>
-		<div class="moduleState">{{ returnState(item.deviceState)  + ((item.timer.s>0 || item.timer.m>0 || item.timer.h>0)?" 持续"+item.timer.m+"m" +Math.floor(item.timer.s)+"s":"")}}</div>
+		<div class="moduleState">{{ returnState(item.deviceState)  + "   " + ((item.timer.s>0 || item.timer.m>0 || item.timer.h>0)?
+                        ((item.timer.h/10<1?"0"+item.timer.h+":":item.timer.h+":")+
+                        (item.timer.m/10<1?"0"+item.timer.m+":":item.timer.m+":")+
+			(item.timer.s/10<1?"0"+Math.floor(item.timer.s):Math.floor(item.timer.s))):"")}}
+              </div>
               </div>
             </div>
           </div>
@@ -44,7 +48,11 @@
                       @click.stop="itemClick($event, item)" >
                       <div class="moduleNum">{{ item.userID }}</div>
                       <div class="moduleKind">{{item.type == 1 ? "话机设备" : "视频设备" }}</div>
-		      <div class="moduleState">{{ returnState(item.deviceState)  + ((item.timer.s>0 || item.timer.m>0 || item.timer.h>0)?" 持续"+item.timer.m+"m" +Math.floor(item.timer.s)+"s":"")}}</div>
+			<div class="moduleState">{{ returnState(item.deviceState)  + "   " + ((item.timer.s>0 || item.timer.m>0 || item.timer.h>0)?
+                        ((item.timer.h/10<1?"0"+item.timer.h+":":item.timer.h+":")+
+                        (item.timer.m/10<1?"0"+item.timer.m+":":item.timer.m+":")+
+			(item.timer.s/10<1?"0"+Math.floor(item.timer.s):Math.floor(item.timer.s))):"")}}
+              </div>
                     </div>
                   </div>
                 </div>
@@ -61,6 +69,7 @@
 
       <div class="functionMenu">
         <ul class="nav nav-justified menuList">
+          <li id="a1" @click="tmute" @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-user-circle fa-2x" aria-hidden="true"></i><span>管理员静音</span></li>
           <li id="a2" @click="shout" @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-bullhorn fa-2x" aria-hidden="true"></i><span>喊话</span></li>
           <li id="a3" @click="play" @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-play-circle-o fa-2x" aria-hidden="true"></i><span>播放</span></li>
           <li id="a4" @click="allOver" @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-window-close fa-2x" aria-hidden="true"></i><span>全部结束</span></li>
@@ -97,7 +106,7 @@
       this.deviceList
       return {
         selectPhone: [],
-        name: '3000' + '-' + window.location.hostname,
+        name: '9111' + '-' + window.location.hostname,
         playListShow: false,     //播放列表显示切换
 	groupShow:""
       }
@@ -122,7 +131,8 @@
         'deviceList',                       // 所有设备
         'currentLoginUser',  // 当前用户
 	'callQueue',
-	'userGroup'
+	'userGroup',
+	'confIpBoard'
       ]),
     },
     methods: {
@@ -239,7 +249,7 @@
 	  //this.fsAPI('conference',this.name + ' ' + 'bgdial' + ' ' + "user/9000")
 	  this.vertoHandle.newCall({
           // Extension to dial.
-          destination_number: '3000',
+          destination_number: '9111',
           caller_id_name: '9000',
           caller_id_number: '9000',
           outgoingBandwidth: 'default',
@@ -304,8 +314,14 @@
       allOver() {
         // 结束全部喊话和播放
 
-	this.fsAPI('conference','3000-scc.ieyeplus.com'+' '+'hup'+' '+'all')
-      }
+	this.fsAPI('conference','9111-scc.ieyeplus.com'+' '+'hup'+' '+'all')
+      },
+      tmute(){
+        this.confIpBoard.forEach((item,index)=>{	
+	if(item.caller_id_number=='9000')
+	this.fsAPI('conference','9111-scc.ieyeplus.com'+' '+'tmute'+' '+item.conf_id)
+	})
+	}
     }
   }
 </script>

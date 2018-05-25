@@ -2,49 +2,13 @@
   <div>
     <left-phone  :select-phone="selectPhone" ></left-phone>
     <div class="middleCon">
-      <div class="memberList">
-        <div class="module">
-          <div class="moduleList">
-
-            <div class="singleM" v-for="item in nowSession">
-              <div class="moduleStyle calling "  @click.stop="itemClick($event, item)">
-                <div class="moduleNum">{{ item.userExten }}</div>
-                <div class="moduleKind">
-                  通话终端
-                </div>
-                <div class="moduleState">00:00:01<span class="fa fa-phone" aria-hidden="true"></span></div>
-              </div>
-            </div>
-
-          </div>
-        </div>
-        <div class="functionMenu">
-          <ul class="nav nav-justified menuList">
-            <li id="a1" @click="closeMeeting"  @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-window-close-o fa-2x"  aria-hidden="true"></i><span>结束会议
-            </span></li>
-            <li id="a2" @click="publicFunction('unmute')"  @mousedown="$btnMousedown" @mouseup="$btnMouseup">
-              <i class="fa fa-microphone fa-2x" aria-hidden="true"></i>
-              <span>允许发言</span>
-            </li>
-            <li id="a3" @click="publicFunction('mute')"  @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-microphone-slash fa-2x"
-                                                           aria-hidden="true" ></i><span>禁止发言</span></li>
-            <li id="a4" @click="publicFunction('kick')"  @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-sign-out fa-2x" aria-hidden="true"></i><span>踢出会议
-            </span></li>
-            <li id="a5" @click="meetingRecord('start')"  @mousedown="$btnMousedown" @mouseup="$btnMouseup">
-              <i class="fa fa-play-circle fa-2x" aria-hidden="true"></i>
-              <span>会议录音</span>
-            </li>
-          </ul>
-        </div>
-      </div>
-      <div class="memberList">
-        <div class="module">
+	<div class="module">
           <ul class="nav nav-justified choose" data-name="title">
             <li class="on">全部</li>
             <li @click="refresh(userGroup[0])">分组</li>
           </ul>
           <div data-name="con">
-            <div class="moduleList"  >
+            <div class="moduleList" id = "height01" >
               <div class="singleM" v-for="item in deviceList">
                 <div class="moduleStyle"
                      :class="returnClass(item.deviceState)"
@@ -55,11 +19,15 @@
                     </span> 
                   </div>
                   <div class="moduleKind">视频终端</div>
-		  <div class="moduleState">{{ returnState(item.deviceState)  + ((item.timer.s>0 || item.timer.m>0 || item.timer.h>0)?" 持续"+item.timer.m+"m" +Math.floor(item.timer.s)+"s":"")}}</div>
+		<div class="moduleState">{{ returnState(item.deviceState)  + "   " + ((item.timer.s>0 || item.timer.m>0 || item.timer.h>0)?
+                        ((item.timer.h/10<1?"0"+item.timer.h+":":item.timer.h+":")+
+                        (item.timer.m/10<1?"0"+item.timer.m+":":item.timer.m+":")+
+			(item.timer.s/10<1?"0"+Math.floor(item.timer.s):Math.floor(item.timer.s))):"")}}
+              </div>
                 </div>
               </div>
-            </div>
-            <div class="grouping">
+             </div>
+            <div class="moduleList">
               <div class="department">
                 <ul data-name="title">
 			<li
@@ -78,7 +46,11 @@
                       @click.stop="itemClick($event, item)" >
                       <div class="moduleNum">{{ item.userID }}</div>
                       <div class="moduleKind">{{item.type == 1 ? "话机设备" : "视频设备" }}</div>
-		      <div class="moduleState">{{ returnState(item.deviceState)  + ((item.timer.s>0 || item.timer.m>0 || item.timer.h>0)?" 持续"+item.timer.m+"m" +Math.floor(item.timer.s)+"s":"")}}</div>
+			<div class="moduleState">{{ returnState(item.deviceState)  + "   " + ((item.timer.s>0 || item.timer.m>0 || item.timer.h>0)?
+                        ((item.timer.h/10<1?"0"+item.timer.h+":":item.timer.h+":")+
+                        (item.timer.m/10<1?"0"+item.timer.m+":":item.timer.m+":")+
+			(item.timer.s/10<1?"0"+Math.floor(item.timer.s):Math.floor(item.timer.s))):"")}}
+              </div>
                     </div>
                   </div>
                   </div>
@@ -100,14 +72,13 @@
             </li>
 
           </ul>
-        </div>
       </div>
     </div>
-    <rightPhone></rightPhone>
-    <confirm-dialog v-if="dialogShow">
-      <slot name="content">确定要呼叫到</slot>
-    </confirm-dialog>
-    <callDivert v-if="phoneShow"></callDivert>
+    <right-phone></right-phone>
+    <!--confirm-dialog v-if="dialogShow"-->
+      <!--slot name="content">确定要呼叫到</slot-->
+    <!--/confirm-dialog-->
+    <!--callDivert v-if="phoneShow"></callDivert-->
   </div>
 </template>
 
@@ -124,7 +95,7 @@
       return {
         shows: false,
         deviceAll: [],
-        name: 3800+ '-' + window.location.hostname,
+        name: '9112' + '-' + window.location.hostname,
         nowSession: [],       // 正在开会的话机
         selectNowSession: [], // 会议中选中的话机
         selectPhone: [],

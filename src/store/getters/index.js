@@ -86,6 +86,9 @@ export default {
   confIpBoard: state=> {
     return  state.confIpBoard
   },
+  confMeeting: state=> {
+    return  state.confMeeting
+  },
   selectedAlarm: state=> {
     return  state.selectedAlarm
   },

@@ -851,7 +851,8 @@ ul.choose>li.on {
 
 .memberList {
     position: relative;
-    height: 50%;
+    height:100%;
+
 }
 
 @media(min-width:966px) {

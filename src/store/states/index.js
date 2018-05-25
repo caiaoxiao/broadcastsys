@@ -45,6 +45,7 @@ export default {
   callQueue: [],
   confLeft: [],
   confAlarm:[],
+  confMeeting:[],
   confIpBoard:[],
   userGroup:[],
   selectedAlarm:[],

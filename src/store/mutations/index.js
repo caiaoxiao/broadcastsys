@@ -85,6 +85,9 @@ export default {
   SET_CONF_ALARM: (state, data) => {
     state.confAlarm = data
   },
+  SET_CONF_IP_BOARD: (state, data) => {
+    state.confIpBorad = data
+  },
   SET_SELECTED_ALARM: (state, data) => {
     state.selectedAlarm = data
   },

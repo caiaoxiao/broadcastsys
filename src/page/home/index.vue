@@ -39,8 +39,9 @@
         deviceList:'deviceList',
         deviceGroup:'deviceGroup',
         callQueue:'callQueue',
-	      confLeft:'confLeft',
+        confLeft:'confLeft',
         confAlarm:'confAlarm',
+	confIpBoard: 'confIpBoard'
       }),
     },
     watch: {
@@ -221,8 +222,23 @@
                 // Subscribe to live array changes.
                 _this.liveArray.onChange = function(liveArrayObj, args) {
 		let uuid = Object.keys(liveArrayObj.hash())[0] 
-                let  arr = liveArrayObj.name == '9100-scc.ieyeplus.com'?_this.$store.getters.confLeft:_this.$store.getters.confAlarm
-		let action = liveArrayObj.name == '9100-scc.ieyeplus.com'? 'setConfLeft': 'setConfAlarm'
+		let action = ""
+		let arr =[]
+			if(liveArrayObj.name == '9100-scc.ieyeplus.com')
+                                {
+				arr = _this.$store.getters.confLeft
+				action = 'setConfLeft'
+				}
+			else if(liveArrayObj.name =='9110-scc.ieyeplus.com')
+				{
+				arr = _this.$store.getters.confAlarm
+				action = 'setConfAlarm'
+				}
+			else if(liveArrayObj.name =='3002-scc.ieyeplus.com')
+				{
+				arr = _this.$store.getters.confIpBoard
+				action = 'setConfIpBoard'
+				}
                   try {
                     switch (args.action) {
 
@@ -245,8 +261,8 @@
 
                         })
                         _this.$store.dispatch(action,arr)
-			if(liveArrayObj.name == '9100-scc.ieyeplus.com')
-			_this.fsAPI('conference','9100-scc.ieyeplus.com'+' '+'play'+' '+'/usr/local/freeswitch/sounds/music/8000/danza-espanola-op-37-h-142-xii-arabesca.wav'+ ' '+ parseInt(args.data[0]).toString()) 
+			if((liveArrayObj.name == '9100-scc.ieyeplus.com' || liveArrayObj.name == '3002-scc.ieyeplus.com' )&& args.data[1]!='9000' )
+			_this.fsAPI('conference',liveArrayObj.name+' '+'play'+' '+'/usr/local/freeswitch/sounds/music/8000/danza-espanola-op-37-h-142-xii-arabesca.wav'+ ' '+ parseInt(args.data[0]).toString()) 
                         break;
 
                       // User left conference.
@@ -293,7 +309,7 @@
 
 
 			}
-                        _this.$store.dispatch(action,arr)
+			_this.$store.dispatch(action,arr)
                         break;
 
                     }
@@ -337,6 +353,7 @@
                   // sessions that were re-attached.
                   initLiveArray(verto, dialog, data,"conference-liveArray.9100-scc.ieyeplus.com@scc.ieyeplus.com","9100-scc.ieyeplus.com");
                   initLiveArray(verto, dialog, data,"conference-liveArray.9110-scc.ieyeplus.com@scc.ieyeplus.com","9110-scc.ieyeplus.com");
+                  initLiveArray(verto, dialog, data,"conference-liveArray.3002-scc.ieyeplus.com@scc.ieyeplus.com","3002-scc.ieyeplus.com");
                   console.log('verto channel ready')
                   break;
               }

@@ -86,6 +86,9 @@ export default {
   setSelectedAlarm({ commit }, data) {
     commit('SET_SELECTED_ALARM', data)
   },
+  setConfIpBoard({ commit }, data) {
+    commit('SET_CONF_IP_BOARD', data)
+  },
   setUserGroup({ commit }, data) {
     commit('SET_USER_GROUP', data)
   },

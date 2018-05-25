@@ -45,6 +45,7 @@ export default {
   callQueue: [],
   confLeft: [],
   confAlarm:[],
+  confIpBoard:[],
   userGroup:[],
   selectedAlarm:[],
   // 是否订阅会议回调

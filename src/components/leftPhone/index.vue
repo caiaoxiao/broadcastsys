@@ -3,11 +3,11 @@
     <div class="phoneTitle">
        <i class="fa fa-phone" aria-hidden="true"></i>语音
       <div 
-		:class="(!this.flag_confleft)&&(this.confLeft.length>0)?'phoneMeeting meetingOut':(this.flag_confleft?'phoneMeeting meetingIn':'phoneMeeting')"
+		:class="(!this.flag_conf)&&(this.conf.length>0)?'phoneMeeting meetingOut':(this.flag_conf?'phoneMeeting meetingIn':'phoneMeeting')"
 		@click="toggle_enter"><!--进入为phoneMeeting 离开添加meetingOut-->
         <i aria-hidden="true" 	
-		:class="this.flag_confleft ? 'fa fa-sign-out fixed-nav' :(this.confLeft.length>0?'fa fa-volume-control-phone fixed-nav':'fa fa-plus fixed-nav')"></i>
-		{{this.flag_confleft?'离开':'进入'}}
+		:class="this.flag_conf ? 'fa fa-sign-out fixed-nav' :(this.conf.length>0?'fa fa-volume-control-phone fixed-nav':'fa fa-plus fixed-nav')"></i>
+		{{this.flag_conf?'离开':'进入'}}
 		</div><!--进入为fa-plus 离开为fa-sign-out 有语音呼入为fa-volume-control-phone fixed-nav-->
     </div>
     <div class="numList">
@@ -18,7 +18,7 @@
           <!--1005-->
           <!--<span>00:00:01</span>-->
           <!--</li>-->
-          <li class ="unselected" v-if="item.caller_id_number!='9000'" v-for="item in confLeft" @click.stop="select($event,item)">
+          <li class ="unselected" v-if="item.caller_id_number!='9000'" v-for="item in conf" @click.stop="select($event,item)">
           <i class="fa fa-circle orange" aria-hidden="true"></i>
 		             {{ item.caller_id_number}}
           </li>
@@ -64,24 +64,38 @@
     data() {
       return {
         btnData,
-	selected:[],
-	status:"进入",
-	userDeflect:null,
-	flag_confleft:false,
-	flag_confalarm:false,
-        flag_callqueue:false
+	      selected:[],
+	      status:"进入",
+        conf:[],
+        confname:{},
+        userDeflect:null,
+        flag_conf:false,
+        flag_confalarm:false,
+        flag_callqueue:false,
       }
     },
     created() {
       this.$nextTick(function () {
         // getHeight()
         // $.verto.init({}, this.bootstrap);
+        if(this.$router.history.current.fullPath=="/voiceCall" || this.$router.history.current.fullPath=="/meeting"){
+          this.conf = this.confLeft
+          this.confname = {name:'confleft',num:'9100'}
+        }
+        else if(this.$router.history.current.fullPath=="/ipBroad") {
+          this.conf = this.$store.getters.confIpBoard
+          this.confname = {name:'confipboard',num:'3002'}
+        }
+	      else	{
+	        this.conf = this.confLeft 
+          this.confname = {name:'confleft',num:'9100'}
+        }
+	
       })
     },
     mounted(){
     },
     watch: {
-
         callQueue:function(callqueue)
         {
         if(callqueue.length>0){
@@ -93,18 +107,18 @@
         else
                 this.flag_callqueue = false
         },
-        confLeft:function(confleft)
+        conf:function(conf)
         {
-        for(var  i = 0;i < confleft.length;i++)
-                  if(confleft[i].caller_id_number == '9000')
-                        {   this.flag_confleft = true
+        for(var  i = 0;i < conf.length;i++)
+                  if(conf[i].caller_id_number == '9000')
+                        {   this.flag_conf = true
                             break
                         }
-        if(i==confleft.length)
-             this.flag_confleft = false
+        if(i==conf.length)
+             this.flag_conf = false
 
         },
-	confAlarm:function(confalarm)
+	      confAlarm:function(confalarm)
         {
         for(var  i = 0;i < confalarm.length;i++)
                   if(confalarm[i].caller_id_number == '9000')
@@ -123,26 +137,27 @@
         users: 'users',
         currentLoginUser: 'currentLoginUser',
         callQueue: 'callQueue',
-	confLeft : 'confLeft',
-	confAlarm : 'confAlarm',
-	selectedAlarm : 'selectedAlarm',
+	      confLeft : 'confLeft',
+	      confAlarm : 'confAlarm',
+        confIpBoard : 'confIpBoard',
+	      selectedAlarm : 'selectedAlarm',
 
       }),
     },
     methods: {
       toggle_enter(){
-	let _this = this
-	if(this.flag_confleft==true)
-        this.confLeft.forEach(function(item,index,array){
+        let _this = this
+	      if(this.flag_conf==true)
+          this.conf.forEach(function(item,index,array){
         if(item.caller_id_number=='9000')
-          _this.fsAPI('conference',"9100-scc.ieyeplus.com"+" "+"hup"+" "+item.conf_id)
-	_this.fsAPI('conference',"9100-scc.ieyeplus.com"+" "+"mute"+" "+item.conf_id)
-	_this.fsAPI('conference',"9100-scc.ieyeplus.com"+" "+"deaf"+" "+item.conf_id)
+          _this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"hup"+" "+item.conf_id)
+	        _this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"mute"+" "+item.conf_id)
+	        _this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"deaf"+" "+item.conf_id)
         })
       else			
 	{
                this.vertoHandle.newCall({
-          		destination_number: "9100",
+          		destination_number: this.confname.num,
             		caller_id_name: "LegalHigh",
           		caller_id_number: "9000",
           		outgoingBandwidth: "default",
@@ -156,9 +171,9 @@
             		useCamera: "any"
           		}
         		})
-	_this.fsAPI('conference',"9100-scc.ieyeplus.com"+" "+"stop"+" current "+_this.confLeft[0].conf_id)
-	_this.fsAPI('conference',"9100-scc.ieyeplus.com"+" "+"unmute"+" "+_this.confLeft[0].conf_id)
-	_this.fsAPI('conference',"9100-scc.ieyeplus.com"+" "+"undeaf"+" "+_this.confLeft[0].conf_id)
+	_this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"stop"+" current "+_this.conf[0].conf_id)
+	_this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"unmute"+" "+_this.conf[0].conf_id)
+	_this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"undeaf"+" "+_this.conf[0].conf_id)
 	}
       },
       fsAPI(cmd, arg, success_cb, failed_cb) {
@@ -176,7 +191,7 @@
           case '踢出会话':
               if(this.selected.length > 0)
                 this.selected.forEach(function(a,i){
-                  _this.fsAPI('conference',"9100-scc.ieyeplus.com"+" "+"hup"+" "+a.conf_id)
+                  _this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"hup"+" "+a.conf_id)
                 })
 	      if(this.selectedAlarm.length > 0)
                 this.selectedAlarm.forEach(function(a,i){
@@ -186,9 +201,9 @@
           case '允许通话':
               if(this.selected.length > 0){
                 this.selected.forEach(function(a,i){
-                  _this.fsAPI('conference',"9100-scc.ieyeplus.com"+" "+"unmute"+" "+a.conf_id)})
+                  _this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"unmute"+" "+a.conf_id)})
                 this.selected.forEach(function(a,i){
-                  _this.fsAPI('conference',"9100-scc.ieyeplus.com"+" "+"undeaf"+" "+a.conf_id)})
+                  _this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"undeaf"+" "+a.conf_id)})
 		
            	$('.selected').removeClass().addClass('unselected')
            	this.selected = []
@@ -206,9 +221,9 @@
 	      console.log('waiting clicked')
               if(this.selected.length > 0){
                 this.selected.forEach(function(a,i){
-                  _this.fsAPI('conference',"9100-scc.ieyeplus.com"+" "+"mute"+" "+a.conf_id		   )})
+                  _this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"mute"+" "+a.conf_id		   )})
                 this.selected.forEach(function(a,i){
-                  _this.fsAPI('conference',"9100-scc.ieyeplus.com"+" "+"deaf"+" "+a.conf_id		   )})
+                  _this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"deaf"+" "+a.conf_id		   )})
            	$('.selected').removeClass().addClass('unselected')
            	this.selected = []
                 }
@@ -223,9 +238,9 @@
 		}
 		break
 	  case '结束服务':
-	      if(this.confLeft)
-              this.confLeft.forEach(function(a,i){
-              _this.fsAPI('conference',"9100-scc.ieyeplus.com"+" "+"kick"+" "+a.conf_id)
+	      if(this.conf)
+              this.conf.forEach(function(a,i){
+              _this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"kick"+" "+a.conf_id)
 	        }) 
 	      if(this.confAlarm)
               this.confAlarm.forEach(function(a,i){
@@ -240,7 +255,7 @@
 	      break
 	   case '确认转出':
 	      if(this.userDeflect){
-		 _this.fsAPI('uuid_transfer',this.userDeflect.channel_uuid+ " "+"sip:"+this.selectPhone[0].userID+"@"+this.selectPhone[0].networkIP+":"+this.selectPhone[0].networkPort)	
+		 this.fsAPI('uuid_transfer',this.userDeflect.channel_uuid+ " "+"sip:"+this.selectPhone[0].userID+"@"+this.selectPhone[0].networkIP+":"+this.selectPhone[0].networkPort)	
 	      }
 	      this.userDeflect = null
 	      $('.selected').removeClass().addClass('unselected')
@@ -261,7 +276,7 @@
                 }
 		else if(this.selectPhone.length > 0 ){
                  this.selectPhone.forEach(function(a,i){
-                  _this.fsAPI('conference',"9100-scc.ieyeplus.com"+" "+"bgdial"+" "+"user/"+  a.userID)
+                  _this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"bgdial"+" "+"user/"+  a.userID)
                 })
                 }
                 break

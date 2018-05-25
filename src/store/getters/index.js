@@ -83,6 +83,9 @@ export default {
   confAlarm: state=> {
     return  state.confAlarm
   },
+  confIpBoard: state=> {
+    return  state.confIpBoard
+  },
   selectedAlarm: state=> {
     return  state.selectedAlarm
   },

@@ -63,16 +63,17 @@
         </div>
       </div>
 
-      <playList v-if="playListShow"  @closeDialog="close(2)"></playList>
+      <playList :selectPhone="selectPhone" v-if="playListShow"  @closeDialog="close(2)"></playList>
 
 
 
       <div class="functionMenu">
         <ul class="nav nav-justified menuList">
           <li id="a1" @click="tmute" @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-user-circle fa-2x" aria-hidden="true"></i><span>管理员静音</span></li>
-          <li id="a2" @click="shout" @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-bullhorn fa-2x" aria-hidden="true"></i><span>喊话</span></li>
+          <li id="a2" @click="startIpbroad" @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-bullhorn fa-2x" aria-hidden="true"></i><span>喊话</span></li>
           <li id="a3" @click="play" @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-play-circle-o fa-2x" aria-hidden="true"></i><span>播放</span></li>
-          <li id="a4" @click="allOver" @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-window-close fa-2x" aria-hidden="true"></i><span>全部结束</span></li>
+          <li id="a4" @click="pauseOrPlay" @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i :class="ifPlay(playState)" aria-hidden="true"></i><span>{{playState}}</span></li>
+          <li id="a5" @click="allOver" @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-window-close fa-2x" aria-hidden="true"></i><span>全部结束</span></li>
         </ul>
       </div>
     </div>
@@ -105,10 +106,12 @@
     data() {
       this.deviceList
       return {
+        playState: 'pause',
         selectPhone: [],
         name: '9111' + '-' + window.location.hostname,
         playListShow: false,     //播放列表显示切换
-	groupShow:""
+	groupShow:"",
+        playList: [],
       }
     },
     components: {
@@ -124,6 +127,9 @@
         getHeights()
       })
     },
+    /* watch: {
+      whetherPlayAnotherSong: 'pauseOrPlay',
+    }, */
     computed: {
       ...mapGetters([
         'phoneShow',
@@ -132,7 +138,8 @@
         'currentLoginUser',  // 当前用户
 	'callQueue',
 	'userGroup',
-	'confIpBoard'
+	'confIpBoard',
+        'whetherPlayAnotherSong'
       ]),
     },
     methods: {
@@ -240,14 +247,50 @@
           })
         }
       },
+      
+      pauseOrPlay() {
+        if(this.whetherPlayAnotherSong == 'no') {
+          console.log("The same song");
+          if(this.playState == 'pause') {
+            this.playState = 'play'
+            this.fsAPI("conference",this.name + " " + "pause_play",function(res) {console.log("zan ting")}.bind(this));
+          }else {
+            this.playState = 'pause'
+            this.fsAPI("conference",this.name + " " + "pause_play",function(res) {console.log("continue play")}.bind(this));
+          }
+        }else {
+         console.log("Another song"); 
+         this.playState = 'play'
+         this.fsAPI("conference",this.name + " " + "pause_play",function(res) {console.log("play a new song")}.bind(this));
+         this.$store.dispatch('setWhetherPlayAnotherSong','no')
+        }
+      },
 
       shout() {
+        this.vertoHandle.newCall({
+          destination_number: '9111',
+          caller_id_name: '9000',
+          caller_id_number: '9000',
+          outgoingBandwidth: 'default',
+          incomingBandwidth: 'default',
+          useStereo: true,
+          dedEnc: false,
+          tag: "video-container",
+          deviceParams: {
+            useMic: "any",
+            useSpeak: "any",
+            useCamera: "any"
+          }
+        })
+      },
+
+      startIpbroad() {
         // 喊话
         const laChannelName = this.getChannelName("liveArray");
 
         if(this.selectPhone.length != 0) {
 	  //this.fsAPI('conference',this.name + ' ' + 'bgdial' + ' ' + "user/9000")
-	  this.vertoHandle.newCall({
+	/*  this.vertoHandle.newCall({
           // Extension to dial.
           destination_number: '9111',
           caller_id_name: '9000',
@@ -262,7 +305,7 @@
             useSpeak: "any",
             useCamera: "any"
           }
-          })
+          })  */
           //  批量邀请设备开始会议
           this.selectPhone.forEach(function(s, i){
             var op =   this.name + '+flags{mute}'+  " " + "bgdial" + " " + "user/"+this.selectPhone[i].userID
@@ -274,7 +317,7 @@
           }.bind(this))
 
           //  重置勾选话机数组
-          this.selectPhone = []
+          
 
           // 创建会议室
           this.broadcast(laChannelName, {
@@ -313,7 +356,7 @@
       },
       allOver() {
         // 结束全部喊话和播放
-
+        this.selectPhone = []
 	this.fsAPI('conference','9111-scc.ieyeplus.com'+' '+'hup'+' '+'all')
       },
       tmute(){

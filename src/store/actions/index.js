@@ -80,6 +80,9 @@ export default {
   setConfLeft({ commit }, data) {
     commit('SET_CONF_LEFT', data)
   },
+  setWhetherPlayAnotherSong({ commit }, data) {
+    commit('SET_WHETHER_PLAY_ANOTHER_SONG', data)
+  },
   setConfAlarm({ commit }, data) {
     commit('SET_CONF_ALARM', data)
   },

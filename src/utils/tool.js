@@ -46,3 +46,14 @@ vue.prototype.returnState = function(deviceState) {
       return '在线'
   }
 }
+//
+vue.prototype.ifPlay = function(playState) {
+  switch (playState) {
+    case 'play':
+      return 'fa fa-play fa-2x';
+    case 'pause':
+      return 'fa fa-pause fa-2x';
+    default:
+      return 'fa fa-pause fa-2x';
+  }
+}

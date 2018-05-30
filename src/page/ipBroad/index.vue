@@ -84,11 +84,27 @@
     <div class="playList">
       <i class="fa fa-chevron-right" aria-hidden="true"  @click="close(1)"></i>
       <div class="listTitle">播放设备列表</div>
+
+     
       <div class="musicList" id="end">
-        <div v-for="item in selectPhone" class="singleFlies selectDelate" @click="removeItem(item)">
-          {{ item.userID }}
+        <div class="songSheet" v-for="songlist in playList" @click="(()=> songlist.unfold = !songlist.unfold)">
+          <div class="songSheetName songSheetNameSelect">
+            <div class="songSetting">
+              <span class="toggle"><i class="fa fa-angle-right" aria-hidden="true"></i></span>
+              <p>{{songlist.FolderName}}</p>
+              <span class="musicNum">[{{ songlist.Files ? songlist.Files.length :0}}]</spam>
+            </div>
+          </div>
+          <ul class="musicList" v-if="songlist.unfold">
+            <li v-for="fileItem in songlist.Files">
+              <p>{{fileItem.FileName}}</p>
+              <span class="totalTime" v-if="fileItem.MediaType == 1">{{fileItem.FileTime}}<span>
+            </li>
+          </ul>
         </div>
       </div>
+
+
       <div class="selectAll" @click="removeAll">全部移除</div>
     </div>
     <callDivert v-if="phoneShow"></callDivert>
@@ -125,6 +141,7 @@
       this.$nextTick(function() {
         getHeight()
         getHeights()
+        this.reFresh()
       })
     },
     /* watch: {
@@ -191,7 +208,20 @@
       item.selected = true
       this.groupShow = item.deviceGroupId
     },
-      itemClick(e, row) {
+
+    reFresh() {
+      this.$ajax.get('Folder/getTreeFiles', {params: {userID: '133585596bb04c9cbe311d0857dd7196'}})
+        .then(res => {
+          if(res.data.code == 1) {
+            let result = res.data.result
+            result.forEach(function(r,i){
+              r.unfold = false
+            })
+            this.playList = result
+          }
+        })
+    },
+    itemClick(e, row) {
         let _this = this
         let target = e.currentTarget
         if($(target).hasClass('online')) {
@@ -356,6 +386,7 @@
       },
       allOver() {
         // 结束全部喊话和播放
+        console.log(this.playList[0].FolderName);
         this.selectPhone = []
 	this.fsAPI('conference','9111-scc.ieyeplus.com'+' '+'hup'+' '+'all')
       },

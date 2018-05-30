@@ -165,6 +165,7 @@
       },
 
       close() {
+        console.log(this.playList[0].FolderName);
         this.$emit('closeDialog')
       }
     }

@@ -66,7 +66,7 @@
               <i class="fa fa-fire fa-2x" aria-hidden="true"></i>
               <span>开始会议</span>
             </li>
-            <li id="a2" @mousedown="$btnMousedown" @mouseup="$btnMouseup">
+            <li id="a2" @click="startMeeting"  @mousedown="$btnMousedown" @mouseup="$btnMouseup">
               <i class="fa fa-user-plus fa-2x" aria-hidden="true"></i>
               <span>加入成员</span>
             </li>
@@ -91,6 +91,7 @@
   import {leftPhone,rightPhone,confirmDialog,callDivert} from 'components'
   export default {
 
+    watch:{},
     data() {
       return {
         shows: false,
@@ -108,7 +109,8 @@
         'vertoHandle',           // verto初始化
         'deviceList',           // 分组设备(不包括当前用户)
         'phoneShow',             // 话机显示或隐藏
-	'userGroup'
+	'userGroup',
+	'confMeeting'
       ]),
     },
     components: {
@@ -139,7 +141,7 @@
           return "waitting"
           break
         case "active":
-          return "calling01"
+          return "calling"
           break
         case "register":
           return "online"
@@ -228,13 +230,14 @@
 
           //  重置勾选话机数组
           this.selectPhone = []
+          $('.onlineSelected').removeClass('onlineSelected')//.addClass('online')
           //  重置勾选样式
-          let allPhone = $('.middleCon .memberList').eq(1).find('.moduleList').find('.moduleStyle')
-          for(let i=0;i<allPhone.length;i++) {
-            $(allPhone[i]).removeClass('onlineSelected')
-            $(allPhone[i]).removeClass('callingSelected')
-            $(allPhone[i]).removeClass('waittingSelected')
-          }
+          //let allPhone = $('.middleCon .memberList').eq(1).find('.moduleList').find('.moduleStyle')
+          //for(let i=0;i<allPhone.length;i++) {
+          //  $(allPhone[i]).removeClass('onlineSelected')
+          //  $(allPhone[i]).removeClass('callingSelected')
+          //  $(allPhone[i]).removeClass('waittingSelected')
+          //}
 
 
           this.broadcast(laChannelName, {

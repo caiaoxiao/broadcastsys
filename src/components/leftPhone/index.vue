@@ -19,8 +19,8 @@
           <!--<span>00:00:01</span>-->
           <!--</li>-->
           <li class ="unselected" v-if="item.caller_id_number!='9000'" v-for="item in conf" @click.stop="select($event,item)">
-          <i class="fa fa-circle orange" aria-hidden="true"></i>
-		             {{ item.caller_id_number}}
+	  <i :class="callStatus(item)" aria-hidden="true"></i> 
+		             {{ item.caller_id_number }}
           </li>
           <!--<li><i class="fa fa-clock-o" aria-hidden="true"></i>1005</li>-->
         </ul>
@@ -79,7 +79,7 @@
         // getHeight()
         // $.verto.init({}, this.bootstrap);
         if(this.$router.history.current.fullPath=="/voiceCall"){
-          this.conf = this.confLeft
+          this.conf = this.$store.getters.confLeft
           this.confname = {name:'confleft',num:'9100'}
         }
         else if(this.$router.history.current.fullPath=="/ipBroad") {
@@ -89,10 +89,6 @@
 	else if(this.$router.history.current.fullPath=="/meeting") {
           this.conf = this.$store.getters.confMeeting
           this.confname = {name:'confmeeting',num:'9112'}
-        }
-	      else	{
-	        this.conf = this.confLeft 
-          this.confname = {name:'confleft',num:'9100'}
         }
 	
       })
@@ -120,6 +116,13 @@
                         }
         if(i==conf.length)
              this.flag_conf = false
+        if(conf.length>0 && conf.every(function(item,index,array){return item.caller_id_number=='9000'}))
+        {
+           let _this = this
+           conf.forEach(function(item){
+           _this.fsAPI('conference',_this.confname.num+'-scc.ieyeplus.com'+' ' +'hup'+' '+item.conf_id)
+                })
+        }
 
         },
 	      confAlarm:function(confalarm)
@@ -141,14 +144,25 @@
         users: 'users',
         currentLoginUser: 'currentLoginUser',
         callQueue: 'callQueue',
-	      confLeft : 'confLeft',
-	      confAlarm : 'confAlarm',
+	confLeft : 'confLeft',
+	confAlarm : 'confAlarm',
         confIpBoard : 'confIpBoard',
-	      selectedAlarm : 'selectedAlarm',
+	selectedAlarm : 'selectedAlarm',
 
       }),
     },
     methods: {
+      callStatus(item){
+
+	if(item.muted == true && item.deaf == true)
+		return 'fa fa-spinner red'
+	else if(item.muted == true && item.deaf == false)
+		return 'fa fa-microphone-slash blue'
+	else if(item.muted == false && item.deaf == false)
+		return 'fa fa-microphone green'
+	else 
+		return 'fa fa-circle orange'
+      },
       toggle_enter(){
         let _this = this
 	      if(this.flag_conf==true)
@@ -228,7 +242,7 @@
                   _this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"mute"+" "+a.conf_id		   )})
                 this.selected.forEach(function(a,i){
                   _this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"deaf"+" "+a.conf_id		   )})
-           	$('.selected').removeClass().addClass('unselected')
+               $('.onlineSelected').removeClass('onlineSelected').addClass('online')
            	this.selected = []
                 }
 		if(this.selectedAlarm.length > 0){
@@ -237,7 +251,7 @@
                 // this.selectedAlarm.forEach(function(a,i){
                 //  _this.fsAPI('conference',"9110-scc.ieyeplus.com"+" "+"deaf"+" "+a.conf_id)})
 
-                $('.selected').removeClass().addClass('unselected')
+               $('.onlineSelected').removeClass('onlineSelected').addClass('online')
                 this.$store.dispatch('setSelectedAlarm',[])
 		}
 		break
@@ -262,14 +276,14 @@
 		 this.fsAPI('uuid_transfer',this.userDeflect.channel_uuid+ " "+"sip:"+this.selectPhone[0].userID+"@"+this.selectPhone[0].networkIP+":"+this.selectPhone[0].networkPort)	
 	      }
 	      this.userDeflect = null
-	      $('.selected').removeClass().addClass('unselected')
+               $('.onlineSelected').removeClass('onlineSelected').addClass('online')
                this.selected = []
                 this.$store.dispatch('setSelectedAlarm',[])
 	      break
 	   case '取消转出':
 	      this.userDeflect = null
               this.$store.dispatch('setSelectedAlarm',[])
-              $('.selected').removeClass().addClass('unselected')
+               $('.onlineSelected').removeClass('onlineSelected').addClass('online')
               this.selected = []
 	      break
 	   case '邀请成员':
@@ -291,7 +305,7 @@
                 this.selected.forEach(function(a,i){
                   _this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"undeaf"+" "+a.conf_id)})
 
-                $('.selected').removeClass().addClass('unselected')
+                $('.onlineSelected').removeClass('onlineSelected').addClass('online')
                 this.selected = []
                 }
 		break

@@ -102,6 +102,7 @@
   import {leftPhone, rightPhone,switchs,callDivert} from 'components'
 
   export default {
+    watch:{},
     data() {
       this.deviceList
       return {
@@ -151,7 +152,7 @@
           return "waitting"
           break
         case "active":
-          return "calling01"
+          return "calling"
           break
         case "register":
           return "online"
@@ -275,6 +276,7 @@
 
           //  重置勾选话机数组
           this.selectPhone = []
+	  //$('.onlineSelected').removeClass('onlineSelected').addClass('online')
 
           // 创建会议室
           this.broadcast(laChannelName, {
@@ -315,6 +317,8 @@
         // 结束全部喊话和播放
 
 	this.fsAPI('conference','9111-scc.ieyeplus.com'+' '+'hup'+' '+'all')
+	this.selectPhone = []
+	$('.onlineSelected').removeClass('onlineSelected').addClass('online')
       },
       tmute(){
         this.confIpBoard.forEach((item,index)=>{	

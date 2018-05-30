@@ -86,7 +86,7 @@ export default {
     state.confAlarm = data
   },
   SET_CONF_IP_BOARD: (state, data) => {
-    state.confIpBorad = data
+    state.confIpBoard = data
   },
   SET_CONF_MEETING: (state, data) => {
     state.confMeeting = data

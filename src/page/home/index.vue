@@ -253,7 +253,24 @@
 
                       // New user joined conference.
                       case "add":
-			      console.log('conference user added')
+                      let device = _this.$store.getters.deviceList
+                      device.forEach(function(user) {
+                            if(user.userID == args.data[1]) {
+                                user.deviceState = 'active'
+                                var t = setInterval(()=>{
+                                      user.timer.s+=1
+                                if(user.timer.s>59.5){
+                                  user.timer.s=0
+                                  user.timer.m+=1}
+                                if(user.timer.s>59.5 || user.timer.m>59){
+                                  user.timer.m=0
+                                  user.timer.h+=1}
+                                  },1000)
+                                user.timer.id.push(t) 
+                            }
+                        })
+                        _this.$store.dispatch('setDeviceList',device)
+			                  console.log('conference user added')
 	                      var  data = JSON.parse(args.data[4])
                         arr.push({
                           conf_id : parseInt(args.data[0]).toString(),
@@ -272,6 +289,17 @@
 
                       // User left conference.
                       case "del":
+                        let device_del = _this.$store.getters.deviceList
+                        device_del.forEach(function(user) {
+                              if(user.channelUUID == args.key) {
+                                  user.deviceState = 'register'
+                                  user.timer.s=0
+                                  user.timer.m=0
+                                  user.timer.h=0
+                                  user.timer.id.forEach((id)=>{clearInterval(id)})
+                              }
+                        })
+                        _this.$store.dispatch('setDeviceList',device_del)
                         console.log('conference user deleted')
 			                  arr.forEach(function(a,i){
                           if (a.key == args.key)
@@ -282,6 +310,7 @@
 
                       // Existing user's state changed (mute/unmute, talking, floor, etc)
                       case "modify":
+			console.log(args)
                         console.log('conference user changed')
 			                  var data = JSON.parse(args.data[4])
                         if(arr.length == 0 ||  arr.every(function(item,index,array){return item.key!=args.key}))
@@ -415,6 +444,7 @@
                 user.oppoChannelUUID = null
                 user.groupid = []//this.usermap.hasOwnProperty(user.userID)?usermap[userID]:null
                 user.timer = {s:0,m:0,h:0,id:[]}
+                user.calling = ""
                 deviceList.push(user)
               }/*
               else{
@@ -465,6 +495,7 @@
              for(let item in this.usermap){
                let user = {}
                 user.deviceState = "unregistered"
+                user.calling = ""
                 user.userID = item
                 user.callDirection = null
                 user.channelUUID = null
@@ -513,6 +544,7 @@
             user.channelUUID = null
             user.groupid = this.usermap.hasOwnProperty(user.userID)?usermap[userID].list:[]
             user.type = this.usermap.hasOwnProperty(user.userID)?usermap[userID].type:""
+	    user.timer = {s:0,m:0,h:0,id:[]}
             deviceList.push(user)
 
           }
@@ -569,31 +601,31 @@
         } else if (channelCallState == "ACTIVE") {
           channelCallState = "active";
           users.forEach(function(user) {
-              if(user.userID == callerNumber) {
-	      var t = setInterval(()=>{
-              user.timer.s+=0.5
-	      if(user.timer.s>59.5){
-		      user.timer.s=0
-		      user.timer.m+=1}
-	      if(user.timer.s>59.5 || user.timer.m>59){
-          user.timer.m=0
-          user.timer.h+=1}
-          },1000)
-	      user.timer.id.push(t) 
-              }
-	      else  if(user.userID == calleeNumber) {
-              var t = setInterval(()=>{
-               user.timer.s+=0.5
-	       if(user.timer.s>59.5 && user.timer.m<=59){
-                user.timer.s=0
-                user.timer.m+=1}
-	      if(user.timer.s>59.5 && user.timer.m>59){
-                user.timer.m=0
-                user.timer.h+=1}
-          },1000)
-	      user.timer.id.push(t) 
-              }
-	})
+                  if(user.userID == callerNumber) {
+                      var t = setInterval(()=>{
+                            user.timer.s+=0.5
+                      if(user.timer.s>59.5){
+                        user.timer.s=0
+                        user.timer.m+=1}
+                      if(user.timer.s>59.5 || user.timer.m>59){
+                        user.timer.m=0
+                        user.timer.h+=1}
+                        },1000)
+                      user.timer.id.push(t) 
+                  }
+                  else  if(user.userID == calleeNumber) {
+                      var t = setInterval(()=>{
+                      user.timer.s+=0.5
+                      if(user.timer.s>59.5 && user.timer.m<=59){
+                        user.timer.s=0
+                        user.timer.m+=1}
+                      if(user.timer.s>59.5 && user.timer.m>59){
+                        user.timer.m=0
+                        user.timer.h+=1}
+                        },1000)
+                      user.timer.id.push(t) 
+                  }
+	            })
         } else if (channelCallState == "HANGUP") {
           	  users.forEach(function(user) {
               if(user.userID == callerNumber || user.userID == calleeNumber) {
@@ -641,6 +673,7 @@
                 user.channelUUID = channelUUID;
                 user.deviceState = channelCallState;
                 user.callDirection = callDirection;
+                user.calling = calleeNumber
                 usersChanged = true;
               }
             })
@@ -673,6 +706,7 @@
                 user.deviceState = channelCallState;
                 user.callDirection = callDirection;
                 user.oppoChannelUUID = opChannelUUID;
+                user.calling = callerNumber
                 usersChanged = true;
               }
             })

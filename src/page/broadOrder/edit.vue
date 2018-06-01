@@ -184,8 +184,7 @@
           PlanPreTime: new Date(),
           PlanActualTxt: '',
           Files: [],         // 已勾选的歌单
-          FeatureBases: [],
-          FeatureCode: []
+          FeatureBases: []
         },
         dialogShow: false,
         dialogText: null,
@@ -377,10 +376,10 @@
               this.dialogShow = true
             }else {
               this.selectDevice.forEach(function(s,i) {
-                s.FeatureCode = s.userID
+                s.deviceID = s.userID
               }.bind(this))
-              this.formData.FeatureBases = this.selectDevice
               debugger
+              this.formData.FeatureBases = this.selectDevice
               this.fsAPI(`sched_api +10 bgapi originate`, `user/1002 &playback(${this.formData.Files[0].Files[0].MediaPath})`,()=>{
                 this.$ajax.post('Plan/Create', this.formData)
                   .then((res) => {

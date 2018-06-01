@@ -145,14 +145,14 @@ export default {
     // 设备组重命名
     renameDeviceGroupList (item, event) {
       let text = event.target.textContent
-      if (text !== '新建设备分组') {
+      //if (text !== '新建设备分组') {
         this.$ajax.post('DeviceGroup/Create', { name: text })
           .then(res => {
             if (res.data.code === 1) {
               this.initData()
             }
           })
-      }
+      //}
       item.contenteditable = false
     },
     //  删除分组单个设备

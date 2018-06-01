@@ -473,7 +473,7 @@
             this.$ajax.get(`DeviceGroup/Detail/${item.deviceGroupId}`)
             .then(res => {
               if (res.data.code === 1) {
-                  let group  = res.data.result
+                  let group  = res.data.result.deviceGroups
                   group.forEach((r,i)=>{
                     if(this.usermap.hasOwnProperty(r.deviceCode)){
                       this.usermap[r.deviceCode].list.push(r.deviceGroupId)

@@ -204,6 +204,7 @@ Vue.prototype.submitFrom = ((self, pid, CreatedApi, EditApi, formData, updateSta
         if (valid) {
             if (pid == 0) {
                 self.$AjaxPost(CreatedApi, formData, function(data) {
+		    console.log(data)
                     if (data.code != 0) {
                         self.$message.success("新增成功")
                         if (!updateState) {

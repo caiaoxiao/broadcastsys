@@ -6,11 +6,14 @@
           <div class="form-group">
             <input type="text" placeholder="请输入要查询的设备编号" class="form-control select-width" style="width:200px;" v-model="fuzzyquery" />
           </div>
+	  <button type="button" class="btn btn-info" @click="openModal(-1)">
+            <i class="fa fa-bolt" aria-hidden="true"></i>修改联动密匙
+          </button>
           <button type="button" class="btn btn-info" @click="refresh(fuzzyquery)">
             <i class="fa fa-search" aria-hidden="true"></i>查询
           </button>
           <button type="button" class="btn btn-info" @click="openModal(0)">
-            <i class="fa fa-search" aria-hidden="true"></i>新增
+            <i class="fa fa-plus" aria-hidden="true"></i>新增
           </button>
         </form>
       </div>
@@ -41,14 +44,18 @@
         </tbody>
       </table>
     </div>
-    <div v-if="modolType != null">
+    <div v-if="modolType != null && modolType !=2">
       <modal :modolType='modolType' :transferData='transferData' @close="close"></modal>
+    </div>
+    <div v-if="modolType ==2">
+      <basechange :modolType='modolType'  @close="close"></basechange>
     </div>
   </div>
 </template>
 <script>
 import { mapGetters } from 'vuex'
 import modal from './edit.vue'
+import basechange from './base.vue'
 export default {
   data () {
     return {
@@ -76,7 +83,8 @@ export default {
     },
   },
   components: {
-    modal
+    modal,
+    basechange
   },
   methods: {
     refresh (fuzzyquery) {
@@ -94,10 +102,13 @@ export default {
     openModal (id) {
       if (id === 0) {
         this.modolType = 0
-      } else {
+      } else if(id !=-1){
         this.modolType = 1
         this.transferData.deviceId = id
-      }
+      }else{
+	this.modolType = 2 
+	}
+	
     },
     deleteItem (deviceId) {
       this.$ajax.post('Device/RemoveList', [deviceId])

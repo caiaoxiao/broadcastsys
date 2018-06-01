@@ -1,0 +1,64 @@
+<template>
+  <!--设备信息新增-->
+  <div class="popUp" style="display: block;">
+    <div class="popContent">
+	<el-form class="form-horizontal"   :model="formData" ref="formData" :rules="rules">
+        <div class="row">
+            <div class="form-group">
+              <label>视频联动存储密匙</label>
+                <input style="margin:10px auto;display:block;width:450px" type="text" class="form-control" v-model="formData.uniqueId">
+            </div>
+        </div>
+	</el-form >
+    </div>
+    <div class="btnDiv">
+      <button type="button" class="btn btn-sm btn-info" @click="submitFrom(self,  1  , 'Basic/Create', 'Basic/Edit', formData)">确定</button>
+      <button type="button" class="btn btn-sm btn-default" @click="close">取消</button>
+    </div>
+  </div>
+</template>
+
+<script type="text/javascript">
+import { mapActions } from 'vuex'
+export default {
+  props: ['modolType'],
+  data () {
+      return {
+      formData: {
+	uniqueId:"",
+      },
+      rules: {},
+      self: this
+      }
+  },
+  created () {
+    this.$nextTick(() => {
+      let documentHeight = document.documentElement.clientHeight
+      $('.popUp').css('top', documentHeight * 0.3 + 'px')
+      if (this.modolType === 2) {
+        this.$ajax.post('Basic/List')
+          .then(res => {
+	  console.log(res)
+            if (res.data.code === 1 && res.data.result.length>0) {
+              this.formData.uniqueId = res.data.result[0].uniqueId
+	      this.formData.basicId  = res.data.result[0].basicId
+            }
+	    else if(res.data.code === 1){
+	    this.$ajax.post('Basic/Create',{uniqueId:"请输入视频联动存储密匙"})
+          	.then(res => {
+          	this.formData.basicId = res.data.result.basicId})
+		}
+          })
+      }
+    })
+  },
+  methods: {
+    ...mapActions([
+      'update'
+    ]),
+    close () {
+      this.$emit('close')
+    }
+  }
+}
+</script>

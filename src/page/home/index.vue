@@ -282,25 +282,14 @@
                         _this.$store.dispatch(action,arr)
 			if( liveArrayObj.name =='9110-scc.ieyeplus.com' && args.data[1]!='9000')
 			{
-			let request = {}
-			request.deviceCode = args.data[1]
-			_this.$ajax.post('Device/List',request)
+			let deviceCode = args.data[1]
+			_this.$ajax.post('Basic/List')
 				.then(res=>{
-					if (res.data.code === 1){ 
-					let id = res.data.result[0].deviceId			
-					_this.$ajax.get(`Device/Detail/${id}`)
-						.then(res=>{
-							if (res.data.code === 1){		
-							let result = res.data.result
-							result.deviceVedios.forEach((item,index)=>{
-								console.log(item.vedioUrl)
-								if(item.vedioUrl!="")
-								window.open(item.vedioUrl,'newwindow','height=1920,width=1080,top=0,left=0,toolbar=no,menubar=no,scrollbars=no,location=no, status=no')
-							})
+					if (res.data.code === 1 && res.data.result.length>0){ 
+								let url = "http://scc.ieyeplus.com:8080/"+res.data.result[0].uniqueId+"/"+deviceCode 
+								window.open(url,'newwindow','height=1920,width=1080,top=0,left=0,toolbar=no,menubar=no,scrollbars=no,location=no, status=no')
 						}
 					})//device获取videourl
-				}///if1
-			})//devicelist获取id
 		}//liveArrayObj.name =='9110-scc.ieyeplus.com'i && args.data[1]!='9000'
 			//_this.fsAPI('conference',liveArrayObj.name+' '+'play'+' '+'/usr/local/freeswitch/sounds/music/8000/danza-espanola-op-37-h-142-xii-arabesca.wav'+ ' '+ parseInt(args.data[0]).toString()) 
                         break;

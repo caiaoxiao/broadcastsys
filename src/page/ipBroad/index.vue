@@ -92,13 +92,13 @@
             <div class="songSetting">
               <span class="toggle"><i class="fa fa-angle-right" aria-hidden="true"></i></span>
               <p>{{songlist.FolderName}}</p>
-              <span class="musicNum">[{{ songlist.Files ? songlist.Files.length :0}}]</spam>
+              <span class="musicNum">[{{ songlist.Files ? songlist.Files.length :0}}]</span>
             </div>
           </div>
           <ul class="musicList" v-if="songlist.unfold">
             <li v-for="fileItem in songlist.Files">
               <p>{{fileItem.FileName}}</p>
-              <span class="totalTime" v-if="fileItem.MediaType == 1">{{fileItem.FileTime}}<span>
+              <span class="totalTime" v-if="fileItem.MediaType == 1">{{fileItem.FileTime}}</span>
             </li>
           </ul>
         </div>

@@ -104,6 +104,10 @@
         </div>
       </div>
 
+      <div class="btnDiv">
+        <button type="button" class="btn btn-info" @click="playMusic">play</button>
+        <button type="button" class="btn btn-default" @click="close">quxiao</button>
+      </div>
 
       <div class="selectAll" @click="removeAll">全部移除</div>
     </div>
@@ -278,6 +282,27 @@
         }
       },
       
+      playMusic() {
+        this.$store.dispatch('setWhetherPlayAnotherSong','yes')
+        let phone = this.selectPhone[0].userID;
+        let music = this.selectPlayList[0].MediaPath;
+
+        if(this.selectPhone.length!=0) {
+          let usera = this.selectPlayList[0];
+          let users = this.selectPhone;
+          let _this = this;
+      
+          usera.Files.forEach(function(usern){
+            var x = usern.MediaPath.indexOf("IpBcFiles");
+            var y = usern.MediaPath.substring(x);
+            var z = "/var/lib/tomcat8/webapps/"+y;
+            users.forEach(function(user){
+              _this.fsAPI("conference"," " + _this.name + " " + "play" + " " + z,function(res){console.log("bofang")});
+            })
+          });
+        }
+      },  
+
       pauseOrPlay() {
         if(this.whetherPlayAnotherSong == 'no') {
           console.log("The same song");

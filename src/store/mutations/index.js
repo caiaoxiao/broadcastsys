@@ -79,6 +79,9 @@ export default {
   SET_CALL_QUEUE: (state, data) => {
     state.callQueue = data
   },
+  SET_WHETHER_PLAY_ANOTHER_SONG: (state, data) => {
+    state.whetherPlayAnotherSong = data
+  },
   SET_CONF_LEFT: (state, data) => {
     state.confLeft = data
   },

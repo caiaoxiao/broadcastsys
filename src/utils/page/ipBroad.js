@@ -16,7 +16,7 @@ export function getHeights() {
     height: contentHeight - 140
   })
   $("#songListHeight").slimScroll({
-    height: songListheight
+    height: songListheight - 50
   })
   $(".hh").slimScroll({
     height: songListheight-40

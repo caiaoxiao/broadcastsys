@@ -43,6 +43,7 @@ export default {
   currentLoginUser: [],
   //  设置通话队列
   callQueue: [],
+  whetherPlayAnotherSong: 'no',
   confLeft: [],
   confAlarm:[],
   confMeeting:[],

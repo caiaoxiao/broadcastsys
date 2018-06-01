@@ -77,6 +77,9 @@ export default {
   use_livearray: state => {
     return state.use_livearray
   },
+  whetherPlayAnotherSong: state => {
+    return state.whetherPlayAnotherSong
+  },
   confLeft: state=> {
     return  state.confLeft
   },

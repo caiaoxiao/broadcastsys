@@ -35,14 +35,14 @@
       </div>
       <div class="musicList" id="end">
         <div id="groupMember" class="aa">
-          <div class="singleFlies selectDelate" v-for="device in deviceList" :key="device.deviceId">
+          <div class="singleFlies selectDelate" @click="deleteDeviceItem(device)" v-for="device in deviceList.deviceGroups" :key="device.deviceId">
             {{device.deviceCode}}
             <span>{{device.deviceName}}</span>
           </div>
         </div>
       </div>
     </div>
-    <device-list @transferData='transferData' v-show="showDeviceList" @close="close"></device-list>
+    <device-list @transferData='transferData' ref="deviceList" v-show="showDeviceList" @close="close"></device-list>
 
   </div>
 </template>
@@ -129,6 +129,7 @@ export default {
       this.$ajax.get(`DeviceGroup/Detail/${item.deviceGroupId}`)
         .then(res => {
           if (res.data.code === 1) {
+            
             this.deviceList = res.data.result
           }
         })
@@ -144,15 +145,31 @@ export default {
     // 设备组重命名
     renameDeviceGroupList (item, event) {
       let text = event.target.textContent
-      if (text !== '新建设备分组') {
+      //if (text !== '新建设备分组') {
         this.$ajax.post('DeviceGroup/Create', { name: text })
           .then(res => {
             if (res.data.code === 1) {
               this.initData()
             }
           })
-      }
+      //}
       item.contenteditable = false
+    },
+    //  删除分组单个设备
+    deleteDeviceItem(devices) {
+     this.deviceList.deviceGroups.every((d, i) => {
+       if(d.deviceId == devices.deviceId) {
+          this.deviceList.deviceGroups.splice(i, 1)
+          return false
+       }
+       return true
+     })
+    this.$ajax.put('DeviceGroup/Edit', this.deviceList)
+        .then(res => {
+          if (res.data.code === 1) {
+            this.initData()
+          }
+        })
     },
     // 删除分组所有设备
     deleteDeviceAll () {
@@ -178,25 +195,27 @@ export default {
         this.deviceList = selectDevice
       } else { // 数组去重
         selectDevice.map((s, k) => {
-          let isReapt = this.deviceList.every((d, i) => {
+          let isReapt = this.deviceList.deviceGroups.every((d, i) => {
             if (s.deviceId === d.deviceId) {
               return false
             }
             return true
           })
           if (isReapt) {
-            this.deviceList.push(s)
+            this.deviceList.deviceGroups.push(s)
           }
         })
       }
       let request = {
-        deviceGroups: this.deviceList
+        deviceGroups: this.deviceList.deviceGroups
       }
       request = Object.assign(request, this.targetDeviceGroup)
       this.$ajax.put('DeviceGroup/Edit', request)
         .then(res => {
           if (res.data.code === 1) {
             this.initData()
+            this.close()
+            this.$refs.deviceList.$data.selectDevice = []
           }
         })
     }

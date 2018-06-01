@@ -17,7 +17,8 @@
         liveArray:{},
         vertoConf:{},
         group_list:[],
-	      usermap:{}
+	usermap:{},
+	last_id:"",	
       }
     },
     created() {
@@ -45,6 +46,8 @@
       }),
     },
     watch: {
+      'callQueue':function(conf) { 
+	},
       'confAlarm': function(conf) {
         if(conf.length>0 && !conf.some(function(item,indexs,array){return item.caller_id_number=='9000'}))
         {
@@ -66,13 +69,6 @@
             useCamera: "any"
           }
         }) 
-          var url = 'screen.html'
-          var s1 =  "?s1=https://scc.ieyeplus.com:8432/qVYGpk4yKa1n3BuTbdTsUgwYfonzmW8z/embed/lQ4oMZ7/qsbPsvr7PJ/jquery|fullscreen";
-          var s2 =  "&s2=https://scc.ieyeplus.com:8432";
-          var s3 =  "" // &s3=http://www.w3school.com.cn/example/html5/mov_bbb.mp4";
-          var s4 =  "" //&s4=https://media.w3.org/2010/05/sintel/trailer.mp4";
-         // window.open(url+s1+s2+s3+s4,'newwindow','height=1920,width=1080,top=0,left=0,toolbar=no,menubar=no,scrollbars=no,location=no, status=no');
-          window.open("https://scc.ieyeplus.com:8432/qVYGpk4yKa1n3BuTbdTsUgwYfonzmW8z/grid/lQ4oMZ7",'newwindow','height=1920,width=1080,top=0,left=0,toolbar=no,menubar=no,scrollbars=no,location=no, status=no');
           
         }
        else if(conf.length>0 && conf.every(function(item,index,array){return item.caller_id_number=='9000'}))
@@ -253,7 +249,25 @@
 
                       // New user joined conference.
                       case "add":
-			      console.log('conference user added')
+		      if(args.data[1]!='9000'){
+                      let device = _this.$store.getters.deviceList
+                      device.forEach(function(user) {
+                            if(user.userID == args.data[1]) {
+                                user.deviceState = 'active'
+                                var t = setInterval(()=>{
+                                      user.timer.s+=0.5
+                                if(user.timer.s>59.5){
+                                  user.timer.s=0
+                                  user.timer.m+=1}
+                                if(user.timer.s>59.5 || user.timer.m>59){
+                                  user.timer.m=0
+                                  user.timer.h+=1}
+                                  },1000)
+                                user.timer.id.push(t) 
+                            }
+                        })
+                        _this.$store.dispatch('setDeviceList',device)}
+			                  console.log('conference user added')
 	                      var  data = JSON.parse(args.data[4])
                         arr.push({
                           conf_id : parseInt(args.data[0]).toString(),
@@ -266,12 +280,44 @@
 
                         })
                         _this.$store.dispatch(action,arr)
-			if((liveArrayObj.name == '9100-scc.ieyeplus.com' || liveArrayObj.name == '9111-scc.ieyeplus.com' )&& args.data[1]!='9000' )
+			if( liveArrayObj.name =='9110-scc.ieyeplus.com' && args.data[1]!='9000')
+			{
+			let request = {}
+			request.deviceCode = args.data[1]
+			_this.$ajax.post('Device/List',request)
+				.then(res=>{
+					if (res.data.code === 1){ 
+					let id = res.data.result[0].deviceId			
+					_this.$ajax.get(`Device/Detail/${id}`)
+						.then(res=>{
+							if (res.data.code === 1){		
+							let result = res.data.result
+							result.deviceVedios.forEach((item,index)=>{
+								console.log(item.vedioUrl)
+								if(item.vedioUrl!="")
+								window.open(item.vedioUrl,'newwindow','height=1920,width=1080,top=0,left=0,toolbar=no,menubar=no,scrollbars=no,location=no, status=no')
+							})
+						}
+					})//device获取videourl
+				}///if1
+			})//devicelist获取id
+		}//liveArrayObj.name =='9110-scc.ieyeplus.com'i && args.data[1]!='9000'
 			//_this.fsAPI('conference',liveArrayObj.name+' '+'play'+' '+'/usr/local/freeswitch/sounds/music/8000/danza-espanola-op-37-h-142-xii-arabesca.wav'+ ' '+ parseInt(args.data[0]).toString()) 
                         break;
 
                       // User left conference.
                       case "del":
+                        let device_del = _this.$store.getters.deviceList
+                        device_del.forEach(function(user) {
+                              if(user.channelUUID == args.key) {
+                                  user.deviceState = 'register'
+                                  user.timer.s=0
+                                  user.timer.m=0
+                                  user.timer.h=0
+                                  user.timer.id.forEach((id)=>{clearInterval(id)})
+                              }
+                        })
+                        _this.$store.dispatch('setDeviceList',device_del)
                         console.log('conference user deleted')
 			                  arr.forEach(function(a,i){
                           if (a.key == args.key)
@@ -415,6 +461,7 @@
                 user.oppoChannelUUID = null
                 user.groupid = []//this.usermap.hasOwnProperty(user.userID)?usermap[userID]:null
                 user.timer = {s:0,m:0,h:0,id:[]}
+                user.calling = ""
                 deviceList.push(user)
               }/*
               else{
@@ -443,7 +490,7 @@
             this.$ajax.get(`DeviceGroup/Detail/${item.deviceGroupId}`)
             .then(res => {
               if (res.data.code === 1) {
-                  let group  = res.data.result
+                  let group  = res.data.result.deviceGroups
                   group.forEach((r,i)=>{
                     if(this.usermap.hasOwnProperty(r.deviceCode)){
                       this.usermap[r.deviceCode].list.push(r.deviceGroupId)
@@ -465,6 +512,7 @@
              for(let item in this.usermap){
                let user = {}
                 user.deviceState = "unregistered"
+                user.calling = ""
                 user.userID = item
                 user.callDirection = null
                 user.channelUUID = null
@@ -513,6 +561,7 @@
             user.channelUUID = null
             user.groupid = this.usermap.hasOwnProperty(user.userID)?usermap[userID].list:[]
             user.type = this.usermap.hasOwnProperty(user.userID)?usermap[userID].type:""
+	    user.timer = {s:0,m:0,h:0,id:[]}
             deviceList.push(user)
 
           }
@@ -569,31 +618,31 @@
         } else if (channelCallState == "ACTIVE") {
           channelCallState = "active";
           users.forEach(function(user) {
-              if(user.userID == callerNumber) {
-	      var t = setInterval(()=>{
-              user.timer.s+=0.5
-	      if(user.timer.s>59.5){
-		      user.timer.s=0
-		      user.timer.m+=1}
-	      if(user.timer.s>59.5 || user.timer.m>59){
-          user.timer.m=0
-          user.timer.h+=1}
-          },1000)
-	      user.timer.id.push(t) 
-              }
-	      else  if(user.userID == calleeNumber) {
-              var t = setInterval(()=>{
-               user.timer.s+=0.5
-	       if(user.timer.s>59.5 && user.timer.m<=59){
-                user.timer.s=0
-                user.timer.m+=1}
-	      if(user.timer.s>59.5 && user.timer.m>59){
-                user.timer.m=0
-                user.timer.h+=1}
-          },1000)
-	      user.timer.id.push(t) 
-              }
-	})
+                  if(user.userID == callerNumber) {
+                      var t = setInterval(()=>{
+                            user.timer.s+=0.5
+                      if(user.timer.s>59.5){
+                        user.timer.s=0
+                        user.timer.m+=1}
+                      if(user.timer.s>59.5 || user.timer.m>59){
+                        user.timer.m=0
+                        user.timer.h+=1}
+                        },1000)
+                      user.timer.id.push(t) 
+                  }
+                  else  if(user.userID == calleeNumber) {
+                      var t = setInterval(()=>{
+                      user.timer.s+=0.5
+                      if(user.timer.s>59.5 && user.timer.m<=59){
+                        user.timer.s=0
+                        user.timer.m+=1}
+                      if(user.timer.s>59.5 && user.timer.m>59){
+                        user.timer.m=0
+                        user.timer.h+=1}
+                        },1000)
+                      user.timer.id.push(t) 
+                  }
+	            })
         } else if (channelCallState == "HANGUP") {
           	  users.forEach(function(user) {
               if(user.userID == callerNumber || user.userID == calleeNumber) {
@@ -641,6 +690,7 @@
                 user.channelUUID = channelUUID;
                 user.deviceState = channelCallState;
                 user.callDirection = callDirection;
+                user.calling = calleeNumber
                 usersChanged = true;
               }
             })
@@ -673,6 +723,7 @@
                 user.deviceState = channelCallState;
                 user.callDirection = callDirection;
                 user.oppoChannelUUID = opChannelUUID;
+                user.calling = callerNumber
                 usersChanged = true;
               }
             })

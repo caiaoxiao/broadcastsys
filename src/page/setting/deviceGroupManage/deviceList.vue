@@ -55,11 +55,20 @@ export default {
     },
     selectDeviceEvent (device) {
       if (!device.selected) {
-        this.selectDevice.push(device)
+        if(this.selectDevice.length == 0) {
+          this.selectDevice.push(device)
+        }else {
+          let isRepeat = this.selectDevice.find(item => item.deviceId == device.deviceId)
+          if(!isRepeat) {
+            this.selectDevice.push(device)
+          }
+        }
+        
       }
       device.selected = !device.selected
     },
     confirmAdd () {
+      
       if (this.deviceList.length !== 0 && this.selectDevice.length !== 0) {
         this.$emit('transferData', this.selectDevice)
       }

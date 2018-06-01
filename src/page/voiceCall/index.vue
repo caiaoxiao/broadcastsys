@@ -15,7 +15,7 @@
           <div class="moduleList " id="height01">
             <div class="singleM" v-for="item in deviceList">
               <div class="moduleStyle" :class="returnClass(item.deviceState)" @click.stop="itemClick($event, item)">
-                <div class="moduleNum">{{ item.userID }}
+                <div class="moduleNum">{{ item.userID}}
                   <span v-if="item.calleeNumber || item.callerNumber">
                     {{item.calleeNumber ? item.calleeNumber : item.callerNumber}}
                   </span>
@@ -46,7 +46,7 @@
                       class = "moduleStyle"
                       :class="returnClass(item.deviceState)" 
                       @click.stop="itemClick($event, item)" >
-                      <div class="moduleNum">{{ item.userID }}</div>
+                      <div class="moduleNum">{{ item.userID}}</div>
                       <div class="moduleKind">{{item.type == 1 ? "话机设备" : "视频设备" }}</div>
 		      <div class="moduleState">{{ returnState(item.deviceState)  + "   " + ((item.timer.s>0 || item.timer.m>0 || item.timer.h>0)?
                         ((item.timer.h/10<1?"0"+item.timer.h+":":item.timer.h+":")+
@@ -151,8 +151,7 @@ export default {
       'userGroup',
     ])
   },
-  watch: {
-  },
+  watch: {},
   methods: {
     // 获取设备分组数据
     returnGroup(item){
@@ -170,7 +169,7 @@ export default {
           return "waitting"
           break
         case "active":
-          return "calling01"
+          return "calling"
           break
         case "register":
           return "online"
@@ -293,6 +292,7 @@ export default {
       })
 
       this.selectNowCall = [];
+      $('.onlineSelected').removeClass('onlineSelected').addClass('online')
     },
 
 
@@ -321,6 +321,7 @@ export default {
         }
       })
       this.selectNowCall = [];
+	$('.callingSelected').removeClass('callingSelected').addClass('calling')
     },
 
     // 实现管理员对指定通话的监听
@@ -345,6 +346,7 @@ export default {
       })
 
       this.selectNowCall = [];
+      $('.callingSelected').removeClass('callingSelected').addClass('calling')
     },
 
     // 实现第三方对于指定通话中一方的代接
@@ -384,7 +386,9 @@ export default {
          console.log("1234567890");
          this.fsAPI("uuid_transfer",this.selectNowCall[0].channelUUID+" "+"sip:"+this.selectPhone[0].userID+"@"+this.selectPhone[0].networkIP+":"+this.selectPhone[0].networkPort,function(res) {console.log("call traverse")}.bind(this));
          this.selectPhone = [];
+	 $('.onlineSelected').removeClass('onlineSelected').addClass('online')
          this.selectNowCall = [];
+	$('.callingSelected').removeClass('callingSelected').addClass('calling')
       },
 
       // call
@@ -405,6 +409,7 @@ export default {
         }
       })
       this.selectPhone = [];
+	$('.onlineSelected').removeClass('onlineSelected').addClass('online')
     },
 
     hangupCall () {

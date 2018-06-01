@@ -184,9 +184,13 @@
           PlanPreTime: new Date(),
           PlanActualTxt: '',
           Files: [],         // 已勾选的歌单
+<<<<<<< HEAD
           FeatureBases: [],
           FeatureCode: [],
           FeatureBaseID: 'zhangwei'
+=======
+          FeatureBases: []
+>>>>>>> 8a900b6f551a792f1c848d23d7eacb77d3801384
         },
         dialogShow: false,
         dialogText: null,
@@ -379,12 +383,20 @@
               this.dialogShow = true
             }else {
               this.selectDevice.forEach(function(s,i) {
+<<<<<<< HEAD
                 s.FeatureCode = s.userID
                 s.FeatureBaseID = 'zhangwei'
               }.bind(this))
               this.formData.FeatureBases = this.selectDevice
               console.log("777777"); 
              // this.fsAPI('originate', 'user/1009 &playback(${this.formData.Files[0].Files[0].MediaPath})',()=>{
+=======
+                s.deviceID = s.userID
+              }.bind(this))
+              debugger
+              this.formData.FeatureBases = this.selectDevice
+              this.fsAPI(`sched_api +10 bgapi originate`, `user/1002 &playback(${this.formData.Files[0].Files[0].MediaPath})`,()=>{
+>>>>>>> 8a900b6f551a792f1c848d23d7eacb77d3801384
                 this.$ajax.post('Plan/Create', this.formData)
                   .then((res) => {
                     if(res.data.code == 1) {

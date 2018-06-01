@@ -88,7 +88,7 @@
      
       <div class="musicList" id="end">
         <div class="songSheet" v-for="songlist in playList" @click="(()=> songlist.unfold = !songlist.unfold)">
-          <div class="songSheetName songSheetNameSelect">
+          <div class="songSheetName" :class="songlist.selected ? 'songSheetNameSelect' : ''">>
             <div class="songSetting">
               <span class="toggle"><i class="fa fa-angle-right" aria-hidden="true"></i></span>
               <p>{{songlist.FolderName}}</p>
@@ -133,6 +133,7 @@
         playListShow: false,     //播放列表显示切换
 	groupShow:"",
         playList: [],
+        selectPlayList: [],
       }
     },
     components: {
@@ -283,12 +284,18 @@
         }
       },
       
+      addMusic(songlist) {
+        this.selectPlayList.push(songlist)
+        songlist.selected = !songlist.selected
+      },
+
       playMusic() {
         this.$store.dispatch('setWhetherPlayAnotherSong','yes')
         let phone = this.selectPhone[0].userID;
         let music = this.selectPlayList[0].MediaPath;
 
         if(this.selectPhone.length!=0) {
+         
           let usera = this.selectPlayList[0];
           let users = this.selectPhone;
           let _this = this;

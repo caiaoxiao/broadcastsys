@@ -189,7 +189,7 @@
             		useCamera: "any"
           		}
         		})
-	_this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"stop"+" current "+_this.conf[0].conf_id)
+	_this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"pause_play"+_this.conf[0].conf_id)
 	_this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"unmute"+" "+_this.conf[0].conf_id)
 	_this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"undeaf"+" "+_this.conf[0].conf_id)
 	}
@@ -219,15 +219,18 @@
           case '允许通话':
               if(this.selected.length > 0){
                 this.selected.forEach(function(a,i){
-                  _this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"unmute"+" "+a.conf_id)})
-                this.selected.forEach(function(a,i){
-                  _this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"undeaf"+" "+a.conf_id)})
+		  _this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"pause_play"+" "+a.conf_id)
+                  _this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"unmute"+" "+a.conf_id)
+                  _this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"undeaf"+" "+a.conf_id)
+		
+		})
 		
            	$('.selected').removeClass().addClass('unselected')
            	this.selected = []
                 }
 		if(this.selectedAlarm.length > 0){
                 this.selectedAlarm.forEach(function(a,i){
+		_this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"pause_play"+" "+a.conf_id)
                   _this.fsAPI('conference',"9110-scc.ieyeplus.com"+" "+"unmute"+" "+a.conf_id)})
                 //this.selectedAlarm.forEach(function(a,i){
                 //  _this.fsAPI('conference',"9110-scc.ieyeplus.com"+" "+"undeaf"+" "+a.conf_id)})
@@ -236,13 +239,15 @@
                 }
 		break
           case '排队等待':
-	      console.log('waiting clicked')
               if(this.selected.length > 0){
                 this.selected.forEach(function(a,i){
-                  _this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"mute"+" "+a.conf_id		   )})
-                this.selected.forEach(function(a,i){
-                  _this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"deaf"+" "+a.conf_id		   )})
-               $('.onlineSelected').removeClass('onlineSelected').addClass('online')
+                  _this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"mute"+" "+a.conf_id		   )
+                  _this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"deaf"+" "+a.conf_id		   )
+		_this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"pause_play"+" "+a.conf_id)
+		  //_this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"stop"+" "+" current "+a.conf_id)
+		  //_this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+'play'+' '+'/usr/local/freeswitch/sounds/music/8000/danza-espanola-op-37-h-142-xii-arabesca.wav'+ ' '+a.conf_id)
+		})
+		$('.selected').removeClass().addClass('unselected')
            	this.selected = []
                 }
 		if(this.selectedAlarm.length > 0){
@@ -276,14 +281,14 @@
 		 this.fsAPI('uuid_transfer',this.userDeflect.channel_uuid+ " "+"sip:"+this.selectPhone[0].userID+"@"+this.selectPhone[0].networkIP+":"+this.selectPhone[0].networkPort)	
 	      }
 	      this.userDeflect = null
-               $('.onlineSelected').removeClass('onlineSelected').addClass('online')
+		$('.selected').removeClass().addClass('unselected')
                this.selected = []
                 this.$store.dispatch('setSelectedAlarm',[])
 	      break
 	   case '取消转出':
 	      this.userDeflect = null
               this.$store.dispatch('setSelectedAlarm',[])
-               $('.onlineSelected').removeClass('onlineSelected').addClass('online')
+	        $('.selected').removeClass().addClass('unselected')
               this.selected = []
 	      break
 	   case '邀请成员':
@@ -305,7 +310,7 @@
                 this.selected.forEach(function(a,i){
                   _this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"undeaf"+" "+a.conf_id)})
 
-                $('.onlineSelected').removeClass('onlineSelected').addClass('online')
+		 $('.selected').removeClass().addClass('unselected')
                 this.selected = []
                 }
 		break

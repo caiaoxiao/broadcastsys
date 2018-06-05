@@ -291,7 +291,10 @@
 						}
 					})//device获取videourl
 		}//liveArrayObj.name =='9110-scc.ieyeplus.com'i && args.data[1]!='9000'
-			//_this.fsAPI('conference',liveArrayObj.name+' '+'play'+' '+'/usr/local/freeswitch/sounds/music/8000/danza-espanola-op-37-h-142-xii-arabesca.wav'+ ' '+ parseInt(args.data[0]).toString()) 
+			if(liveArrayObj.name =='9100-scc.ieyeplus.com' || liveArrayObj.name =='9111-scc.ieyeplus.com' || liveArrayObj.name =='9112-scc.ieyeplus.com'){ 
+                        _this.fsAPI('conference',liveArrayObj.name+' '+'stop'+' '+'current'+' '+ parseInt(args.data[0]).toString())
+			_this.fsAPI('conference',liveArrayObj.name+' '+'play'+' '+'/usr/local/freeswitch/sounds/music/8000/danza-espanola-op-37-h-142-xii-arabesca.wav'+ ' '+ parseInt(args.data[0]).toString()) 
+			}
                         break;
 
                       // User left conference.
@@ -318,9 +321,10 @@
                       // Existing user's state changed (mute/unmute, talking, floor, etc)
                       case "modify":
                         console.log('conference user changed')
-			                  var data = JSON.parse(args.data[4])
+			var data = JSON.parse(args.data[4])
                         if(arr.length == 0 ||  arr.every(function(item,index,array){return item.key!=args.key}))
                         {
+			console.log(item.key,args.key)
                                 arr.push({
                                 conf_id : parseInt(args.data[0]).toString(),
                                 caller_id_number : args.data[1],

@@ -184,7 +184,13 @@
           PlanPreTime: new Date(),
           PlanActualTxt: '',
           Files: [],         // 已勾选的歌单
-          FeatureBases: []
+
+          FeatureBases: [],
+          FeatureCode: [],
+          FeatureBaseID: 'zhangwei'
+
+
+
         },
         dialogShow: false,
         dialogText: null,
@@ -262,7 +268,8 @@
       },
       // 注册事件 和 取消注册事件
       handleFSEventRegister(v, e) {
-        let deviceList = this.deviceList
+        let _this = this;
+        let deviceList = _this.deviceList;
         if (e.eventChannel == 'FSevent.custom::sofia::register') {
           let isContinue = true
           deviceList.forEach(function(d, i) {
@@ -290,7 +297,7 @@
           })
         }
 
-        this.deviceList(Object.assign([], deviceList))
+        _this.deviceList(Object.assign([], deviceList))
       },
       subtract() {
         if(this.cycleIndex > 0) {
@@ -376,20 +383,30 @@
               this.dialogShow = true
             }else {
               this.selectDevice.forEach(function(s,i) {
-                s.deviceID = s.userID
+
+                s.FeatureCode = s.userID
+                s.FeatureBaseID = 'zhangwei'
               }.bind(this))
-              debugger
               this.formData.FeatureBases = this.selectDevice
-              this.fsAPI(`sched_api +10 bgapi originate`, `user/1002 &playback(${this.formData.Files[0].Files[0].MediaPath})`,()=>{
+              console.log("777777"); 
+             // this.fsAPI('originate', 'user/1009 &playback(${this.formData.Files[0].Files[0].MediaPath})',()=>{
+
+
+
+
+
+
+
                 this.$ajax.post('Plan/Create', this.formData)
                   .then((res) => {
                     if(res.data.code == 1) {
+                      console.log("success")
                       this.$emit('close',1)
                     }else {
                       console.log("新增失败")
                     }
                   })
-              })
+            //  })
 
             }
           }

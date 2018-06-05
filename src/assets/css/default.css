@@ -1599,7 +1599,7 @@ ul.statusTpye>li>span {
 }
 
 .btnDiv button {
-    width: 150px;
+    width: 75px;
 }
 
 @media(min-width:200px) {
@@ -2237,6 +2237,7 @@ ul.orgListPhone>li>span {
 
 
 /*事件选择*/
+        
 
 .datepicker>input {
     border-radius: 3px;

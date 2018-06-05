@@ -84,12 +84,14 @@
     },
     methods: {
       refresh() {
-        this.$ajax.post('Plan/List')
+        console.log("000000000000");
+        this.$ajax.post('Plan/List', {params: {PlanName: '333'}})
           .then(res => {
             if(res.data.code == 1) {
+              console.log("success");
               this.planData = res.data.result
             }else {
-
+              console.log("failed");
             }
           })
       },

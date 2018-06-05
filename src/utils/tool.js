@@ -49,9 +49,9 @@ vue.prototype.returnState = function(deviceState) {
 //
 vue.prototype.ifPlay = function(playState) {
   switch (playState) {
-    case 'play':
+    case '继续播放':
       return 'fa fa-play fa-2x';
-    case 'pause':
+    case '暂停':
       return 'fa fa-pause fa-2x';
     default:
       return 'fa fa-pause fa-2x';

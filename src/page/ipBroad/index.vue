@@ -78,17 +78,17 @@
       </div>
     </div>
 
-    <right-phone></right-phone>
+    
     <switchs></switchs>
 
-    <div class="playList">
-      <i class="fa fa-chevron-right" aria-hidden="true"  @click="close(1)"></i>
+    <div class="playList ListShow">
+      
       <div class="listTitle">播放设备列表</div>
 
      
       <div class="musicList" id="end">
         <div class="songSheet" v-for="songlist in playList" @click="(()=> songlist.unfold = !songlist.unfold)">
-          <div class="songSheetName" :class="songlist.selected ? 'songSheetNameSelect' : ''">>
+          <div class="songSheetName" :class="songlist.selected ? 'songSheetNameSelect' : ''" @click="addMusic(songlist)">
             <div class="songSetting">
               <span class="toggle"><i class="fa fa-angle-right" aria-hidden="true"></i></span>
               <p>{{songlist.FolderName}}</p>
@@ -105,11 +105,10 @@
       </div>
 
       <div class="btnDiv">
-        <button type="button" class="btn btn-info" @click="playMusic">play</button>
-        <button type="button" class="btn btn-default" @click="close">quxiao</button>
+        <button type="button" class="btn btn-info" @click="playMusic">播放</button>
       </div>
 
-      <div class="selectAll" @click="removeAll">全部移除</div>
+      
     </div>
     <callDivert v-if="phoneShow"></callDivert>
   </div>
@@ -127,13 +126,14 @@
     data() {
       this.deviceList
       return {
-        playState: 'pause',
+        playState: '暂停',
         selectPhone: [],
         name: '9111' + '-' + window.location.hostname,
         playListShow: false,     //播放列表显示切换
 	groupShow:"",
         playList: [],
         selectPlayList: [],
+        anotherSong: [],
       }
     },
     components: {
@@ -284,9 +284,17 @@
         }
       },
       
-      addMusic(songlist) {
-        this.selectPlayList.push(songlist)
-        songlist.selected = !songlist.selected
+      addMusic(item) {
+        if(this.selectPlayList[0] == null) {
+          console.log("none");
+          this.selectPlayList.push(item)
+        }else if(this.anotherSong[0] == null) {
+          console.log("one");
+          this.anotherSong.push(item)
+        }else{
+          this.anotherSong[0] = item
+        }
+        item.selected = !item.selected
       },
 
       playMusic() {
@@ -295,35 +303,50 @@
         let music = this.selectPlayList[0].MediaPath;
 
         if(this.selectPhone.length!=0) {
-         
-          let usera = this.selectPlayList[0];
-          let users = this.selectPhone;
-          let _this = this;
+          if(this.anotherSong[0] == null){
+            let usera = this.selectPlayList[0];
+            let users = this.selectPhone;
+            let _this = this;
       
-          usera.Files.forEach(function(usern){
-            var x = usern.MediaPath.indexOf("IpBcFiles");
-            var y = usern.MediaPath.substring(x);
-            var z = "/var/lib/tomcat8/webapps/"+y;
-            users.forEach(function(user){
-              _this.fsAPI("conference"," " + _this.name + " " + "play" + " " + z,function(res){console.log("bofang")});
-            })
-          });
-        }
+            usera.Files.forEach(function(usern){
+              var x = usern.MediaPath.indexOf("IpBcFiles");
+              var y = usern.MediaPath.substring(x);
+              var z = "/var/lib/tomcat8/webapps/"+y;
+              users.forEach(function(user){
+                _this.fsAPI("conference"," " + _this.name + " " + "play" + " " + z,function(res){console.log("bofang")});
+              })
+            });
+          }else {
+            this.selectPlayList[0] = this.anotherSong[0]
+            let usera = this.selectPlayList[0];
+            let users = this.selectPhone;
+            let _this = this;
+            _this.fsAPI("conference"," " + _this.name + " " + "stop",function(res){console.log("qie ge")});
+            usera.Files.forEach(function(usern){
+              var x = usern.MediaPath.indexOf("IpBcFiles");
+              var y = usern.MediaPath.substring(x);
+              var z = "/var/lib/tomcat8/webapps/" + y;
+              users.forEach(function(user){
+                _this.fsAPI("conference"," " + _this.name + " " + "play" + " " + z,function(res){console.log("another song")});
+              })
+            });
+          }
+        } 
       },  
 
       pauseOrPlay() {
         if(this.whetherPlayAnotherSong == 'no') {
           console.log("The same song");
-          if(this.playState == 'pause') {
-            this.playState = 'play'
+          if(this.playState == '暂停') {
+            this.playState = '继续播放'
             this.fsAPI("conference",this.name + " " + "pause_play",function(res) {console.log("zan ting")}.bind(this));
           }else {
-            this.playState = 'pause'
+            this.playState = '暂停'
             this.fsAPI("conference",this.name + " " + "pause_play",function(res) {console.log("continue play")}.bind(this));
           }
         }else {
          console.log("Another song"); 
-         this.playState = 'play'
+         this.playState = '继续播放'
          this.fsAPI("conference",this.name + " " + "pause_play",function(res) {console.log("play a new song")}.bind(this));
          this.$store.dispatch('setWhetherPlayAnotherSong','no')
         }

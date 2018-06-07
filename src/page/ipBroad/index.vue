@@ -375,26 +375,9 @@
         const laChannelName = this.getChannelName("liveArray");
 
         if(this.selectPhone.length != 0) {
-	  //this.fsAPI('conference',this.name + ' ' + 'bgdial' + ' ' + "user/9000")
-	/*  this.vertoHandle.newCall({
-          // Extension to dial.
-          destination_number: '9111',
-          caller_id_name: '9000',
-          caller_id_number: '9000',
-          outgoingBandwidth: 'default',
-          incomingBandwidth: 'default',
-          useStereo: true,
-          dedEnc: false,
-          tag: "video-container",
-          deviceParams: {
-            useMic: "any",
-            useSpeak: "any",
-            useCamera: "any"
-          }
-          })  */
           //  批量邀请设备开始会议
           this.selectPhone.forEach(function(s, i){
-            var op =   this.name + '+flags{mute}'+  " " + "bgdial" + " " + "user/"+this.selectPhone[i].userID
+            var op =   this.name + '@myprofiles_sound_off++flags{mute}'+  " " + "bgdial" + " " + "user/"+this.selectPhone[i].userID
 	    console.log("************************************************",op)
             this.fsAPI("conference",op,
               function(res){

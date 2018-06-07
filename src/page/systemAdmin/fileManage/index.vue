@@ -51,9 +51,10 @@
 
           </div>
           <div class='addFlies'>
-            <span @click="uploadFile(1)">
+            <span @click="uploadFile(1, songList.FolderID)">
               <i class='fa fa-file-o' aria-hidden='true' ></i>
-              <input type="file" class="uploadFile"
+             
+               <input type="file" :class="songlist(songList.FolderID)"
                      @change="uploadFileChange($event, songList.FolderID)"
                      style="display: none;"
                      accept="audio/*"
@@ -82,7 +83,7 @@
             <input type="button"
                    @click.stop="addBlur()"  value="添加到">
             <div v-if="songListShow" v-for="songList in playList" @mouseout="addBlur()">
-              <span @click.self="addFileToPlaylist('', songList)">{{songList.FolderName}}</span>
+              <span style="height:20px;width:20px;"  @click.self="addFileToPlaylist('', songList)">{{songList.FolderName}}</span>
             </div>
 
           </li>
@@ -117,10 +118,11 @@
               <i class="fa fa-plus" aria-hidden="true"></i>
               <input type="button"
                  @click.stop="addBlur(file)"  value="添加到">
-              <div v-if="file.songListShow" v-for="songList in playList">
-                <span @click.self="addFileToPlaylist(file, songList)">{{songList.FolderName}}</span>
+             <div>
+              <div :class="songlist(songList.FolderID)" v-if="file.songListShow" v-for="songList in playList">
+                <span class="songlist(songList.FolderID)" value=songList.FolderName @click.self="addFileToPlaylist(file, songList)">{{songList.FolderName}}</option>
               </div>
-
+             </div>
             </li>
           </ul>
           <span class="totalTime Grid-cell">
@@ -203,6 +205,7 @@
     },
     methods: {
       addBlur(file) {
+        console.log(this.playList);
         if(file) {
           file.songListShow = !file.songListShow
 
@@ -331,11 +334,12 @@
         }
 
       },
+
       renameSongList(item, event) {
         // 歌单重命名
         item.contenteditable = true
         let request = {
-          FolderName: event.target.outerText,
+          FolderName: event.target.textContent,
           UserID: '133585596bb04c9cbe311d0859dd7196',
           FolderType: 1,
           FolderID: item.FolderID
@@ -363,16 +367,22 @@
         this.deleteId = id
         this.dialogText = "您确定要删除此歌单吗?"
       },
-      uploadFile(type) {
-        /* type=1:点击文件上传，type=2:点击文件夹上传 */
-        if(type == 1) {
-          $('.uploadFile').click()
-        }else if(type == 2) {
 
+      uploadFile(type,item) {
+        /* type=1:点击文件上传，type=2:点击文件夹上传 */
+        
+        if(type == 1) {
+          console.log("888888");
+          $('.' + item).click()
+        }else if(type == 2) {
+          console.log("999999");
         }
       },
+
+
       uploadFileChange(event, id) {
         // 监听上传文件事件
+      
         let files = event.target.files
         let request = new FormData();
         if(!files[0]) {return}

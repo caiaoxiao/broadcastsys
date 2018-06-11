@@ -6,7 +6,7 @@
         <div class="row">
             <div class="form-group">
               <label>视频联动存储密匙</label>
-                <input style="margin:10px auto;display:block;width:450px" type="text" class="form-control" v-model="formData.uniqueId">
+                <input id = "input_key" type="text" class="form-control" v-model="formData.uniqueId">
             </div>
         </div>
 	</el-form >
@@ -62,3 +62,9 @@ export default {
   }
 }
 </script>
+<style scoped>
+	#input_key{
+	margin: 10px auto;
+	width : 450px;
+	}
+</style>

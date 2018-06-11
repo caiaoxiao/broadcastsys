@@ -11,20 +11,15 @@
         <div data-name="con">
           <div class="moduleList" id="height01">
             <div class="singleM" v-for="item in deviceList">
-              <div class="moduleStyle"
-                   :class="returnClass(item.deviceState)"
-                   @click="itemClick($event, item)">
-                <div class="moduleNum">
-                  {{ item.userID}}
-                  <span v-if="item.calleeNumber || item.callerNumber">
-                    {{ item.calleeNumber ? item.calleeNumber : item.callerNumber}}
-                  </span>
-                </div>
-                <div class="moduleKind">语音终端</div>
-		<div class="moduleState">{{ returnState(item.deviceState)  + "   " + ((item.timer.s>0 || item.timer.m>0 || item.timer.h>0)?
+		<div class="moduleStyle" :class="returnClass(item.deviceState)" @click.stop="itemClick($event, item)">
+                <div class="moduleNum"><i class="fa fa-video-camera" aria-hidden="true"></i>{{item.userID + " " + (item.name==null?"":item.name)}}</div>
+                <div class="moduleKind">视频终端</div>
+                <div class="moduleState">{{ returnState(item.deviceState)  + "   " + ((item.timer.s>0 || item.timer.m>0 || item.timer.h>0)?
                         ((item.timer.h/10<1?"0"+item.timer.h+":":item.timer.h+":")+
                         (item.timer.m/10<1?"0"+item.timer.m+":":item.timer.m+":")+
-			(item.timer.s/10<1?"0"+Math.floor(item.timer.s):Math.floor(item.timer.s))):"")}}
+                        (item.timer.s/10<1?"0"+Math.floor(item.timer.s):Math.floor(item.timer.s))):"")}}
+                        <i class="fa fa-user" v-if = "item.deviceState=='active'"></i>
+                        {{ (item.calling==null?"":item.calling) }}
               </div>
               </div>
             </div>
@@ -42,18 +37,17 @@
               <div class="departDetail">
                 <div class="detailCon">
 		<div class="singleM" v-show="returnGroup(item)" v-for="item in deviceList">
-                    <div 
-                      class = "moduleStyle"
-                      :class="returnClass(item.deviceState)" 
-                      @click.stop="itemClick($event, item)" >
-                      <div class="moduleNum">{{ item.userID }}</div>
-                      <div class="moduleKind">{{item.type == 1 ? "话机设备" : "视频设备" }}</div>
-			<div class="moduleState">{{ returnState(item.deviceState)  + "   " + ((item.timer.s>0 || item.timer.m>0 || item.timer.h>0)?
+			<div class="moduleStyle" :class="returnClass(item.deviceState)" @click.stop="itemClick($event, item)">
+                <div class="moduleNum"><i class="fa fa-video-camera" aria-hidden="true"></i>{{item.userID + " " + (item.name==null?"":item.name)}}</div>
+                <div class="moduleKind">视频终端</div>
+                <div class="moduleState">{{ returnState(item.deviceState)  + "   " + ((item.timer.s>0 || item.timer.m>0 || item.timer.h>0)?
                         ((item.timer.h/10<1?"0"+item.timer.h+":":item.timer.h+":")+
                         (item.timer.m/10<1?"0"+item.timer.m+":":item.timer.m+":")+
-			(item.timer.s/10<1?"0"+Math.floor(item.timer.s):Math.floor(item.timer.s))):"")}}
+                        (item.timer.s/10<1?"0"+Math.floor(item.timer.s):Math.floor(item.timer.s))):"")}}
+                        <i class="fa fa-user" v-if = "item.deviceState=='active'"></i>
+                        {{ (item.calling==null?"":item.calling) }}
               </div>
-                    </div>
+              </div>
                   </div>
                 </div>
                 <div class="selectAll">全部选择</div>
@@ -69,8 +63,10 @@
 
       <div class="functionMenu">
         <ul class="nav nav-justified menuList">
-          <li id="a1" @click="tmute" @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-user-circle fa-2x" aria-hidden="true"></i><span>管理员静音</span></li>
-          <li id="a2" @click="startIpbroad" @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-bullhorn fa-2x" aria-hidden="true"></i><span>喊话</span></li>
+         <!-- <li id="a1" @click="tmute" @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-user-circle fa-2x" aria-hidden="true"></i><span>管理员静音</span></li>-->
+          <li id="a2" @click="startIpbroad" @mousedown="$btnMousedown" @mouseup="$btnMouseup">
+		<i :class="returnVertoState()"  aria-hidden="true"></i>
+		<span>{{mute}}</span></li>
           <li id="a3" @click="play" @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-play-circle-o fa-2x" aria-hidden="true"></i><span>播放</span></li>
           <li id="a4" @click="pauseOrPlay" @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i :class="ifPlay(playState)" aria-hidden="true"></i><span>{{playState}}</span></li>
           <li id="a5" @click="allOver" @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-window-close fa-2x" aria-hidden="true"></i><span>全部结束</span></li>
@@ -82,10 +78,7 @@
     <switchs></switchs>
 
     <div class="playList ListShow">
-      
       <div class="listTitle">播放设备列表</div>
-
-     
       <div class="musicList" id="end">
         <div class="songSheet" v-for="songlist in playList" @click="(()=> songlist.unfold = !songlist.unfold)">
           <div class="songSheetName" :class="songlist.selected ? 'songSheetNameSelect' : ''" @click="addMusic(songlist)">
@@ -134,6 +127,9 @@
         playList: [],
         selectPlayList: [],
         anotherSong: [],
+	mute:"喊话",
+	selectNowCall: [],
+        selectRingCall: [],
       }
     },
     components: {
@@ -166,6 +162,24 @@
       ]),
     },
     methods: {
+      reset(){
+    	this.selectPhone = []
+    	$('.onlineSelected').removeClass('onlineSelected').addClass('online')
+      },
+      returnVertoState(){
+	if(this.confIpBoard.some((item,index)=>{return item.caller_id_number=='9000' && item.muted == true})){
+		this.mute = "喊话"
+		return  "fa fa-bullhorn fa-2x"
+	    }
+	 else if(this.confIpBoard.some((item,index)=>{return item.caller_id_number=='9000' && item.muted == false})){
+		this.mute = "静音"
+		return  "fa fa-window-close fa-2x"	
+		}
+	 else if(!this.confIpBoard.some((item,index)=>{return item.caller_id_number=='9000'})){ 
+		this.mute = "喊话"
+		return "fa fa-bullhorn fa-2x"
+		}
+    },
       returnGroup(item){
       return item.groupid.some((it)=>{return it==this.groupShow})
     },
@@ -186,6 +200,9 @@
         case "register":
           return "online"
           break
+	//case undefined:
+        //  return "online"
+        //  break
       }
     },
     returnState(status){
@@ -227,26 +244,49 @@
           }
         })
     },
-    itemClick(e, row) {
-        let _this = this
-        let target = e.currentTarget
-        if($(target).hasClass('online')) {
-          if($(target).hasClass("onlineSelected") ){
-            $(target).removeClass("onlineSelected")
-            this.selectPhone.forEach(function(s,i) {
-              if(s.userID == row.userID) {
+	    itemClick (e, row) {
+      let target = e.currentTarget
+      let _this = this
 
-                _this.selectPhone.splice(i, 1)
-              }
-            })
-          }else {
-            $(target).addClass("onlineSelected");
-            $(".playList").removeClass("ListHide").addClass("ListShow");
-            this.selectPhone.push(row)
-          }
+      if ($(target).hasClass('online')) {
+        if ($(target).hasClass("onlineSelected")) {
+          $(target).removeClass("onlineSelected")
+          this.selectPhone.forEach(function (s, i) {
+            if (s.userID == row.userID) {
+              _this.selectPhone.splice(i, 1)
+            }
+          })
+        } else {
+          $(target).addClass("onlineSelected");
+          this.selectPhone.push(row)
         }
+      } else if ($(target).hasClass("calling")) {
+        if ($(target).hasClass("callingSelected")) {
+          $(target).removeClass("callingSelected");
+          this.selectNowCall.forEach(function (s, i) {
+            if (s.userID == row.userID) {
+              _this.selectNowCall.splice(i, 1)
+            }
+          })
+        } else {
+          $(target).addClass("callingSelected");
+          this.selectNowCall.push(row)
+        }
+      } else if ($(target).hasClass("waitting")) {
+        if ($(target).hasClass("waittingSelected")) {
+          $(target).removeClass("waittingSelected");
+          this.selectRingCall.forEach(function (s, i) {
+            if (s.userID == row.userID) {
+              _this.selectRingCall.splice(i, 1)
+            }
+          })
+        } else {
+          $(target).addClass("waittingSelected");
+          this.selectRingCall.push(row)
+        }
+      }
 
-      },
+    },
       play() {
         this.playListShow = true
         this.$nextTick(function(){
@@ -373,12 +413,11 @@
       startIpbroad() {
         // 喊话
         const laChannelName = this.getChannelName("liveArray");
-
-        if(this.selectPhone.length != 0) {
+        if(!this.confIpBoard.some((item,index)=>{return item.caller_id_number=='9000'})){ 
 	  //this.fsAPI('conference',this.name + ' ' + 'bgdial' + ' ' + "user/9000")
-	/*  this.vertoHandle.newCall({
+	  this.vertoHandle.newCall({
           // Extension to dial.
-          destination_number: '9111',
+          destination_number: '9113',
           caller_id_name: '9000',
           caller_id_number: '9000',
           outgoingBandwidth: 'default',
@@ -391,7 +430,9 @@
             useSpeak: "any",
             useCamera: "any"
           }
-          })  */
+          })  
+	 /*
+	 if(this.selectPhone.length>0)
           //  批量邀请设备开始会议
           this.selectPhone.forEach(function(s, i){
             var op =   this.name + '+flags{mute}'+  " " + "bgdial" + " " + "user/"+this.selectPhone[i].userID
@@ -401,10 +442,9 @@
 		console.log("邀请返回*********************************")
               });
           }.bind(this))
-
           //  重置勾选话机数组
-          
-	  //$('.onlineSelected').removeClass('onlineSelected').addClass('online')
+          */ 
+	  $('.onlineSelected').removeClass('onlineSelected').addClass('online')
 
           // 创建会议室
           this.broadcast(laChannelName, {
@@ -416,6 +456,10 @@
             }
           });
         }
+	else if(this.confIpBoard.some((item,index)=>{return item.caller_id_number=='9000' && item.muted == true}))
+	  this.tmute()
+	 else if(this.confIpBoard.some((item,index)=>{return item.caller_id_number=='9000' && item.muted == false}))
+	  this.tmute()
       },
       broadcast(channel, params) {
 
@@ -443,20 +487,19 @@
       },
       allOver() {
         // 结束全部喊话和播放
-        console.log(this.playList[0].FolderName);
-        this.selectPhone = []
 	this.fsAPI('conference','9111-scc.ieyeplus.com'+' '+'hup'+' '+'all')
 	this.selectPhone = []
 	$('.onlineSelected').removeClass('onlineSelected').addClass('online')
       },
       tmute(){
+          // this.fsAPI("conference",this.name + " " + "pause_play" + "all",function(res) {console.log("zan ting")}.bind(this));
         this.confIpBoard.forEach((item,index)=>{	
 	if(item.caller_id_number=='9000')
 	this.fsAPI('conference','9111-scc.ieyeplus.com'+' '+'tmute'+' '+item.conf_id)
 	})
 	}
     }
-  }
+ }
 </script>
 
 <style scoped>

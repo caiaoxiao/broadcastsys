@@ -27,7 +27,7 @@
         //if(this.vertoHandle==null)
           $.verto.init({}, this.initVertoHandle);
         //else
-        //console.log('verto aleray not null')
+        //  console.log('verto aleray not null')
 
       })
     },
@@ -217,9 +217,10 @@
                 _this.liveArray = new $.verto.liveArray(verto,pbx,room, config);
                 // Subscribe to live array changes.
                 _this.liveArray.onChange = function(liveArrayObj, args) {
-		let uuid = Object.keys(liveArrayObj.hash())[0] 
+                let device = _this.$store.getters.deviceList
 		let action = ""
 		let arr =[]
+		let hash = Object.keys(liveArrayObj.hash())
 			if(liveArrayObj.name == '9100-scc.ieyeplus.com')
                                 {
 				arr = _this.$store.getters.confLeft
@@ -250,12 +251,13 @@
                       // New user joined conference.
                       case "add":
 		      if(args.data[1]!='9000'){
-                      let device = _this.$store.getters.deviceList
                       device.forEach(function(user) {
-                            if(user.userID == args.data[1]) {
+                            if(user.userID == args.data[1])  {
                                 user.deviceState = 'active'
+				user.calling = liveArrayObj.name.slice(0,liveArrayObj.name.indexOf('-'))
+				if(user.timer.clock == false){
                                 var t = setInterval(()=>{
-                                      user.timer.s+=0.5
+                                 user.timer.s+=1
                                 if(user.timer.s>59.5){
                                   user.timer.s=0
                                   user.timer.m+=1}
@@ -263,19 +265,21 @@
                                   user.timer.m=0
                                   user.timer.h+=1}
                                   },1000)
+				user.timer.clock = true
                                 user.timer.id.push(t) 
+				}
                             }
                         })
                         _this.$store.dispatch('setDeviceList',device)}
-			                  console.log('conference user added')
-	                      var  data = JSON.parse(args.data[4])
+			console.log('conference user added')
+	                var  data = JSON.parse(args.data[4])
                         arr.push({
                           conf_id : parseInt(args.data[0]).toString(),
                           caller_id_number : args.data[1],
                           muted : data["audio"]["muted"],
                           deaf :  data["audio"]["deaf"],
                           talking : data["audio"]["talking"],
-                          channel_uuid : uuid,
+                          channel_uuid : hash[arr.length], 
                           key : args.key
 
                         })
@@ -291,8 +295,8 @@
 						}
 					})//device获取videourl
 		}//liveArrayObj.name =='9110-scc.ieyeplus.com'i && args.data[1]!='9000'
-			if(liveArrayObj.name =='9100-scc.ieyeplus.com' || liveArrayObj.name =='9111-scc.ieyeplus.com' || liveArrayObj.name =='9112-scc.ieyeplus.com'){ 
-                        _this.fsAPI('conference',liveArrayObj.name+' '+'stop'+' '+'current'+' '+ parseInt(args.data[0]).toString())
+			if((liveArrayObj.name =='9100-scc.ieyeplus.com')  && args.data[1]!='9000'){ 
+                        _this.fsAPI('conference',liveArrayObj.name+' '+'stop'+' '+'all'+' '+ parseInt(args.data[0]).toString())
 			_this.fsAPI('conference',liveArrayObj.name+' '+'play'+' '+'/usr/local/freeswitch/sounds/music/8000/danza-espanola-op-37-h-142-xii-arabesca.wav'+ ' '+ parseInt(args.data[0]).toString()) 
 			}
                         break;
@@ -303,9 +307,11 @@
                         device_del.forEach(function(user) {
                               if(user.channelUUID == args.key) {
                                   user.deviceState = 'register'
+				  user.calling = null 
                                   user.timer.s=0
                                   user.timer.m=0
                                   user.timer.h=0
+				  user.timer.clock = false
                                   user.timer.id.forEach((id)=>{clearInterval(id)})
                               }
                         })
@@ -321,17 +327,17 @@
                       // Existing user's state changed (mute/unmute, talking, floor, etc)
                       case "modify":
                         console.log('conference user changed')
+			//console.log(args)
 			var data = JSON.parse(args.data[4])
                         if(arr.length == 0 ||  arr.every(function(item,index,array){return item.key!=args.key}))
                         {
-			console.log(item.key,args.key)
                                 arr.push({
                                 conf_id : parseInt(args.data[0]).toString(),
                                 caller_id_number : args.data[1],
                                 muted : data["audio"]["muted"],
                                 deaf :  data["audio"]["deaf"],
                                 talking : data["audio"]["talking"],
-                                channel_uuid : uuid,
+                                channel_uuid : hash[arr.length],
                                 key : args.key })
                         }    
 			else
@@ -343,7 +349,7 @@
                                 arr[index].muted =  data["audio"]["muted"],
                                 arr[index].deaf =   data["audio"]["deaf"],
                                 arr[index].talking =  data["audio"]["talking"],
-                                arr[index].channel_uuid =  uuid,
+                                arr[index].channel_uuid =  hash[index],
                                 arr[index].key =  args.key 	
 				}
 
@@ -453,8 +459,9 @@
                 user.operationState = 0
                 user.oppoChannelUUID = null
                 user.groupid = []//this.usermap.hasOwnProperty(user.userID)?usermap[userID]:null
-                user.timer = {s:0,m:0,h:0,id:[]}
-                user.calling = ""
+                user.timer = {s:0,m:0,h:0,id:[],clock:false}
+                user.calling = null 
+		user.name = null 
                 deviceList.push(user)
               }/*
               else{
@@ -484,15 +491,18 @@
             .then(res => {
               if (res.data.code === 1) {
                   let group  = res.data.result.deviceGroups
+		  console.log(group)
                   group.forEach((r,i)=>{
                     if(this.usermap.hasOwnProperty(r.deviceCode)){
                       this.usermap[r.deviceCode].list.push(r.deviceGroupId)
                       this.usermap[r.deviceCode].type =r.type
+		      this.usermap[r.deviceCode].name = r.deviceName
                     }
                     else{
                       this.usermap[r.deviceCode] = {}
                       this.usermap[r.deviceCode].list = [r.deviceGroupId]
                       this.usermap[r.deviceCode].type =r.type
+		      this.usermap[r.deviceCode].name = r.deviceName
                     }
                   })
                 }
@@ -500,6 +510,7 @@
               if(this.usermap.hasOwnProperty(deviceList[index].userID)){
                 deviceList[index].groupid =  this.usermap[deviceList[index].userID].list
                 deviceList[index].type =  this.usermap[deviceList[index].userID].type
+	        deviceList[index].name = this.usermap[deviceList[index].userID].name
                 delete this.usermap[deviceList[index].userID] }
              }
              for(let item in this.usermap){
@@ -515,7 +526,8 @@
                 user.oppoChannelUUID = null
                 user.groupid = this.usermap[item].list
                 user.type = this.usermap[item].type
-                user.timer = {s:0,m:0,h:0,id:[]}
+		user.name = this.usermap[item].name
+                user.timer = {s:0,m:0,h:0,id:[],clock:false}
                 deviceList.push(user)
               }   
           })
@@ -539,7 +551,8 @@
         if (e.eventChannel == 'FSevent.custom::sofia::register') {
           let isContinue = true
           deviceList.forEach(function(d, i) {
-            if(d.userID == e.data.username) {
+            if(d.userID == e.data.username ) {
+	      if( deviceList[i].deviceState == "unregistered")
               deviceList[i].deviceState = "registered"
               isContinue=false
               return;
@@ -554,7 +567,8 @@
             user.channelUUID = null
             user.groupid = this.usermap.hasOwnProperty(user.userID)?usermap[userID].list:[]
             user.type = this.usermap.hasOwnProperty(user.userID)?usermap[userID].type:""
-	    user.timer = {s:0,m:0,h:0,id:[]}
+	    user.timer = {s:0,m:0,h:0,id:[],clock:false}
+	    user.name = this.usermap.hasOwnProperty(user.userID)?usermap[userID].name:null
             deviceList.push(user)
 
           }
@@ -593,27 +607,29 @@
         }, success_cb, failed_cb);
       },
       handleFSEventChannel(v, e) {
+	//console.log(e)
         let callDirection = e.data["Call-Direction"];            //入栈还是出栈
         let callerNumber = e.data["Caller-Caller-ID-Number"];    //主叫号码
-        let calleeNumber = e.data["Caller-Destination-Number"];  //被叫号码
+        let calleeNumber = e.data["Caller-Callee-ID-Number"];  //被叫号码
         let channelUUID = e.data["Unique-ID"];                   //id
         let channelCallState = e.data["Channel-Call-State"];  
-        console.log(channelCallState)   //通话状态
         let currentLoginUser = this.currentLoginUser;
         let users = this.deviceList;
         let currentLoginUserChanged = false;
         let usersChanged = false;
         let _this = this;
+	console.log(channelCallState)
         if (callerNumber == "0000000000") return;
 
         if (channelCallState == "RINGING" || channelCallState == "EARLY") {
           channelCallState = "ringing";
-        } else if (channelCallState == "ACTIVE") {
+        } else if (channelCallState == "ACTIVE"){
           channelCallState = "active";
+	  let time_add = 1 
           users.forEach(function(user) {
-                  if(user.userID == callerNumber) {
+                  if(user.userID == callerNumber && !user.timer.clock) {
                       var t = setInterval(()=>{
-                            user.timer.s+=0.5
+                      user.timer.s+=time_add
                       if(user.timer.s>59.5){
                         user.timer.s=0
                         user.timer.m+=1}
@@ -621,11 +637,12 @@
                         user.timer.m=0
                         user.timer.h+=1}
                         },1000)
+		      user.timer.clock = true
                       user.timer.id.push(t) 
                   }
-                  else  if(user.userID == calleeNumber) {
+                  else  if(user.userID == calleeNumber && !user.timer.clock) {
                       var t = setInterval(()=>{
-                      user.timer.s+=0.5
+                      user.timer.s+=time_add
                       if(user.timer.s>59.5 && user.timer.m<=59){
                         user.timer.s=0
                         user.timer.m+=1}
@@ -633,21 +650,26 @@
                         user.timer.m=0
                         user.timer.h+=1}
                         },1000)
+		      user.timer.clock = true
                       user.timer.id.push(t) 
                   }
 	            })
-        } else if (channelCallState == "HANGUP") {
-          	  users.forEach(function(user) {
-              if(user.userID == callerNumber || user.userID == calleeNumber) {
+        } //number 
+	    else if (channelCallState == "HANGUP") {
+              users.forEach(function(user) {
+             if((e.data.hasOwnProperty("Channel-Presence-ID") && user.userID == e.data["Channel-Presence-ID"].slice(0,e.data["Channel-Presence-ID"].indexOf('@'))) || (!e.data.hasOwnProperty("Channel-Presence-ID") && user.userID == e.data["Channel-Name"].slice(15,e.data["Channel-Name"].indexOf('@')))) {
+		user.deviceState = "register"
+		user.calling = null
 		user.timer.s=0
 		user.timer.m=0
 		user.timer.h=0
+		user.timer.clock = false 
 		user.timer.id.forEach((id)=>{
                  clearInterval(id)	
 		})
 		}
 		})
-          channelCallState = "register";
+                channelCallState = "register";
         }
         // 入栈
         if (callDirection == "inbound") {
@@ -671,24 +693,28 @@
               }
             })
           }
-          else if (callerNumber == '9000') {
+          if (callerNumber == currentLoginUser.userID) {
             currentLoginUser.channelUUID = channelUUID;
             currentLoginUser.deviceState = channelCallState;
             currentLoginUser.callDirection = callDirection;
             currentLoginUserChanged = true;
           }
-          else {
             users.forEach(function(user) {
               if (user.userID  == callerNumber) {
                 user.channelUUID = channelUUID;
                 user.deviceState = channelCallState;
                 user.callDirection = callDirection;
-                user.calling = calleeNumber
+                user.calling = channelCallState=="active"?calleeNumber:null 
+                usersChanged = true;
+              }
+	      else if(user.userID  == calleeNumber) {
+                user.channelUUID = channelUUID;
+                user.deviceState = channelCallState;
+                user.callDirection = callDirection;
+                user.calling = channelCallState=="active"?callerNumber:null 
                 usersChanged = true;
               }
             })
-
-          }
 
           // 出栈
         } else if (callDirection == "outbound") {
@@ -716,7 +742,7 @@
                 user.deviceState = channelCallState;
                 user.callDirection = callDirection;
                 user.oppoChannelUUID = opChannelUUID;
-                user.calling = callerNumber
+                user.calling = channelCallState=="active"?callerNumber:null
                 usersChanged = true;
               }
             })

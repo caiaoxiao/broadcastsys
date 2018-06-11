@@ -1,7 +1,7 @@
 <script src="../../utils/page/meeting.js"></script>
 <template>
   <div >
-     <left-phone  :select-phone="selectPhone" ></left-phone>
+     <left-phone  :select-phone="selectPhone" @reset='reset'></left-phone>
     <div id="media">
       <video width=800 id="webcam" autoplay="autoplay" hidden="true"></video>
     </div>
@@ -13,18 +13,23 @@
         </ul>
         <div data-name="con">
           <div class="moduleList " id="height01">
+             <div class="singleM "><!--video-camera：视频终端，phone：语音终端，left:被叫 right：主叫-->
+              <div class="moduleStyle  calling01 "><!--通话中-->
+                <div class="moduleNum"><i class="fa fa-video-camera" aria-hidden="true"></i>8001<i class="fa fa-arrow-left"></i><p>襄十分中心哎哟哎哟3车道</p></div>
+                <div class="moduleNum"><i class="fa fa-phone" aria-hidden="true"></i>7001<i class="fa fa-arrow-right"></i><p>襄十分中心哎哟哎哟3车道</p> </div>
+                <div class="moduleState">00:00:01<span class="fa fa-phone" aria-hidden="true"></span></div>
+              </div>
+            </div>
             <div class="singleM" v-for="item in deviceList">
               <div class="moduleStyle" :class="returnClass(item.deviceState)" @click.stop="itemClick($event, item)">
-                <div class="moduleNum">{{ item.userID}}
-                  <span v-if="item.calleeNumber || item.callerNumber">
-                    {{item.calleeNumber ? item.calleeNumber : item.callerNumber}}
-                  </span>
-                </div>
+                <div class="moduleNum"><i class="fa fa-video-camera" aria-hidden="true"></i>{{item.userID + " " + (item.name==null?"":item.name)}}</div>
                 <div class="moduleKind">视频终端</div>
-<div class="moduleState">{{ returnState(item.deviceState)  + "   " + ((item.timer.s>0 || item.timer.m>0 || item.timer.h>0)?
+		<div class="moduleState">{{ returnState(item.deviceState)  + "   " + ((item.timer.s>0 || item.timer.m>0 || item.timer.h>0)?
                         ((item.timer.h/10<1?"0"+item.timer.h+":":item.timer.h+":")+
                         (item.timer.m/10<1?"0"+item.timer.m+":":item.timer.m+":")+
 			(item.timer.s/10<1?"0"+Math.floor(item.timer.s):Math.floor(item.timer.s))):"")}}
+			<i class="fa fa-user" v-if = "item.deviceState=='active'"></i>
+		        {{ (item.calling==null?"":item.calling)	}}
               </div>
               </div>
             </div>
@@ -42,17 +47,16 @@
               <div class="departDetail">
                 <div class="detailCon">
                   <div class="singleM" v-show="returnGroup(item)" v-for="item in deviceList">
-                    <div 
-                      class = "moduleStyle"
-                      :class="returnClass(item.deviceState)" 
-                      @click.stop="itemClick($event, item)" >
-                      <div class="moduleNum">{{ item.userID}}</div>
-                      <div class="moduleKind">{{item.type == 1 ? "话机设备" : "视频设备" }}</div>
-		      <div class="moduleState">{{ returnState(item.deviceState)  + "   " + ((item.timer.s>0 || item.timer.m>0 || item.timer.h>0)?
+			<div class="moduleStyle" :class="returnClass(item.deviceState)" @click.stop="itemClick($event, item)">
+                <div class="moduleNum"><i class="fa fa-video-camera" aria-hidden="true"></i>{{item.userID + " " + (item.name==null?"":item.name)}}</div>
+                <div class="moduleKind">视频终端</div>
+                <div class="moduleState">{{ returnState(item.deviceState)  + "   " + ((item.timer.s>0 || item.timer.m>0 || item.timer.h>0)?
                         ((item.timer.h/10<1?"0"+item.timer.h+":":item.timer.h+":")+
                         (item.timer.m/10<1?"0"+item.timer.m+":":item.timer.m+":")+
-			(item.timer.s/10<1?"0"+Math.floor(item.timer.s):Math.floor(item.timer.s))):"")}}
-              </div>
+                        (item.timer.s/10<1?"0"+Math.floor(item.timer.s):Math.floor(item.timer.s))):"")}}
+                        <i class="fa fa-user" v-if = "item.deviceState=='active'"></i>
+                        {{ (item.calling==null?"":item.calling) }}
+              		</div>
                     </div>
                   </div>
 
@@ -154,6 +158,10 @@ export default {
   watch: {},
   methods: {
     // 获取设备分组数据
+    reset(){
+    this.selectPhone = []
+    $('.onlineSelected').removeClass('onlineSelected').addClass('online')
+    },
     returnGroup(item){
       return item.groupid.some((it)=>{return it==this.groupShow})
     },
@@ -174,6 +182,9 @@ export default {
         case "register":
           return "online"
           break
+	case undefined:
+	  return "online"
+	  break
       }
     },
     returnState(status){

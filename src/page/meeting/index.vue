@@ -10,21 +10,17 @@
           <div data-name="con">
             <div class="moduleList" id = "height01" >
               <div class="singleM" v-for="item in deviceList">
-                <div class="moduleStyle"
-                     :class="returnClass(item.deviceState)"
-                     @click.stop="itemClick($event, item)">
-                  <div class="moduleNum">{{ item.userID }}
-                    <span v-if="item.calleeNumber || item.callerNumber">
-                      {{ item.calleeNumber ? item.calleeNumber : item.callerNumber }}
-                    </span> 
-                  </div>
-                  <div class="moduleKind">视频终端</div>
-		<div class="moduleState">{{ returnState(item.deviceState)  + "   " + ((item.timer.s>0 || item.timer.m>0 || item.timer.h>0)?
+		<div class="moduleStyle" :class="returnClass(item.deviceState)" @click.stop="itemClick($event, item)">
+                <div class="moduleNum"><i class="fa fa-video-camera" aria-hidden="true"></i>{{item.userID + " " + (item.name==null?"":item.name)}}</div>
+                <div class="moduleKind">视频终端</div>
+                <div class="moduleState">{{ returnState(item.deviceState)  + "   " + ((item.timer.s>0 || item.timer.m>0 || item.timer.h>0)?
                         ((item.timer.h/10<1?"0"+item.timer.h+":":item.timer.h+":")+
                         (item.timer.m/10<1?"0"+item.timer.m+":":item.timer.m+":")+
-			(item.timer.s/10<1?"0"+Math.floor(item.timer.s):Math.floor(item.timer.s))):"")}}
+                        (item.timer.s/10<1?"0"+Math.floor(item.timer.s):Math.floor(item.timer.s))):"")}}
+                        <i class="fa fa-user" v-if = "item.deviceState=='active'"></i>
+                        {{ (item.calling==null?"":item.calling) }}
               </div>
-                </div>
+              </div>
               </div>
              </div>
             <div class="moduleList">
@@ -40,18 +36,17 @@
                 <div class="departDetail">
                   <div class="detailCon">
 		  <div class="singleM" v-show="returnGroup(item)" v-for="item in deviceList">
-                    <div 
-                      class = "moduleStyle"
-                      :class="returnClass(item.deviceState)" 
-                      @click.stop="itemClick($event, item)" >
-                      <div class="moduleNum">{{ item.userID }}</div>
-                      <div class="moduleKind">{{item.type == 1 ? "话机设备" : "视频设备" }}</div>
-			<div class="moduleState">{{ returnState(item.deviceState)  + "   " + ((item.timer.s>0 || item.timer.m>0 || item.timer.h>0)?
+			<div class="moduleStyle" :class="returnClass(item.deviceState)" @click.stop="itemClick($event, item)">
+                <div class="moduleNum"><i class="fa fa-video-camera" aria-hidden="true"></i>{{item.userID + " " + (item.name==null?"":item.name)}}</div>
+                <div class="moduleKind">视频终端</div>
+                <div class="moduleState">{{ returnState(item.deviceState)  + "   " + ((item.timer.s>0 || item.timer.m>0 || item.timer.h>0)?
                         ((item.timer.h/10<1?"0"+item.timer.h+":":item.timer.h+":")+
                         (item.timer.m/10<1?"0"+item.timer.m+":":item.timer.m+":")+
-			(item.timer.s/10<1?"0"+Math.floor(item.timer.s):Math.floor(item.timer.s))):"")}}
+                        (item.timer.s/10<1?"0"+Math.floor(item.timer.s):Math.floor(item.timer.s))):"")}}
+                        <i class="fa fa-user" v-if = "item.deviceState=='active'"></i>
+                        {{ (item.calling==null?"":item.calling) }}
               </div>
-                    </div>
+              </div>
                   </div>
                   </div>
                   <div class="selectAll">全部选择</div>
@@ -100,7 +95,9 @@
         nowSession: [],       // 正在开会的话机
         selectNowSession: [], // 会议中选中的话机
         selectPhone: [],
-	groupShow:""       // 选中待会议的话机
+	groupShow:"",       // 选中待会议的话机
+	selectNowCall: [],
+        selectRingCall: [],
       }
     },
     computed: {
@@ -126,6 +123,10 @@
       })
     },
     methods: {
+      reset(){
+    	this.selectPhone = []
+    	$('.onlineSelected').removeClass('onlineSelected').addClass('online')
+    },
       returnGroup(item){
       return item.groupid.some((it)=>{return it==this.groupShow})
     },
@@ -144,6 +145,9 @@
           return "calling"
           break
         case "register":
+          return "online"
+          break
+	case undefined:
           return "online"
           break
       }

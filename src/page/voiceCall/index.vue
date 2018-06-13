@@ -13,13 +13,6 @@
         </ul>
         <div data-name="con">
           <div class="moduleList " id="height01">
-             <div class="singleM "><!--video-camera：视频终端，phone：语音终端，left:被叫 right：主叫-->
-              <div class="moduleStyle  calling01 "><!--通话中-->
-                <div class="moduleNum"><i class="fa fa-video-camera" aria-hidden="true"></i>8001<i class="fa fa-arrow-left"></i><p>襄十分中心哎哟哎哟3车道</p></div>
-                <div class="moduleNum"><i class="fa fa-phone" aria-hidden="true"></i>7001<i class="fa fa-arrow-right"></i><p>襄十分中心哎哟哎哟3车道</p> </div>
-                <div class="moduleState">00:00:01<span class="fa fa-phone" aria-hidden="true"></span></div>
-              </div>
-            </div>
             <div class="singleM" v-for="item in deviceList">
               <div class="moduleStyle" :class="returnClass(item.deviceState)" @click.stop="itemClick($event, item)">
                 <div class="moduleNum"><i class="fa fa-video-camera" aria-hidden="true"></i>{{item.userID + " " + (item.name==null?"":item.name)}}</div>

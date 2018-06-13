@@ -625,8 +625,8 @@
                     let user = {}
                     user.conf_id = conference_data[0],
                     user.caller_id_number = conference_data[4],
-                    user.muted = "speak" in sound?false:true,
-                    user.deaf =  "hear"  in sound?false:true,
+                    user.muted = sound.findIndex((item)=>{return item =="speak"})==-1?true:false,
+                    user.deaf =  sound.findIndex((item)=>{return item =="hear"})==-1?true:false,
                     user.talking = false,
                     user.channel_uuid = conference_data[2],
                     user.key = conference_data[2] 
@@ -748,8 +748,8 @@
         }
         // 入栈
         if (callDirection == "inbound") {
-    
-        /*  if ('9000' == callerNumber && '9001' == calleeNumber && channelCallState == 'ringing') {
+
+          if ('9000' == callerNumber && '9001' == calleeNumber && channelCallState == 'ringing') {
             users.forEach(function(user) {
               if(user.operationState == 1) {
                 user.operationState = 0;
@@ -767,7 +767,7 @@
                 usersChanged = true;
               }
             })
-          } else */
+          }
           if (callerNumber == currentLoginUser.userID) {
             currentLoginUser.channelUUID = channelUUID;
             currentLoginUser.deviceState = channelCallState;

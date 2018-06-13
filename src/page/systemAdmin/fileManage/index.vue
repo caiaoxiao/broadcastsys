@@ -98,7 +98,7 @@
                  @click.stop="addBlur(file)"  value="添加到">
              <div>
               <div :class="songlist(songList.FolderID)" v-if="file.songListShow" v-for="songList in playList">
-                <span class="songlist(songList.FolderID)" value=songList.FolderName @click.self="addFileToPlaylist(file, songList)">{{songList.FolderName}}</option>
+                <span class="songlist(songList.FolderID)" value=songList.FolderName @click.self="addFileToPlaylist(file, songList)">{{songList.FolderName}}</span>
               </div>
              </div>
             </li>

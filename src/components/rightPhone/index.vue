@@ -44,12 +44,12 @@
           <div class="dialAction">
 
             <div 
-              :class ="!(flag_confleft || flag_callqueue)?'dial ring active':'dial ring disable'"
-	      @click ="!(flag_confleft || flag_callqueue)? makeCall():''" 
-	      @mouseup = "!(flag_confleft || flag_callqueue)? $btnMouseup($event) : ''" 
-	      @mousedown = "!(flag_confleft || flag_callqueue)? $btnMousedown($event) : ''" 
+              :class ="!(flag_confleft || flag_callqueue)?'dial ring active':(flag_call?'dial ring active':'dial ring disable')"
+	      @click ="!(flag_confleft || flag_callqueue)? makeCall():(flag_call?answerCall():'')" 
+	      @mouseup = "!(flag_confleft || flag_callqueue)? $btnMouseup($event) :(flag_call?$btnMouseup($event):'')" 
+	      @mousedown = "!(flag_confleft || flag_callqueue)? $btnMousedown($event) : (flag_call?$btnMousedown($event):'')" 
 		 >
-              <i :class="!(flag_confleft || flag_callqueue)? 'fa fa-phone fa-2x' : 'fa fa-microphone fa-2x'" aria-hidden="true"></i>
+              <i :class="!(flag_confleft || flag_callqueue)? 'fa fa-phone fa-2x' : (flag_call?'fa fa-phone fa-2x':'fa fa-microphone fa-2x')" aria-hidden="true"></i>
             </div>
             <div class="dial hangup" @click="hangupCall" @mousedown="$btnMousedown" @mouseup="$btnMouseup">挂断</div>
           </div>
@@ -86,6 +86,7 @@
 	flag_callqueue:false,
 	flag_confleft:false,
 	flag_confalarm:false,
+	flag_call:false,
 	nowCalling:""
 
       };
@@ -113,9 +114,14 @@
 	callQueue:function(callqueue)
 	{
 	if(callqueue.length>0 && (callqueue[callqueue.length-1].des=='9000') )
-           this.nowCalling = callqueue[0].des+"正在呼叫您，请及时接听"
-        else 
+	  {
+	   this.flag_call = true
+           this.nowCalling = callqueue[0].caller+"正在呼叫您，请及时接听"
+	  }
+        else{ 
 	   this.nowCalling = ""
+	   this.flag_call = false
+	}
 	if(callqueue.length>0){
          if(callqueue[0].caller =='9000' || callqueue[0].des =='9000')
                 this.flag_callqueue = true
@@ -199,15 +205,9 @@
         this.destination_number = this.destination_number + value;
       },
       answerCall(item, index) {
-        let type = true;
-        this.callQueue.forEach((c, i) => {
-          if (c.state == "answering") {
-            type = false;
-          }
-        })
-        if (type) {
-          this.callQueue[index].curCall.answer();
-        }
+          this.callQueue[this.callQueue.length-1].curCall.answer();
+	   this.nowCalling = ""
+	   this.flag_call = false
       },
       callDivert() {
         // 呼叫转移

@@ -23,45 +23,12 @@
               <li>
                 <p>{{ fileItem.FileName }}</p>
                 <ul class="musicListTools">
-                  <li><i class="fa fa-play-circle" aria-hidden="true"></i>试听</li>
-                  <li @click="upload(fileItem)"><i class="fa fa-cloud-download" aria-hidden="true"></i>下载</li>
                   <li @click="removeFile(songList, fileItem)"><i class="fa fa-times" aria-hidden="true"></i>移除</li>
                 </ul>
                 <span class="totalTime Grid-cell">05:12</span>
               </li>
-              <!-- <li>
-                 <p>噢噢噢噢.text</p>
-                 <ul class="musicListTools">
-                   <li><i class="fa fa-file-text-o" aria-hidden="true"></i>预览</li>
-                   <li><i class="fa fa-cloud-download" aria-hidden="true"></i>下载</li>
-                   <li><i class="fa fa-times" aria-hidden="true"></i>删除</li>
-                   <li>
-                     <i class="fa fa-plus" aria-hidden="true"></i>添加到
-                     <div>
-                       <span>歌单一</span>
-                       <span>歌单二</span>
-                       <span>歌单三</span>
-                     </div>
-                   </li>
-                 </ul>
-                 <span class="totalTime">05:12</span>
-               </li>-->
-
             </ul>
 
-          </div>
-          <div class='addFlies'>
-            <span @click="uploadFile(1, songList.FolderID)">
-              <i class='fa fa-file-o' aria-hidden='true' ></i>
-             
-               <input type="file" :class="songlist(songList.FolderID)"
-                     @change="uploadFileChange($event, songList.FolderID)"
-                     style="display: none;"
-                     accept="audio/*"
-                     value="">
-              添加文件
-            </span>
-            <span><i class='fa fa-folder-open-o' aria-hidden='true'></i>添加文件夹</span>
           </div>
         </div>
 
@@ -73,11 +40,19 @@
       <div class="menuType">
         <i class="fa fa-list-ul" aria-hidden="true"></i>默认列表
       </div>
-      <div class="tableTool Grid">
+     
+      <div class="addFiles">
+        <span @click="uploadFile">
+          <i class="fa fa-file-o" aria-hidden='true'></i>
+          <input type="file" class="uploadFiles" @change="uploadFileChange($event)" style="display: none;" accept="audio/*" value="">上传文件
+        </span>
+      </div>
+    <!--  <div class="tableTool Grid">
         <ul class="musicListTools Grid-cell">
           <li @click.stop="audition('')"><i class="fa fa-play-circle" aria-hidden="true"></i>试听</li>
           <li @click.stop="download('')"><i class="fa fa-cloud-download" aria-hidden="true"></i>下载</li>
           <li @click.stop="deleteFileList"><i class="fa fa-times" aria-hidden="true"></i>删除</li>
+          <li accept="audio/*"  @click.stop="uploadFileChange($event)"><i class="fa fa-cloud-download" aria-hidden="true"></i>上传</li>
           <li>
             <i class="fa fa-plus" ></i>
             <input type="button"
@@ -88,7 +63,7 @@
 
           </li>
         </ul>
-        <div class="operate Grid-cell">
+       <div class="operate Grid-cell">
           <form class="form-inline">
             <div class="form-group">
               <label>文件名</label>
@@ -100,7 +75,7 @@
             </div>
           </form>
         </div>
-      </div>
+      </div> -->
       <ul class="musicList" id="height09">
         <li class="Grid" :class="{selected: file.selected}"
             v-for="(file, index) in defaultList"  @click="fileClick(file,index)">
@@ -109,10 +84,13 @@
             <li v-if="file.MediaType == 3"  @click.stop="priview(file)">
               <i class="fa fa-file-text-o" aria-hidden="true"></i>预览
             </li>
-            <li @click="audition(file)" v-if="file.MediaType == 1">
+            <li @click="prePlay(file)" v-if="file.MediaType == 1">
               <i class="fa fa-play-circle" aria-hidden="true"></i>试听
             </li>
-            <li @click.stop="download(file)"><i class="fa fa-cloud-download" aria-hidden="true"></i>下载</li>
+            <li @click="stopMusic(file)" v-if="file.MediaType == 1">
+              <i class="fa fa-pause-circle" aria-hidden="true"></i>停止
+            </li>
+            <li @click.stop="download(file)"><i class="fa fa-cloud-download" aria-hidden="true"></i>下载</li> 
             <li @click.stop="deleteFile(file)"><i class="fa fa-times" aria-hidden="true"></i>删除</li>
             <li id="add">
               <i class="fa fa-plus" aria-hidden="true"></i>
@@ -160,7 +138,7 @@
         <button type="button" class="btn btn-info ">选择本地文件夹</button>
     </div>-->
 
-
+    <audio id="music"></audio>
     </div>
     <confirm-dialog @submit="confirm">
       <div slot="content">
@@ -261,7 +239,21 @@
         }
 
       },
+      prePlay(file) {
+        var audio = document.getElementById("music");
+        console.log(audio);
+        audio.src = file.MediaPath;
+        audio.play();
+        console.log(audio);
+      },
+      stopMusic(file) {
+        var audio = document.getElementById("music");
+        console.log(audio);
+        audio.currentTime = 0;
+        audio.pause();
+      },
       audition(file) {
+        console.log(this.defaultList[0].MediaPath);
         let playlist = this.$store.state.player.playlist
         if(file != '') {
           playlist.push(file)
@@ -279,6 +271,8 @@
           }
         }
       },
+      
+      // 新建歌单，歌单默认名字是新建歌单
       addSongList() {
         // 添加歌单
         let request = {
@@ -300,6 +294,7 @@
         })
       },
 
+      // 添加指定歌曲到指定歌单
       addFileToPlaylist(file, songList) {
         // 添加文件至歌单
         if(file == '') {
@@ -368,27 +363,27 @@
         this.dialogText = "您确定要删除此歌单吗?"
       },
 
-      uploadFile(type,item) {
-        /* type=1:点击文件上传，type=2:点击文件夹上传 */
-        
-        if(type == 1) {
+      uploadFile() {
           console.log("888888");
-          $('.' + item).click()
-        }else if(type == 2) {
+          $('.uploadFiles').click()
           console.log("999999");
-        }
       },
 
 
-      uploadFileChange(event, id) {
+      uploadFileChange(event) {
+        console.log(event);
+        console.log(event.target);
         // 监听上传文件事件
-      
-        let files = event.target.files
+        console.log("888888"); 
+        let files = event.target.files;
+        console.log(files);
         let request = new FormData();
-        if(!files[0]) {return}
-        request.append('folderId', id);
+        console.log("111111");
+      //  if(!files[0]) {return}
+       // request.append('folderId', id);
+        console.log("222222");
         request.append('file', files[0]);
-
+       console.log("999999");
         if(files.length != 0) {
           console.log("请选择文件")
           this.$ajax.post(`File/UploadFiles/${'133585596bb04c9cbe311d0859dd7196'}`, request)
@@ -499,6 +494,7 @@
 
       download(file) {
         // 下载文件
+        console.log(file.FileTime);
         if(file =='') {
           if(this.filePaths.length !=0) {
             this.filePaths.forEach(function(f,i) {

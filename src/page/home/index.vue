@@ -651,8 +651,8 @@
         }
         // 入栈
         if (callDirection == "inbound") {
-
-          if ('9000' == callerNumber && '9001' == calleeNumber && channelCallState == 'ringing') {
+    
+        /*  if ('9000' == callerNumber && '9001' == calleeNumber && channelCallState == 'ringing') {
             users.forEach(function(user) {
               if(user.operationState == 1) {
                 user.operationState = 0;
@@ -670,8 +670,8 @@
                 usersChanged = true;
               }
             })
-          }
-          else if (callerNumber == '9000') {
+          }*/
+          if (callerNumber == '9000') {
             currentLoginUser.channelUUID = channelUUID;
             currentLoginUser.deviceState = channelCallState;
             currentLoginUser.callDirection = callDirection;

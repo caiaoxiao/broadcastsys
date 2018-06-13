@@ -256,7 +256,7 @@
                             if(user.userID == args.data[1])  {
                                 user.deviceState = 'active'
 				user.calling = liveArrayObj.name.slice(0,liveArrayObj.name.indexOf('-'))
-				if(user.timer.clock == false){
+				                if(user.timer.clock == false){
                                 var t = setInterval(()=>{
                                  user.timer.s+=1
                                 if(user.timer.s>59.5){
@@ -266,7 +266,7 @@
                                   user.timer.m=0
                                   user.timer.h+=1}
                                   },1000)
-				user.timer.clock = true
+				                        user.timer.clock = true
                                 user.timer.id.push(t) 
 				}
                             }
@@ -345,7 +345,7 @@
 			{
 				arr.forEach(function(item,index){	
                                  if(item.key == args.key){
-				arr[index].conf_id  =  parseInt(args.data[0]).toString(),
+				                        arr[index].conf_id  =  parseInt(args.data[0]).toString(),
                                 arr[index].caller_id_number =  args.data[1],
                                 arr[index].muted =  data["audio"]["muted"],
                                 arr[index].deaf =   data["audio"]["deaf"],
@@ -462,7 +462,7 @@
                 user.groupid = []//this.usermap.hasOwnProperty(user.userID)?usermap[userID]:null
                 user.timer = {s:0,m:0,h:0,id:[],clock:false}
                 user.calling = null 
-		user.name = null 
+		            user.name = null 
                 deviceList.push(user)
               }/*
               else{
@@ -492,7 +492,6 @@
             .then(res => {
               if (res.data.code === 1) {
                   let group  = res.data.result.deviceGroups
-		  console.log(group)
                   group.forEach((r,i)=>{
                     if(this.usermap.hasOwnProperty(r.deviceCode)){
                       this.usermap[r.deviceCode].list.push(r.deviceGroupId)
@@ -527,7 +526,7 @@
                 user.oppoChannelUUID = null
                 user.groupid = this.usermap[item].list
                 user.type = this.usermap[item].type
-		user.name = this.usermap[item].name
+		            user.name = this.usermap[item].name
                 user.timer = {s:0,m:0,h:0,id:[],clock:false}
                 deviceList.push(user)
               }   
@@ -588,13 +587,87 @@
       handleGetCallOrRinging() {
         let _this = this;
         this.vertoHandle.sendMethod("jsapi",{command:"fsapi", data:{cmd:"show", arg:"channels as xml"}},
-          function(data) {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(data.message, "text/xml");
-            const msg = parseXML(doc);
+          (data) => {
+            const parser = new DOMParser()
+            const doc = parser.parseFromString(data.message, "text/xml")
+            const msg = parseXML(doc)
             if(msg != 0) {
-		console.log(msg)
-            }
+              let channel_data = msg.row
+              if(!(channel_data instanceof Array))
+                channel_data = [channel_data]
+              channel_data.forEach( (item,index) => {
+                if(item.application == 'conference'){
+                this.vertoHandle.sendMethod("jsapi",{command:"fsapi", data:{cmd:"conference", arg: item.application_data.slice(0,item.application_data.indexOf('+')) +" " + "list as xml"}},
+                  (data)=>{
+                    let application_des = ""
+                    let arr = []
+                    let conf_name = item.application_data.slice(0,item.application_data.indexOf('+'))
+                    switch(conf_name){
+                    case "9100-scc.ieyeplus.com":
+                      application_des = "setConfLeft"
+                      arr = this.$store.getters.confLeft
+                      break
+                    case "9110-scc.ieyeplus.com":
+                      application_des = "setConfAlarm"
+                      arr = this.$store.getters.confAlarm
+                      break
+                    case "9111-scc.ieyeplus.com":
+                      application_des = "setConfIpBoard"
+                      arr = this.$store.getters.confIpBoard
+                      break
+                    case "9112-scc.ieyeplus.com":
+                      application_des = "setConfMeeting"
+                      arr = this.$store.getters.confMeeting
+                      break
+                    }
+                    let conference_data = data.message.split(";")
+                    let sound  = conference_data[5].split("|")
+                    let user = {}
+                    user.conf_id = conference_data[0],
+                    user.caller_id_number = conference_data[4],
+                    user.muted = "speak" in sound?false:true,
+                    user.deaf =  "hear"  in sound?false:true,
+                    user.talking = false,
+                    user.channel_uuid = conference_data[2],
+                    user.key = conference_data[2] 
+                    arr.push(user)
+                    this.$store.dispatch(application_des,arr) 
+                })
+                } //会议channel需要单独处理
+              let deviceList = this.$store.getters.deviceList
+              deviceList.forEach((device,index) => {
+                  if(device.userID == item.presence_id.slice(0,item.presence_id.indexOf('@'))){
+                    if(item.callstate == "RINGING"  || item.callstate == "EARLY" || item.callstate =="RING_WAIT")
+                      device.deviceState = "ringing"
+                    else if(item.callstate == "ACTIVE"){
+                    device.deviceState = "active"
+                    device.channelUUID = item.call_uuid
+                    device.calling = item.sent_callee_num
+                    if(device.timer.clock == false){
+                      item.created = item.created.replace(/\-/g, "/")
+                      let time = new Date(item.created)
+                      let now = new Date()
+                      device.timer.h = parseInt(parseInt(now - time)/1000/60/60)
+                      device.timer.m = parseInt(parseInt(now - time - device.timer.h*1000*60*60)/1000/60)
+                      device.timer.s = parseInt(parseInt(now - time - device.timer.h*1000*60*60-device.timer.m*1000*60)/1000)
+                      var t = setInterval(()=>{
+                          device.timer.s+=1
+                          if(device.timer.s>59.5){
+                              device.timer.s=0
+                              device.timer.m+=1}
+                              if(device.timer.s>59.5 || device.timer.m>59){
+                                  device.timer.m=0
+                                  device.timer.h+=1}
+                                  },1000)
+                      device.timer.clock = true
+                      device.timer.id.push(t) 
+                      } //开启计时器
+                    } //通话状态
+                  } //遍历userid
+              }) //deviceList
+              this.$store.dispatch('setDeviceList',deviceList)
+              }) // 遍历启动的channel
+            } //msg
           }
         )
       },

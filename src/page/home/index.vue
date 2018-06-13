@@ -694,7 +694,7 @@
                 usersChanged = true;
               }
             })
-          }
+          } else */
           if (callerNumber == currentLoginUser.userID) {
             currentLoginUser.channelUUID = channelUUID;
             currentLoginUser.deviceState = channelCallState;

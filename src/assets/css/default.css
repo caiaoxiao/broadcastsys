@@ -777,12 +777,12 @@ ul.choose>li.on {
 }
 
 .calling {
-    background: #ff0000;
+    background: #DC143C;
 }
 
 .callingSelected {
     border: 1px solid #8C0000;
-    background: url(../img/jiaobiao02.fw.png) no-repeat right 46px #ff0000;
+    background: url(../img/jiaobiao02.fw.png) no-repeat bottom right #DC143C;
 }
 
 .waitting {
@@ -802,7 +802,7 @@ ul.choose>li.on {
 .moduleNum,
 .moduleKind,
 .moduleState {
-    height: 33.3333%;
+    height: 34%;
     padding: 2px 10px;
     position: relative;
 }
@@ -839,16 +839,16 @@ ul.choose>li.on {
 
 .moduleState span {
     margin-top: 5px;
-    color: #ff0000
+    color: #ff0000;
 }
-
+/*
 .calling .moduleState,
 .calling01 .moduleState {
     background-color: #8C0000;
     border-bottom-left-radius: 5px;
     border-bottom-right-radius: 5px;
 }
-
+*/
 .memberList {
     position: relative;
     height:100%;

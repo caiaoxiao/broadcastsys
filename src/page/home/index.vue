@@ -105,6 +105,7 @@
             onWSLogin(verto, success) {
               // 登录回调
               _this.refresh()
+	      _this.handleGetCallOrRinging()
               console.log('onWSLogin', success);
             },
             onWSClose(verto, success) {
@@ -592,6 +593,7 @@
             const doc = parser.parseFromString(data.message, "text/xml");
             const msg = parseXML(doc);
             if(msg != 0) {
+		console.log(msg)
             }
           }
         )
@@ -621,7 +623,7 @@
 	console.log(channelCallState)
         if (callerNumber == "0000000000") return;
 
-        if (channelCallState == "RINGING" || channelCallState == "EARLY") {
+        if (channelCallState == "RINGING" || channelCallState == "EARLY" || channelCallState == "RING_WAIT") {
           channelCallState = "ringing";
         } else if (channelCallState == "ACTIVE"){
           channelCallState = "active";

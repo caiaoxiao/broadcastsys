@@ -96,10 +96,6 @@
     mounted(){
     },
     watch: {
-	userDeflect:function(selected){
-	console.log("点选成功")
-	console.log(selected)
-	},
         callQueue:function(callqueue)
         {
         if(callqueue.length>0){

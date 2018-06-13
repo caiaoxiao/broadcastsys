@@ -274,20 +274,10 @@ export default {
       let users = this.deviceList
       let userChanged = false
       let select = this.selectNowCall[0]
-  
-
-      users.forEach(function (user) {
-        if (user.userID == select.userID) {
-          user.operationState = 1
-          userChanged = true
-        }
-      }
-      )
-
+     
       if (userChanged) this.$store.dispatch('setDeviceList', users)
-
       this.vertoHandle.newCall({
-        destination_number: '9001',
+        destination_number: '9001' + select.channelUUID,
         caller_id_name: '9000',
         caller_id_number: '9000',
         outgoingBandwidth: 'default',

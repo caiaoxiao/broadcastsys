@@ -57,3 +57,7 @@ vue.prototype.ifPlay = function(playState) {
       return 'fa fa-pause fa-2x';
   }
 }
+//
+vue.prototype.songlist = function(listid) {
+  return listid;
+}

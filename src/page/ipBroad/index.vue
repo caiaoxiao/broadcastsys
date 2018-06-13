@@ -415,9 +415,9 @@
         const laChannelName = this.getChannelName("liveArray");
         if(!this.confIpBoard.some((item,index)=>{return item.caller_id_number=='9000'})){ 
 	  //this.fsAPI('conference',this.name + ' ' + 'bgdial' + ' ' + "user/9000")
-	  this.vertoHandle.newCall({
+	 /* this.vertoHandle.newCall({
           // Extension to dial.
-          destination_number: '9113',
+          destination_number: '9111',
           caller_id_name: '9000',
           caller_id_number: '9000',
           outgoingBandwidth: 'default',
@@ -431,7 +431,7 @@
             useCamera: "any"
           }
           })  
-	 /*
+	 
 	 if(this.selectPhone.length>0)
           //  批量邀请设备开始会议
           this.selectPhone.forEach(function(s, i){

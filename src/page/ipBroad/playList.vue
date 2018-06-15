@@ -35,11 +35,11 @@
       </div>
     </div>
       <div class="textFlies"  v-show="tabType == '实时文本'" >
-        <textarea class="form-control" rows="7"></textarea>
+        <textarea v-model="text" class="form-control" rows="7"></textarea>
       </div>
 
     <div class="btnDiv">
-      <button type="button" class="btn btn-info" @click="play">OK,播放！</button>
+      <button type="button" class="btn btn-info" @click="play">播放</button>
       <button type="button" class="btn btn-default" @click="close">取消</button>
     </div>
   </div>

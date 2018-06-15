@@ -109,6 +109,7 @@
       play() {
 	if(this.text!=""){
 		this.fsAPI("conference", this.name +" " +  "say" + " " +  this.text)
+		this.text = ""
 	}
         this.$store.dispatch('setWhetherPlayAnotherSong','yes')
         

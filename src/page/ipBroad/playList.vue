@@ -1,10 +1,10 @@
 <template>
   <div class="module playMenu" id="music">
-    <ul class="nav nav-justified broadcast" data-name="title">
+    <ul class="nav nav-justified broadcast" data-name="title" @click="tabClick($event)">
       <li class="on">播放列表</li>
       <li >实时文本</li>
     </ul>
-    <div class="con" data-name="con">
+    <div class="con" v-show="tabType == '播放列表'">
       <div class="selection"  >
         <div class="menuType"><i class="fa fa-outdent" aria-hidden="true"></i>播放列表</div>
         <div id="songListHeight">
@@ -33,10 +33,10 @@
 
 
       </div>
-      <div class="textFlies"   >
+    </div>
+      <div class="textFlies"  v-show="tabType == '实时文本'" >
         <textarea class="form-control" rows="7"></textarea>
       </div>
-    </div>
 
     <div class="btnDiv">
       <button type="button" class="btn btn-info" @click="play">OK,播放！</button>
@@ -45,7 +45,6 @@
   </div>
 
 </template>
-
 <script>
   import {getHeight} from 'utils/height'
   import {getHeights} from 'utils/page/ipBroad'
@@ -64,6 +63,7 @@
         name: '9111'+'-'+window.location.hostname,
         selectPlayList: [],
         anotherSong: [],
+	text:"",
       }
     },
     created() {
@@ -104,9 +104,12 @@
       },
       tabClick(e) {
         this.tabType = e.target.innerText
+	console.log(this.tabType)
       },
       play() {
-        
+	if(this.text!=""){
+		this.fsAPI("conference", this.name +" " +  "say" + " " +  this.text)
+	}
         this.$store.dispatch('setWhetherPlayAnotherSong','yes')
         
         if(this.selectPhone.length!=0) {
@@ -130,7 +133,7 @@
            let _this = this;
            _this.fsAPI("conference"," " + _this.name + " " + "stop",function(res){console.log("qie ge")});
 
-           usera.Files.forEach(function(usern){
+           users.Files.forEach(function(usern){
              var x = usern.MediaPath.indexOf("IpBcFiles");
              var y = usern.MediaPath.substring(x);
              var z = "/var/lib/tomcat8/webapps/" + y;
@@ -173,5 +176,5 @@
 </script>
 
 <style type="text/scss" rel="stylesheet/scss" lang="scss">
-
+textarea{margin: 10px 0px;}
 </style>

@@ -1,6 +1,6 @@
 <template>
   <div >
-<left-phone  :select-phone="selectPhone" ></left-phone>
+ <left-phone  :select-phone="selectPhone" @reset='reset'></left-phone>
     <div class="middleCon">
 
       <div class="module">

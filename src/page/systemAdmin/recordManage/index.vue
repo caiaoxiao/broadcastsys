@@ -34,71 +34,97 @@
     <div class="table">
       <table class="table">
         <thead>
-        <tr >
-          <td>呼叫时间</td>
-          <td>主叫号码</td>
-          <td>被叫号码</td>
-          <td>通话时长（秒）</td>
-          <td>应答状态</td>
-          <td>录音</td>
-        </tr>
+          <tr >
+            <td>呼叫时间</td>
+            <td>主叫号码</td>
+            <td>被叫号码</td>
+            <td>通话时长（秒）</td>
+            <td>应答状态</td>
+            <td>录音</td>
+          </tr>
         </thead>
         <tbody>
-        <tr @click="TrClick(0)">
-          <td>2017-11-05 13:00:00</td>
-          <td>700</td>
-          <td>300</td>
-          <td>15</td>
-          <td>应答</td>
-          <td>11.MP3</td>
-        </tr>
-        <tr>
-          <td>2017-11-05 13:00:00</td>
-          <td>700</td>
-          <td>300</td>
-          <td>15</td>
-          <td>应答</td>
-          <td>11.MP3</td>
-        </tr>
-        <tr>
-          <td>2017-11-05 13:00:00</td>
-          <td>700</td>
-          <td>300</td>
-          <td>15</td>
-          <td>应答</td>
-          <td>11.MP3</td>
-        </tr>
-        <tr>
-          <td>2017-11-05 13:00:00</td>
-          <td>700</td>
-          <td>300</td>
-          <td>15</td>
-          <td>应答</td>
-          <td>11.MP3</td>
-        </tr>
+          <tr v-for="item in dataAll">
+            <td>{{item.startStamp}}</td>
+            <td>{{item.callerNumber}}</td>
+            <td>{{item.calleeNumber}}</td>
+            <td>{{item.duration}}</td>
+            <td>应答</td>
+            <td>
+              <button type="submit" @click="prePlay(item)" class="btn btn-sm btn-info" id="play"><i class="fa fa-play" aria-hidden="true"></i>播放</button>
+              <button type="submit" @click="stopRecord(item)" class="btn btn-sm btn-info"><i class="fa fa-pause" aria-hidden="true"></i>暂停</button>
+            </td>
+          </tr>
         </tbody>
       </table>
     </div>
-
+    <audio id="music"></audio>
   </div>
 </template>
 
 <script>
+  import { page } from 'components'
+  import { mapGetters, mapActions } from 'vuex'
   import { Button, Select } from 'element-ui'
   export default {
     data() {
       return {
         fileType: '通话录音',           // 默认文件类型
         formData: {
-          calledNumber: 2222,
+          calleeNumber: '',
           callNumber: '',
-          time: new Date()
-        }
+          startStamp: null,
+          endStamp: null,
+        },
+        dataAll: []
+      }
+    },
+    created() {
+     this.refresh()
+    },
+    computed: {
+      ...mapGetters({
+        pageData: 'pageData',
+      })
+    },
+    components: {
+      page
+    },
+    watch: {
+      'pageData.pageSize': function() {
+        this.refresh()
+      },
+      'pageData.pageIndex': function() {
+        this.refresh()
       }
     },
     methods: {
       refresh() {
-
+        this.formData = Object.assign( this.formData, this.pageData);
+        this.$ajax.post('CallRecord/List', this.formData)
+          .then(function(res) {
+            if(res.data.code == 1) {
+              this.dataAll = res.data.result
+              this.pageData.total = res.data.total
+            }
+          }.bind(this))
+      },
+      prePlay(item) {
+        var arr1 = item.startStamp.split("-");
+        var s1 = arr1[0]+arr1[1]+arr1[2];
+        var arr2 = s1.split(":");
+        var s2 = arr2[0]+arr2[1]+arr2[2];
+        var s3 = s2.replace(' ','');
+        var s4 = s3.substr(0,12);
+        var s5 = item.uuid.substr(1);
+        var s6 = s4 + s5;
+        var audio = document.getElementById("music");
+        audio.src = 'https://scc.ieyeplus.com:8443/IpBcFiles/recording/'+s6+'.mp3';
+        audio.play();
+        console.log(audio);
+      },
+      stopRecord(item) {
+        console.log("888888");
       },
       typeSwitch(e) {
         this.fileType = e.target.innerText

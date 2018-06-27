@@ -14,25 +14,25 @@
               <thead>
               <tr>
                 <td>预案名称</td>
-                <td>预约模式</td>
+                <!-- <td>预约模式</td> -->
                 <td>预约时间</td>
-                <td>播放模式</td>
-                <td>播放次数</td>
+                <!-- <td>播放模式</td>
+                <td>播放次数</td> -->
                 <td>播放终端</td>
-                <td>操作</td>
+                <!-- <td>操作</td> -->
               </tr>
               </thead>
-              <tbody v-if="planData.length != 0">
-              <tr @click="selectClick(index, plan)" v-for="(plan, index) in planData">
+              <tbody v-if="showPlanData.length != 0">
+              <tr @click="selectClick(index, plan)" v-for="(plan, index) in showPlanData">
                 <td>{{ plan.PlanName }}</td>
-                <td>{{ plan.PlanPreModel == 1 ? '定时预约' : ''}}</td>
+                <!-- <td>{{ plan.PlanPreModel == 1 ? '定时预约' : ''}}</td> -->
                 <td>{{ plan.PlanPreTime }}</td>
-                <td>{{ plan.PlanModel == 1 ? '循环播放' : '按次播放' }}</td>
-                <td>{{ plan.PlanTime }}</td>
-                <td>701</td>
-                <td>
+                <!-- <td>{{ plan.PlanModel == 1 ? '循环播放' : '按次播放' }}</td>
+                <td>{{ plan.PlanTime }}</td> -->
+                <td>9111</td>
+                <!-- <td>
                   <span @click.stop="nowPlay">立即播放</span>
-                </td>
+                </td> -->
               </tr>
               </tr>
               </tbody>
@@ -63,7 +63,9 @@
       return {
         editShow: false,    //编辑框显示或隐藏
         selectPlan: [],
-        planData: []
+        
+        xPlanData: [],
+        showPlanData: [],
       }
     },
     created() {
@@ -84,16 +86,48 @@
     },
     methods: {
       refresh() {
-        console.log("000000000000");
-        this.$ajax.post('Plan/List', {params: {PlanName: '333'}})
+        console.log("111111111111");
+        this.$ajax.get('QzTask/getAll')
           .then(res => {
             if(res.data.code == 1) {
               console.log("success");
-              this.planData = res.data.result
+              this.xPlanData = res.data.result
             }else {
               console.log("failed");
             }
           })
+          console.log(this.xPlanData[29]);
+        console.log("000000000000");
+        this.$ajax.post('Plan/List')
+          .then(res => {
+            if(res.data.code == 1) {
+              console.log("success");
+              this.showPlanData = res.data.result
+              console.log(res.data.result);
+              let i = 0;
+              let j = 0;
+              let sum = 1;
+              for( i = 1; i<res.data.result.length && res.data.result[i].PlanName == res.data.result[i-1].PlanName; i++) {
+                sum++;
+              }
+              for( i = 0, j = 0; i<res.data.result.length; i=i+sum,j++) {
+                this.showPlanData[j] = res.data.result[i]
+                if(i+sum == res.data.result.length) {
+                  console.log("77777777");
+                  console.log(j);
+                  this.showPlanData.splice(j+1,res.data.result.length-j-1)
+                }
+              }
+              // for( i = j; i<res.data.result.length; i++) {
+              //  this.showPlanData[i] = null
+              // } 
+              console.log("show2:"+this.showPlanData[9].PlanName);
+              
+            }else {
+              console.log("failed");
+            }
+          })
+         
       },
       selectClick(index, plan) {
         let target = $(".table>tbody>tr").eq(index)
@@ -119,14 +153,16 @@
         }
       },
       deleteItem() {
+        console.log(this.showPlanData[0].PlanName);
         if(this.selectPlan.length != 0) {
           this.$store.dispatch('setDialogShow', true)
         }
       },
       nowPlay() {
-
+        
       },
       confirm(){
+        console.log(this.showPlanData[0].planName);
         let ids = []
         this.selectPlan.forEach(function(s, i) {
           ids.push(s.PlanID)

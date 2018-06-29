@@ -155,7 +155,6 @@ export default {
                   }
                 })
               })
-              debugger
               this.formData.selectDeviceGroup = result
             }
           })

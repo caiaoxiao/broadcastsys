@@ -3,12 +3,30 @@
     <el-tree
       ref="tree"
       :data="data"
+      highlight-current 
       :props="defaultProps"
       :default-expanded-keys="defaultExpanded"
       node-key="OrganizationID"
-      :highlight-current="true"
       @node-click="handleNodeClick"
+      :render-content="renderContent"
     >
+	<span class="custom-tree-node" slot-scope="{ node, data }">
+	<span>{{node.label}}</span>
+        <span>
+          <el-button
+            type="text"
+            size="mini"
+            @click="() => append(data)">
+            <i class = " fa fa-plus"></i>
+          </el-button>
+          <el-button
+            type="text"
+            size="mini"
+            @click="() => remove(node, data)">
+            <i class = " fa fa-delete"></i>
+          </el-button>
+        </span>
+      </span>
     </el-tree>
   </div>
 </template>
@@ -51,11 +69,24 @@
         'TreeChange',
         'setInitData'
       ]),
+      renderContent(h, { node, data, store }) {
+        return (
+          <span class="custom-tree-node">
+	    <span>{node.label}</span>
+            <span>
+              <el-button size="mini" type="text" on-click=""><i class = " fa fa-plus"></i></el-button>
+              <el-button size="mini" type="text" on-click=""><i class = " fa fa-delete"></i></el-button>
+            </span>
+          </span>);
+      },
       refresh () {
-        this.$ajax.get(this.Api + 'Organization/Data/' + this.$store.state.user_info.user.organizationID)
+	console.log(this.$store.state.user_info.user.organizationID)
+	console.log(this.Api)
+        this.$ajax.get('https://scc.ieyeplus.com:8443/IpBc/' + 'Organization/Data/' + this.get_user_info.user.organizationID)
           .then((res) => {
             let data = res.data.result
             this.data = data
+	    console.log(data)
             // 初始化树对象
             this.$emit('setInitData', data[0])
             //  循环出默认展开项的ID
@@ -81,3 +112,17 @@
 
   };
 </script>
+<style scoped>
+.el-highlight-current .el-tree-node.is-current>.el-tree-node__content{background-color:#6F7882}
+.custom-tree-node {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    margin-left: 5px;
+  }
+i {
+    margin:0px 5px;
+}
+</style>

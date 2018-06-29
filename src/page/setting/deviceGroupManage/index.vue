@@ -119,6 +119,7 @@ export default {
               r.contenteditable = false
             })
             this.deviceGroupList = result
+	    console.log(this.deviceGroupList)
             this.refresh(result[0])
           }
         })

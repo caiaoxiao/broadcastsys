@@ -191,7 +191,7 @@
         }
         else if ($(target).hasClass('selected')){
             $(target).removeClass().addClass('unselected')
-            this.selectedAlarm.forEach(function(a,i){if(a.conf_id==item.conf_id) _this.selected.splice(i,1)})
+            this.selectedAlarm.forEach(function(a,i){if(a.conf_id==item.conf_id) _this.selected.slice(i,1)})
         }
 
             },

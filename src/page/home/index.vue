@@ -25,6 +25,7 @@
       this.$nextTick(()=> {
         // 初始化vertoHandle
         //if(this.vertoHandle==null)
+	  console.log(this.$store.state.user_info)
           $.verto.init({}, this.initVertoHandle);
         //else
         //  console.log('verto aleray not null')
@@ -42,7 +43,7 @@
         callQueue:'callQueue',
         confLeft:'confLeft',
         confAlarm:'confAlarm',
-	confIpBoard: 'confIpBoard'
+	confIpBoard: 'confIpBoard',
       }),
     },
     watch: {

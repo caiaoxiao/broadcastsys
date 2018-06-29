@@ -1531,7 +1531,14 @@ ul.statusTpye>li>span {
     top: 5px;
     right: 0px;
 }
-
+.table caption span{
+    text-size:20px;
+    color : #ffffff;
+}
+.table caption button{
+    float:right;
+    margin: 0px 2px;
+}
 .table div.p {
     float: left;
     margin: 5px 15px 0px 0px

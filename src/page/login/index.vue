@@ -89,6 +89,7 @@
         this.$ajax.get('User/Login', {params:this.formData})
           .then((res) => {
             if (res.data.code == 1) {
+	      console.log(res.data.result)
               this.set_user_info({
                 user: res.data.result,
                 login: true

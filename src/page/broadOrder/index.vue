@@ -86,18 +86,16 @@
     },
     methods: {
       refresh() {
-        console.log("111111111111");
         this.$ajax.get('QzTask/getAll')
           .then(res => {
             if(res.data.code == 1) {
               console.log("success");
               this.xPlanData = res.data.result
+              console.log("id:"+this.xPlanData[0].id);
             }else {
               console.log("failed");
             }
           })
-          console.log(this.xPlanData[29]);
-        console.log("000000000000");
         this.$ajax.post('Plan/List')
           .then(res => {
             if(res.data.code == 1) {
@@ -112,17 +110,11 @@
               }
               for( i = 0, j = 0; i<res.data.result.length; i=i+sum,j++) {
                 this.showPlanData[j] = res.data.result[i]
+                this.showPlanData[j].PlanPreTime = this.xPlanData[i].time
                 if(i+sum == res.data.result.length) {
-                  console.log("77777777");
-                  console.log(j);
                   this.showPlanData.splice(j+1,res.data.result.length-j-1)
                 }
               }
-              // for( i = j; i<res.data.result.length; i++) {
-              //  this.showPlanData[i] = null
-              // } 
-              console.log("show2:"+this.showPlanData[9].PlanName);
-              
             }else {
               console.log("failed");
             }
@@ -162,11 +154,26 @@
         
       },
       confirm(){
-        console.log(this.showPlanData[0].planName);
         let ids = []
+        let idx = []
+        let xxx = this.xPlanData;
+        console.log("0000");
         this.selectPlan.forEach(function(s, i) {
           ids.push(s.PlanID)
+          console.log("1111");
+          xxx.forEach(function(m, n) {
+            console.log("2222");
+            if(s.PlanPreTime == m.time) idx.push(m.id)
+          })
         })
+        this.$ajax.delete('QzTask/delete/idx')
+          .then(res => {
+            if(res.data.code == 1) {
+              console.log("delete success");
+            }else {
+              console.log("delete failed");
+            } 
+          })
         this.$ajax.post('Plan/RemoveList', ids)
           .then(res => {
             if(res.data.code == 1) {

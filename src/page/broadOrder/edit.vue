@@ -394,9 +394,7 @@
         this.dialogShow = false
       },
       submitPlan() {
-        console.log(this.formData.PlanPreTime.toString());
         this.xData.period = String(this.cycleIndex * 86400);
-        console.log(this.xData.period);
         let path = '';
         this.xData.time = this.formData.PlanPreTime.toString()
         this.xData.meeting = '9111'

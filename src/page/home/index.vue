@@ -22,7 +22,7 @@
       }
     },
     created() {
-      this.$nextTick(function() {
+      this.$nextTick(()=> {
         // 初始化vertoHandle
         //if(this.vertoHandle==null)
           $.verto.init({}, this.initVertoHandle);

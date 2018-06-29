@@ -781,8 +781,8 @@ ul.choose>li.on {
 }
 
 .callingSelected {
-    border: 1px solid #8C0000;
-    background: url(../img/jiaobiao02.fw.png) no-repeat right 46px #ff0000;
+    border: 1px solid #8c0000;
+    background-color: #ff0000;
 }
 
 .waitting {
@@ -802,8 +802,8 @@ ul.choose>li.on {
 .moduleNum,
 .moduleKind,
 .moduleState {
-    height: 33.3333%;
-    padding: 2px 10px;
+    height: 34%;
+    padding: 5px 10px;
     position: relative;
 }
 
@@ -812,7 +812,9 @@ ul.choose>li.on {
 .moduleState span {
     float: right
 }
-
+.moduleState img{
+    float: right
+}
 .moduleNum p {
     display: block;
     position: absolute;
@@ -839,14 +841,16 @@ ul.choose>li.on {
 
 .moduleState span {
     margin-top: 5px;
-    color: #ff0000
+    color: #ff0000;
 }
+.calling .moduleState{
+    background-color : #8c0000;
+    border-bottom-left-radius:5px;border-bottom-right-radius:5px;
+}
+.callingSelected .moduleState{
+    background: url(../img/jiaobiao02.fw.png) no-repeat bottom right #8c0000; 
+    margin-left:-1px;
 
-.calling .moduleState,
-.calling01 .moduleState {
-    background-color: #8C0000;
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
 }
 
 .memberList {
@@ -1649,7 +1653,7 @@ ul.statusTpye>li>span {
 
 .department ul>li {
     line-height: 35px;
-    padding: 0px 40px 0px 40px;
+    padding: 0px 15px 0px 15px;
     color: #fff;
     width: 100%;
 }

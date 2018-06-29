@@ -30,9 +30,9 @@ import 'assets/js/jquery.slimscroll.min'
 // 2.动态高度
 import 'assets/js/effect.js'
 // 3.小球飞入动画
-import 'assets/js/addList/addList'
-import 'assets/js/addList/requestAnimationFrame'
-import 'assets/js/addList/jquery_002'
+//import 'assets/js/addList/addList'
+//import 'assets/js/addList/requestAnimationFrame'
+//import 'assets/js/addList/jquery_002'
 // 4.引入滚动条插件
 import BScroll from 'better-scroll'
 // 5.引入verto相关js

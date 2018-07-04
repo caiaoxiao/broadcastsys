@@ -34,7 +34,7 @@
       </div>
     </div>
     <div class="btnDiv">
-      <button type="button" class="btn btn-sm btn-info" @click="submitFrom(self, modolType, 'User/Create', 'User/Edit', formData)">确定</button>
+      <button type="button" class="btn btn-sm btn-info" @click="submitFrom(self, modolType, 'User/Create', 'User/Edit', formData,1)">确定</button>
       <button type="button" class="btn btn-sm btn-default" @click="close">取消</button>
     </div>
   </div>
@@ -112,6 +112,9 @@ export default {
     },
     close () {
       this.$emit('close')
+    },
+    refresh () {
+      this.$emit('refresh')
     }
   }
 }

@@ -219,6 +219,7 @@ Vue.prototype.submitFrom = ((self, pid, CreatedApi, EditApi, formData, updateSta
             } else {
 
                 self.$AjaxPut(EditApi, formData, function(data) {
+		    console.log(data)
                     if (data.code != 0) {
                         self.$message.success("修改成功")
                         if (!updateState) {

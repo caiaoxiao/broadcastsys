@@ -8,25 +8,9 @@
       :default-expanded-keys="defaultExpanded"
       node-key="OrganizationID"
       @node-click="handleNodeClick"
+      :expand-on-click-node="false"
       :render-content="renderContent"
     >
-	<span class="custom-tree-node" slot-scope="{ node, data }">
-	<span>{{node.label}}</span>
-        <span>
-          <el-button
-            type="text"
-            size="mini"
-            @click="() => append(data)">
-            <i class = " fa fa-plus"></i>
-          </el-button>
-          <el-button
-            type="text"
-            size="mini"
-            @click="() => remove(node, data)">
-            <i class = " fa fa-delete"></i>
-          </el-button>
-        </span>
-      </span>
     </el-tree>
   </div>
 </template>
@@ -40,6 +24,23 @@
       Api: {
         type: String,
         default: ''
+      },
+      status:{
+        type: String
+      },
+      targetUserGroupId:{
+        type: String
+      },
+      users:{
+        type: Array
+      },
+      deviceGroupsDelete:{
+        type:Array
+      }
+    },
+    watch:{
+      targetUserGroupId:(targetUserGroupId)=>{
+        console.log(targetUserGroupId)
       }
     },
     data() {
@@ -69,24 +70,12 @@
         'TreeChange',
         'setInitData'
       ]),
-      renderContent(h, { node, data, store }) {
-        return (
-          <span class="custom-tree-node">
-	    <span>{node.label}</span>
-            <span>
-              <el-button size="mini" type="text" on-click=""><i class = " fa fa-plus"></i></el-button>
-              <el-button size="mini" type="text" on-click=""><i class = " fa fa-delete"></i></el-button>
-            </span>
-          </span>);
-      },
       refresh () {
-	console.log(this.$store.state.user_info.user.organizationID)
-	console.log(this.Api)
         this.$ajax.get('https://scc.ieyeplus.com:8443/IpBc/' + 'Organization/Data/' + this.get_user_info.user.organizationID)
           .then((res) => {
             let data = res.data.result
+            console.log(data)
             this.data = data
-	    console.log(data)
             // 初始化树对象
             this.$emit('setInitData', data[0])
             //  循环出默认展开项的ID
@@ -107,6 +96,104 @@
         // 提交树对象，以及当前点击树菜单的数据至仓库
         this.TreeChange({data, node})
       },
+      append(data,node) {
+            const newChild = { OrganizationID:data.OrganizationID,ChildNum: 0, OrgName:"新建组织机构", Children: [] };
+            if (!data.Children) {
+              this.$set(data, 'Children', []);
+            }
+            data.Children.push(newChild)
+            this.TreeChange({data, node})
+          
+      },
+      remove(node, data) {
+        let parent = node.parent
+        parent.data.Children.pop()
+        let request = []
+        this.users.forEach((element) => {
+          request.push(element.userID)
+        })
+        if(request.length>0) {
+        this.$ajax.post(`User/RemoveList`,request)
+        .then((res)=>{
+          if(res.data.code == 1){
+          this.$ajax.delete(`Organization/Remove/${data.OrganizationID}`)
+          .then((res)=>{
+            console.log(res)
+            if(res.data.code == 1){
+              console.log("组织机构删除成功")
+              if(this.targetUserGroupId!=""){
+              this.$ajax.delete(`Role/Remove/${this.targetUserGroupId}`)
+              this.$ajax.post(`DeviceGroup/RemoveList/${this.deviceGroupsDelete}`)
+              console.log("用户组,设备组删除成功")
+              this.$emit("refresh")
+              }
+              else
+              console.log("用户组删除失败")
+              }
+            })
+          }
+        })
+        }
+      else{
+        this.$ajax.delete(`Organization/Remove/${data.OrganizationID}`)
+          .then((res)=>{
+            if(res.data.code == 1){
+              console.log("组织机构删除成功")
+              if(this.targetUserGroupId!=""){
+              this.$ajax.delete(`Role/Remove/${this.targetUserGroupId}`)
+              console.log("用户组删除成功")
+              this.$emit("refresh")
+              }
+              else
+              console.log("用户组删除失败")
+              }
+            })
+      }
+      },
+      renameDeviceGroupList (event , data ,node) {
+      console.log("焦点转移绑定成功")
+      let text = event.target.textContent
+      let children = node.parent.data.Children
+      children[children.length-1].OrgName = text
+      //if (text !== '新建设备分组') {
+        this.$ajax.post('Organization/Create',{orgCode:"012345",OrgName:text,parentID:data.OrganizationID})
+        .then((res)=>{
+          console.log(res)
+          if(res.data.code == 1){
+            let organizationID = res.data.result.organizationID
+            data.OrganizationID = organizationID
+            let request = {
+              roleName: text,
+              childData: false
+            }
+            this.$ajax.post('Role/Create', request)
+            .then(res => {
+              console.log(res)
+              if (res.data.code === 1) {
+                let result = res.data.result
+                this.$emit("refresh")
+                }
+            })
+        }
+     })
+     event.target.contentEditable = "false"
+    },
+      renderContent(h, { node, data, store }) {
+        if(this.status=="change")
+        return (
+            <span class="custom-tree-node">
+            <span contenteditable = {node.label=='新建组织机构'?true:false}  onblur = {() => this.renameDeviceGroupList($event,data,node)} >  {node.label} </span>
+            <span>
+              <el-button size="mini" type="text" on-click={ () => this.append(data) }><i class = "fa fa-plus"></i></el-button>
+              <el-button size="mini" type="text" on-click={ () => this.remove(node, data) }><i class = "fa fa-minus"></i></el-button>
+            </span>
+          </span>)
+        else
+        return (
+          <span class="custom-tree-node">
+            <span>{node.label}</span>
+          </span>)
+      }
 
     },
 
@@ -122,6 +209,9 @@
     font-size: 14px;
     margin-left: 5px;
   }
+.operation{
+    float:right;
+}
 i {
     margin:0px 5px;
 }

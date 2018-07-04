@@ -261,7 +261,7 @@ ul.nav li {
 
 .content {
     width: 100%;
-    position: relative
+    position: relative;
 }
 
 @media(min-width:200px) {

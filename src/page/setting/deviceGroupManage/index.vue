@@ -50,6 +50,7 @@
 import { mapGetters } from 'vuex'
 import { GET_USER_INFO } from 'store/getters/type'
 import deviceList from './deviceList.vue'
+import {getHeights} from 'utils/page/setting'
 export default {
   computed: {
     ...mapGetters({
@@ -100,6 +101,10 @@ export default {
   },
   created () {
     this.initData()
+    this.$nextTick(()=> {
+        this.refresh()
+        getHeights()
+    })
   },
   methods: {
     // 添加分组事件

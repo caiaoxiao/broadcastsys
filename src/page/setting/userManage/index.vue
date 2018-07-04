@@ -3,17 +3,16 @@
     <div class="groupList">
       <div class="menuType">
         <i class="fa fa-list-ul" aria-hidden="true"></i>组织机构
+        <i id ="change" @click="changeStatus" class="fa fa-pencil" aria-hidden="true"></i> 修改
       </div>
-    <tree :addr="OrgUrl" ref="tree" :lable="labels" @setInitData="initDatas"></tree>
+      <tree :deviceGroupsDelete="deviceGroupsDelete" :users="dataAll" :targetUserGroupId ="targetUserGroupId" :status = status :addr="OrgUrl" ref="tree" :lable="labels" @setInitData="initDatas" @refresh="refresh"></tree>
     </div>
     <div class="singleDevice">
       <div class="tableTool">
-        <span><button type="submit" class="btn btn-sm btn-info" @click="openModal(0)">新增用户</button></span>
+        <span><button type="submit" class="btn btn-sm btn-info" @click="openModal(1 ,0)">新增用户</button></span>
         <div class="operate" >
-          <div class="menuType">
               <p @click="open">
-                <i class="fa fa-plus" aria-hidden="true"></i>添加设备组</p>
-          </div>
+                <button type="button" class="btn btn-sm btn-info" >添加设备组</button></p>
           <!--<button type="submit" class="btn btn-sm btn-info" @click="openModal(-1)">新增设备组</button>-->
           <!--<button type="submit" class="btn btn-sm btn-info" :disabled="batch_select.length === 0" @click="on_batch_del">
               <i class="fa fa-search" aria-hidden="true"></i>批量删除
@@ -21,8 +20,8 @@
         </div>
       </div>
       <div class="table">
+        <h3> 用户 </h3> 
         <table class="table">
-          <caption> <h3> 用户 </h3> </caption>
           <thead>
             <tr>
               <td>用户名</td>
@@ -37,8 +36,8 @@
               <td>{{ data.roleName }}</td>
               <td>{{ data.orgName }}</td>
               <td width="170">
-                <button type="button" class="btn btn-sm btn-info" @click="openModal(data.userID)">修改</button>
-                <button type="button" class="btn btn-sm btn-default" @click="deleteItem(data.userID)">删除</button>
+                <button type="button" class="btn btn-sm btn-info" @click="openModal( 1 ,data.userID)">修改</button>
+                <button type="button" class="btn btn-sm btn-default" @click="deleteUser(data.userID)">删除</button>
               </td>
             </tr>
           </tbody>
@@ -47,7 +46,7 @@
         <table class = "table" >
           <caption>
           <span> {{this.targetUserGroup}} </span>
-          <button type="button" class="btn btn-sm btn-info" @click="openModal(data.userID)">添加设备</button>
+          <button type="button" class="btn btn-sm btn-info" @click="openModal(-1 ,0)">添加设备</button>
           </caption>
           <thead>
             <tr>
@@ -65,7 +64,8 @@
                 {{ device.type == 0 ? '单话机' : '视频话机' }}
               </td>
               <td>
-                <button type="submit" class="btn btn-sm btn-default" @click="deleteItem(device.deviceId)">删除</button>
+                <button type="button" class="btn btn-sm btn-info" @click="openModal(-1 ,device.deviceId)">修改</button>
+                <button type="button" class="btn btn-sm btn-default" @click="deleteDevice(device.deviceId)">删除</button>
               </td>
             </tr>
           </tbody>
@@ -73,15 +73,13 @@
         <h3 v-if = "deviceGroups.length>0">设备组</h3>
         <table class = "table" v-for = "group in deviceGroups" >
           <caption> <span> {{group.name}} </span> 
-          <button type="submit" class="btn btn-sm btn-info" @click="editDeviceGroup(group.deviceGroupId)">添加设备</button>
-          <button type="submit" class="btn btn-sm btn-info" @click="deleteDeviceGroup(group.deviceGroupId)">删除</button>
+          <button type="button" class="btn btn-sm btn-info" @click="deleteDeviceGroup(group.deviceGroupId)">删除</button>
           </caption>
           <thead>
             <tr>
               <td>设备编号</td>
               <td>设备名称</td>
               <td>设备类型</td>
-              <td>操作</td>
             </tr>
           </thead>
           <tbody>
@@ -91,21 +89,17 @@
               <td>
                 {{ item.type == 0 ? '单话机' : '视频话机' }}
               </td>
-              <td>
-                <button type="button" class="btn btn-sm btn-info" @click="openModal(data.userID)">修改</button>
-                <button type="submit" class="btn btn-sm btn-default" @click="deleteItem(item.deviceId)">删除</button>
-              </td>
             </tr>
           </tbody>
       </table>
 
         <!--<paging></paging>-->
       </div>
-      <div v-if="modolType!=null && modolType >= 0">
-        <modal :targetMenu="targetMenu" :modolType='modolType' @close="closeModal"></modal>
+      <div v-if="modolType!=null && modolType >=0 ">
+        <modal :targetMenu="targetMenu" :modolType='modolType' @close="closeModal" @refresh="refresh"></modal>
       </div>
-      <div v-if="modolType == -1">
-        <add :targetMenu="targetMenu" :modolType='modolType' @close="closeModal"></add>
+      <div v-if="modolType!=null && modolType < 0">
+        <edit :transferdata="transferdata" :modolType='modolType' @close="closeModal" @refresh="refresh"></edit>
       </div>
     </div>
     <device-list :targetMenu='targetMenu' @transferData='transferData' ref="deviceList" v-show="showDeviceList" @close="close"></device-list>
@@ -117,7 +111,7 @@ import { mapGetters } from 'vuex'
 import tree from '../structureTree/index.vue'
 import paging from '../paging/index.vue'
 import modal from './modal.vue'
-import add from './addDeviceGroup.vue'
+import edit from  './edit.vue'
 import {getHeights} from 'utils/page/setting'
 import { GET_USER_INFO } from 'store/getters/type'
 const labels = {
@@ -134,6 +128,7 @@ export default {
   },
   data () {
     return {
+      status:"change",
       showDeviceList: false,
       labels,
       selectUser: [],
@@ -144,22 +139,25 @@ export default {
       modolType: null,
       targetUserGroup:null,
       allDevices:[],
-      targetUserGroupId:""
+      targetUserGroupId:"",
+      transferdata: {deviceId: '' ,targetMenuId:'' },
+      deviceGroupsDelete:[]
     }
   },
   watch: {
     'TreeData': {
       handler: function (data) {
         this.targetMenu = data
+        this.transferdata.targetMenuId = data.OrganizationID
         this.targetUserGroup = data.OrgName
+        this.modolType =  null
         /*this.deviceGroups.forEach(
           (item,index)=>{
             this.deviceGroups.splice(index,1)
           }
         )*/
-        this.$nextTick(function () {
-            this.refresh()
-            getHeights()
+        this.$nextTick(function (){
+        this.refresh()
         })
       },
       deep: true
@@ -173,20 +171,21 @@ export default {
       }
       this.$store.state.updateState = 0
     },
-    'deviceGroups':(data)=>{
-	console.log(data)}
   },
   components: {
     tree,
     modal,
     paging,
-    add,
     deviceList,
+    edit,
   },
   created () {
-    this.refresh()
+    this.$nextTick(()=> {
+    	this.refresh()
+    	getHeights()
+        })
+    this.targetUserGroup = this.$store.state.user_info.user.OrgName
     this.OrgUrl = 'Organization/TreeRoot/' + this.$store.state.user_info.user.organizationID
-     getHeights()
   },
   methods: {  //  组织机构树默认选中
     initDatas (data) {
@@ -237,6 +236,7 @@ export default {
                   .then((res) => {
                       for (let i = 0 ; i<length ; i++){
                         this.deviceGroups.push(res[i].data.result)
+                        deviceGroupsDelete.push(res[i].data.result.deviceGroupId)
                       }
                })
             }
@@ -246,21 +246,38 @@ export default {
           }
         })
     },
-    openModal (id) {
+    openModal (status , id) {
       // 编辑或新增
-      if (id === -1)
-	this.modolType = -1
-      else if (id === 0) {
+      if (status == 1){
+       if (id === 0) {
         this.modolType = 0
       } else {
         this.modolType = 1
         this.targetMenu.userId = id
       }
+      }
+        if (status == -1){
+       if (id === 0) {
+        this.modolType = -1
+      } else {
+        this.modolType = -2
+        this.transferdata.deviceId = id
+      }
+      }
     },
     closeModal () {
       this.modolType = null
     },
-    deleteItem (userId) {
+    deleteDevice (deviceId){
+      this.$ajax.post('Device/RemoveList', [deviceId])
+        .then(res => {
+          if (res.data.code === 1) {
+            console.log('删除成功')
+            this.refresh()
+          }
+        })
+    },
+    deleteUser (userId) {
       this.$ajax.delete(`User/Remove/${userId}`)
         .then(res => {
           if (res.data.code === 1) {
@@ -306,8 +323,25 @@ export default {
           }
       })
       
-    }
+    },
+
+  editDeviceGroup(deviceGroupId){
+      this.showDeviceList = true
+      $('.singleDevice').removeClass('moveRightMiddle').addClass('moveLeftMiddle')
+      $('.allDevice').removeClass('moveRightDev').addClass('moveLeftDev')
+  
+  },
+  changeStatus(){
+    if(this.status == "show")
+    this.status = "change"
+    else
+    this.status = "show"
+  },
+
   }
 }
+
 </script>
+<style  scoped>
+</style>
 

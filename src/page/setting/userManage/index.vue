@@ -128,7 +128,7 @@ export default {
   },
   data () {
     return {
-      status:"change",
+      status:"show",
       showDeviceList: false,
       labels,
       selectUser: [],
@@ -236,7 +236,7 @@ export default {
                   .then((res) => {
                       for (let i = 0 ; i<length ; i++){
                         this.deviceGroups.push(res[i].data.result)
-                        deviceGroupsDelete.push(res[i].data.result.deviceGroupId)
+                        this.deviceGroupsDelete.push(res[i].data.result.deviceGroupId)
                       }
                })
             }
@@ -344,4 +344,5 @@ export default {
 </script>
 <style  scoped>
 </style>
+
 

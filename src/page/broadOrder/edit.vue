@@ -49,7 +49,7 @@
 
           <div>
             <div class="textFlies">
-              <textarea class="form-control" v-model="formData.PlanActualTxt"  id="textarea01"></textarea>
+              <textarea class="form-control" v-model="xData.path"  id="textarea01"></textarea>
 
             </div>
           </div>
@@ -122,27 +122,26 @@
           </el-date-picker>
         </div>
       </div>
+   
       <div class="settingMoudle">
-        <div class="settingTitle">预约模式</div>
-        <div class="settingCon">
-          <span class="moudle moudleSelected">定时播放</span>
-          <span class="moudle">XX播放</span>
-        </div>
-      </div>
-      <div class="settingMoudle">
-        <div class="settingTitle">播放次数</div>
+        <div class="settingTitle">循环周期</div>
         <div class="settingCon">
           <span class="times" @click="subtract">-</span>
           <input type="text" v-model="cycleIndex" class="cycleIndex"/>
           <span class="times" @click="add">+</span>
+          <span>天</span>
         </div>
 
       </div>
       <div class="settingMoudle">
-        <div class="settingTitle">播放模式</div>
+        <div class="settingTitle">播放文件类型</div>
         <div class="settingCon">
-          <span class="moudle moudleSelected">循环播放</span>
-          <span class="moudle">单次播放</span>
+          <span class="moudle"
+                :class="xData.cmdtype==1 ? 'moudleSelected' : ''"
+                @click="textPlay">文本播放</span>
+          <span class="moudle"
+                :class="xData.cmdtype==2 ? 'moudleSelected' : ''"
+                @click="musicPlay">音乐播放</span>
         </div>
       </div>
     </div>
@@ -187,11 +186,17 @@
           deviceId: '1005',
           FeatureBases: [],
           FeatureCode: [],
-          FeatureBaseID: 'zhangwei'
-
-
-
         },
+
+        selectSongList: [],
+        xData: {
+          path: '',
+          time: '',
+          meeting: '',
+          cmdtype: 0,
+          period: '',
+        },
+
         dialogShow: false,
         dialogText: null,
       }
@@ -299,6 +304,12 @@
 
         _this.deviceList = Object.assign([], deviceList)
       },
+      textPlay() {
+        this.xData.cmdtype = 1
+      },
+      musicPlay() {
+        this.xData.cmdtype = 2
+      },
       subtract() {
         if(this.cycleIndex > 0) {
           this.cycleIndex = this.cycleIndex -1
@@ -310,15 +321,29 @@
         }
       },
       selectSonglist(songlist){
+
+
         if(!songlist.selected) {
-          this.formData.Files.push(songlist)
+            
+           songlist.Files.forEach(function(c,i) {
+            this.formData.Files.push(c);
+            this.selectSongList.push(c);
+           }.bind(this))
+           
         }else {
+          this.selectSonglist.forEach(function(c,i) {
+            if(songlist.FolderID == c.FolderID) {
+              this.selectSongList.splice(i, 1)
+            }
+          }.bind(this))
           this.formData.Files.forEach(function(c,i) {
             if(songlist.FolderID == c.FolderID) {
               this.formData.Files.splice(i, 1)
             }
           }.bind(this))
         }
+
+ 
         songlist.selected = !songlist.selected
       },
       selectItem(device) {
@@ -369,40 +394,56 @@
         this.dialogShow = false
       },
       submitPlan() {
+        console.log(this.formData.PlanPreTime.toString());
+        this.xData.period = String(this.cycleIndex * 86400);
+        console.log(this.xData.period);
+        let path = '';
+        this.xData.time = this.formData.PlanPreTime.toString()
+        this.xData.meeting = '9111'
+        console.log(this.xData.type);
+        if(this.xData.cmdtype == 2) {
+           this.selectSongList.forEach(function(c,i) {
+             path = path + ' ' + c.MediaPath
+           }.bind(this))
+           this.xData.path = path
+        }
+        this.$ajax.post('QzTask/add',this.xData)
+          .then((res) => {
+            if(res.data.code == 1) {
+              console.log(res.data.result.id)
+              this.$ajax.get('https://scc.ieyeplus.com:8082/api/scheds/'+res.data.result.id)
+            }else {
+            }
+          })
         // 提交预案
         if(this.formData.PlanName == ''){
           this.dialogText = '预案名称不能为空'
           this.dialogShow = true
         }else {
-          if(this.formData.Files.length == 0 && this.formData.PlanActualTxt == ''){
+          if(this.xData.path == ''){
             this.dialogText = '歌单选择或者实时文本输入不能为空'
             this.dialogShow = true
           }else {
-            if(this.selectDevice.length == 0) {
-              this.dialogText = '要播放的设备不能为空'
-              this.dialogShow = true
-            }else {
               this.selectDevice.forEach(function(s,i) {
-
-                s.FeatureCode = s.userID
-                s.FeatureBaseID = 'zhangwei'
+                s.deviceId = s.userID;
               }.bind(this))
               this.formData.FeatureBases = this.selectDevice
-              console.log("777777"); 
-             // this.fsAPI('originate', 'user/1009 &playback(${this.formData.Files[0].Files[0].MediaPath})',()=>{
-
+              console.log("777777");
+              console.log(this.formData.Files[0]); 
                 this.$ajax.post('Plan/Create', this.formData)
                   .then((res) => {
                     if(res.data.code == 1) {
-                      console.log("success")
+                      console.log("success"); 
+                      console.log(res.data.result.planID);
+                      this.$ajax.post(''+res.data.result.planID) 
                       this.$emit('close',1)
                     }else {
-                      console.log("新增失败")
+                      console.log(res)
                     }
                   })
-            //  })
+         
 
-            }
+            
           }
         }
       },

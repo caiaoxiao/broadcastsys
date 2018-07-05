@@ -98,6 +98,7 @@
           .then(function(res) {
             if (res.data.code == 1) {
               this.dataAll = res.data.result
+              console.log(this.dataAll[0]);
               this.pageData.total = res.data.total
             }
           }.bind(this))

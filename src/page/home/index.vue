@@ -3,6 +3,8 @@
     <topMenu></topMenu>
     <container></container>
     <footNav></footNav>
+    <switch-left></switch-left>
+    <tree-list></tree-list>
   </div>
 </template>
 
@@ -10,22 +12,25 @@
   import parseXML from 'utils/xml_parser';
   import { mapGetters,mapActions } from 'vuex'
   import {isArray,isObject,isString} from 'utils/tool'
-  import { topMenu, footNav, container } from 'components'
+  import { topMenu, footNav, container,treeList,switchLeft } from 'components'
+  import {getHeights} from 'utils/page/home'
   export default {
     data () {
       return {
         liveArray:{},
         vertoConf:{},
         group_list:[],
-	usermap:{},
-	last_id:"",	
+	      usermap:{},
+	      last_id:"",	
+        targetUserGroupId:"",
       }
     },
     created() {
       this.$nextTick(()=> {
         // 初始化vertoHandle
         //if(this.vertoHandle==null)
-	  console.log(this.$store.state.user_info)
+	  getHeights()
+	      console.log(this.$store.state.user_info)
           $.verto.init({}, this.initVertoHandle);
         //else
         //  console.log('verto aleray not null')
@@ -43,18 +48,20 @@
         callQueue:'callQueue',
         confLeft:'confLeft',
         confAlarm:'confAlarm',
-	confIpBoard: 'confIpBoard',
+	      confIpBoard: 'confIpBoard',
+	      TreeData:'TreeData'
       }),
     },
     watch: {
+      'TreeData':function(data){this.$nextTick(()=> {this.refresh() })},
       'callQueue':function(conf) { 
 	},
       'confAlarm': function(conf) {
         if(conf.length>0 && !conf.some(function(item,indexs,array){return item.caller_id_number=='9000'}))
         {
-	if(this.callQueue.some(function(item,index,array){return  item.des=='9000'}))
-	 this.vertoHandle.hangup()
-	 this.vertoHandle.newCall({
+          if(this.callQueue.some(function(item,index,array){return  item.des=='9000'}))
+          this.vertoHandle.hangup()
+          this.vertoHandle.newCall({
           // Extension to dial.
           destination_number: '9110',
           caller_id_name: "LegalHigh",
@@ -481,60 +488,77 @@
 
                 }*/
             })	
-	    this.$ajax.post('DeviceGroup/List')
-        .then(res => {
-          if (res.data.code === 1) {
-            this.group_list = res.data.result
-            for(let g in this.group_list)
-              this.group_list[g].selected = false
-            this.$store.dispatch('setUserGroup',this.group_list)
-            this.group_list.forEach((item,index) => {
-            this.$ajax.get(`DeviceGroup/Detail/${item.deviceGroupId}`)
-            .then(res => {
-              if (res.data.code === 1) {
-                  let group  = res.data.result.deviceGroups
-                  group.forEach((r,i)=>{
-                    if(this.usermap.hasOwnProperty(r.deviceCode)){
-                      this.usermap[r.deviceCode].list.push(r.deviceGroupId)
-                      this.usermap[r.deviceCode].type =r.type
-		      this.usermap[r.deviceCode].name = r.deviceName
-                    }
-                    else{
-                      this.usermap[r.deviceCode] = {}
-                      this.usermap[r.deviceCode].list = [r.deviceGroupId]
-                      this.usermap[r.deviceCode].type =r.type
-		      this.usermap[r.deviceCode].name = r.deviceName
-                    }
+                  this.$ajax.post(`Role/List`)
+                    .then((res) => {
+                      if (res.data.code === 1) {
+                        let groupList = res.data.result
+                        this.targetUserGroupId = ""
+                        groupList.forEach(element => {
+                          if(element.roleName == this.TreeData.OrgName){
+                            this.targetUserGroupId = element.roleID
+                          }
+                  if(this.targetUserGroupId!="")
+                      this.$ajax.get(`Role/getDeviceGroup/${this.targetUserGroupId}`)
+                        .then((res) => {
+                      if (res.data.code === 1) {
+                        this.group_list = res.data.result
+                        for(let g in this.group_list)
+                          this.group_list[g].selected = false
+                        this.$store.dispatch('setUserGroup',this.group_list)
+                        this.group_list.forEach((item,index) => {
+                        this.$ajax.get(`DeviceGroup/Detail/${item.deviceGroupId}`)
+                        .then(res => {
+                          if (res.data.code === 1) {
+                              let group  = res.data.result.deviceGroups
+                              group.forEach((r,i)=>{
+                                if(this.usermap.hasOwnProperty(r.deviceCode)){
+                                  this.usermap[r.deviceCode].list.push(r.deviceGroupId)
+                                  this.usermap[r.deviceCode].type =r.type
+                              this.usermap[r.deviceCode].name = r.deviceName
+                                }
+                                else{
+                                  this.usermap[r.deviceCode] = {}
+                                  this.usermap[r.deviceCode].list = [r.deviceGroupId]
+                                  this.usermap[r.deviceCode].type =r.type
+                                  this.usermap[r.deviceCode].name = r.deviceName
+                                }
+                              })
+                            }
+                        for(let index in deviceList){
+                          if(this.usermap.hasOwnProperty(deviceList[index].userID)){
+                            deviceList[index].groupid =  this.usermap[deviceList[index].userID].list
+                            deviceList[index].type =  this.usermap[deviceList[index].userID].type
+                            deviceList[index].name = this.usermap[deviceList[index].userID].name
+                            delete this.usermap[deviceList[index].userID] }
+                        }
+                        for(let item in this.usermap){
+                          let user = {}
+                            user.deviceState = "unregistered"
+                            user.calling = ""
+                            user.userID = item
+                            user.callDirection = null
+                            user.channelUUID = null
+                            user.networkIP = null
+                            user.networkPort = null
+                            user.operationState = 0
+                            user.oppoChannelUUID = null
+                            user.groupid = this.usermap[item].list
+                            user.type = this.usermap[item].type
+                            user.name = this.usermap[item].name
+                            user.timer = {s:0,m:0,h:0,id:[],clock:false}
+                            deviceList.push(user)
+                                  }   
+                              })
+                          })
+                        }
+                    })
+                else
+                {
+                  this.$store.dispatch('setUserGroup',[])
+                }
                   })
                 }
-             for(let index in deviceList){
-              if(this.usermap.hasOwnProperty(deviceList[index].userID)){
-                deviceList[index].groupid =  this.usermap[deviceList[index].userID].list
-                deviceList[index].type =  this.usermap[deviceList[index].userID].type
-	        deviceList[index].name = this.usermap[deviceList[index].userID].name
-                delete this.usermap[deviceList[index].userID] }
-             }
-             for(let item in this.usermap){
-               let user = {}
-                user.deviceState = "unregistered"
-                user.calling = ""
-                user.userID = item
-                user.callDirection = null
-                user.channelUUID = null
-                user.networkIP = null
-                user.networkPort = null
-                user.operationState = 0
-                user.oppoChannelUUID = null
-                user.groupid = this.usermap[item].list
-                user.type = this.usermap[item].type
-		            user.name = this.usermap[item].name
-                user.timer = {s:0,m:0,h:0,id:[],clock:false}
-                deviceList.push(user)
-              }   
-          })
-       })
-    }
-})
+            })
           this.$store.dispatch('setDeviceList',deviceList)
           }.bind(this),function(data) {
             console.log("error:"+data)
@@ -831,7 +855,9 @@
     components: {
       topMenu,
       footNav,
-      container
+      container,
+      switchLeft,
+      treeList
     }
   }
 </script>

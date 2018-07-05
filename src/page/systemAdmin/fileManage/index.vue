@@ -371,25 +371,18 @@
 
 
       uploadFileChange(event) {
-        console.log(event);
-        console.log(event.target);
         // 监听上传文件事件
         console.log("888888"); 
         let files = event.target.files;
-        console.log(files);
         let request = new FormData();
-        console.log("111111");
-      //  if(!files[0]) {return}
-       // request.append('folderId', id);
-        console.log("222222");
         request.append('file', files[0]);
-       console.log("999999");
         if(files.length != 0) {
           console.log("请选择文件")
           this.$ajax.post(`File/UploadFiles/${'133585596bb04c9cbe311d0859dd7196'}`, request)
             .then(res => {
               if(res.data.code == 1) {
-                console.log("上传成功")
+                console.log("上传成功");
+                console.log(res.data); 
                 this.refresh()
 
               }

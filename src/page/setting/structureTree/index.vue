@@ -156,7 +156,7 @@
       let children = node.parent.data.Children
       children[children.length-1].OrgName = text
       //if (text !== '新建设备分组') {
-        this.$ajax.post('Organization/Create',{orgCode:"012345",OrgName:text,parentID:data.OrganizationID})
+        this.$ajax.post('Organization/Create',{orgCode:data.OrganizationID.slice(-4,)+String(children.length),OrgName:text,parentID:data.OrganizationID})
         .then((res)=>{
           console.log(res)
           if(res.data.code == 1){

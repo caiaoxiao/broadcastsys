@@ -20,29 +20,6 @@
   import {GET_USER_INFO} from 'store/getters/type'
 
   export default {
-    props: {
-      Api: {
-        type: String,
-        default: ''
-      },
-      status:{
-        type: String
-      },
-      targetUserGroupId:{
-        type: String
-      },
-      users:{
-        type: Array
-      },
-      deviceGroupsDelete:{
-        type:Array
-      }
-    },
-    watch:{
-      targetUserGroupId:(targetUserGroupId)=>{
-        console.log(targetUserGroupId)
-      }
-    },
     data() {
       return {
         data: [],
@@ -78,6 +55,7 @@
             this.data = data
             // 初始化树对象
             this.$emit('setInitData', data[0])
+            this.TreeChange({data:data[0],node:{}})
             //  循环出默认展开项的ID
             for(let i in data) {
               this.defaultExpanded.push(data[i]['OrganizationID'])

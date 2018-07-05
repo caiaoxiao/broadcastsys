@@ -202,8 +202,10 @@ export default {
       this.userGroup.forEach((r, i) => {
               r.selected = false
             })
+      if(item){
       item.selected = true
       this.groupShow = item.deviceGroupId
+     }
     },
     itemClick (e, row) {
       let target = e.currentTarget

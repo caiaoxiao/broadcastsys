@@ -49,6 +49,7 @@
   }
 </script>
 <style scoped>
+.content{overflow-y:auto;}
 ::-webkit-scrollbar{
   width: 5px;
   background: #4E545A

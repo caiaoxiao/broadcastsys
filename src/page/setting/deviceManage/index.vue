@@ -98,6 +98,7 @@ export default {
         .then(res => {
           if (res.data.code === 1) {
             let data = res.data.result
+	    console.log(data)
             let axios = []
             data.forEach((device)=>{
               axios.push(this.$ajax.get(`Feature/Detail/${device.deviceId}`))
@@ -105,8 +106,10 @@ export default {
             this.$ajax.all(axios)
                   .then((res) => {
                       for (let i = 0 ; i< res.length ; i++){
+			if(res[i].data.result!=null)
                         data[i].OrganizationID = res[i].data.result.organizationId
                       }
+		    console.log(data)
                     this.dataAll = data
                })
           }

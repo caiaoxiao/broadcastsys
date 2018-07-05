@@ -157,23 +157,39 @@
         let ids = []
         let idx = []
         let xxx = this.xPlanData;
+	console.log(xxx);
         console.log("0000");
         this.selectPlan.forEach(function(s, i) {
           ids.push(s.PlanID)
           console.log("1111");
           xxx.forEach(function(m, n) {
             console.log("2222");
+            console.log(typeof(m.id));
             if(s.PlanPreTime == m.time) idx.push(m.id)
           })
         })
-        this.$ajax.delete('QzTask/delete/idx')
-          .then(res => {
-            if(res.data.code == 1) {
-              console.log("delete success");
-            }else {
-              console.log("delete failed");
-            } 
-          })
+        console.log("ids:"+ids);
+        console.log("idx:"+idx)
+        this.$ajax.get("https://scc.ieyeplus.com:8082/api/examples/1")
+        let _this = this
+        
+        idx.forEach(function(s, i) {
+          console.log("qwer")
+          _this.$ajax.get("https://scc.ieyeplus.com:8082/api/deletescheds/"+s)
+            .then(res => {
+              console.log(11111111111111111111111111111);    
+            })
+          console.log("asdf")
+        
+          _this.$ajax.delete('QzTask/delete/'+s)
+            .then(res => {
+              if(res.data.code == 1) {
+                console.log("delete success");
+              }else {
+                console.log("delete failed");
+              } 
+           })
+        })  
         this.$ajax.post('Plan/RemoveList', ids)
           .then(res => {
             if(res.data.code == 1) {

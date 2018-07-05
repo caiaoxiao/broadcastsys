@@ -40,20 +40,20 @@
             <td>被叫号码</td>
             <td>通话时长（秒）</td>
             <td>应答状态</td>
-            <td>录音</td>
+            <!--    <td>录音</td> -->
           </tr>
         </thead>
         <tbody>
-          <tr v-for="item in dataAll">
+          <tr @click="selectClick(item, index)" v-for="(item, index) in dataAll">
             <td>{{item.startStamp}}</td>
             <td>{{item.callerNumber}}</td>
             <td>{{item.calleeNumber}}</td>
             <td>{{item.duration}}</td>
             <td>应答</td>
-            <td>
+            <!--    <td>
               <button type="submit" @click="prePlay(item)" class="btn btn-sm btn-info" id="play"><i class="fa fa-play" aria-hidden="true"></i>播放</button>
               <button type="submit" @click="stopRecord(item)" class="btn btn-sm btn-info"><i class="fa fa-pause" aria-hidden="true"></i>暂停</button>
-            </td>
+            </td>   -->
           </tr>
         </tbody>
       </table>
@@ -85,6 +85,7 @@
     computed: {
       ...mapGetters({
         pageData: 'pageData',
+        mediaPath: 'mediaPath',
       })
     },
     components: {
@@ -108,6 +109,27 @@
               this.pageData.total = res.data.total
             }
           }.bind(this))
+      },
+      selectClick(item, index) {
+        let target = $(".table>tbody>tr").eq(index)
+        var s7 = '';
+        if(target.hasClass('selected')) {
+          this.mediaPath = ''
+        }else {
+          console.log("here")
+          var arr1 = item.startStamp.split("-");
+          var s1 = arr1[0] + arr1[1] + arr1[2];
+          var arr2 = s1.split(":");
+          var s2 = arr2[0] + arr2[1] + arr2[2];
+          var s3 = s2.replace(' ','');
+          var s4 = s3.substr(0,12);
+          var s5 = item.uuid.substr(1);
+          var s6 = s4 + s5;
+          s7 = 'https://scc.ieyeplus.com:8443/IpBcFiles/recording/'+s6+'.mp3';
+        }
+        target.toggleClass("selected")
+        this.mediaPath = s7;
+        this.$store.dispatch('setMediaPath',s7);
       },
       prePlay(item) {
         var arr1 = item.startStamp.split("-");

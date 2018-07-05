@@ -97,6 +97,9 @@ export default {
   SET_SELECTED_ALARM: (state, data) => {
     state.selectedAlarm = data
   },
+  SET_MEDIA_PATH: (state, data) => {
+    state.mediaPath = data
+  },
   SET_USER_GROUP: (state, data) => {
     state.userGroup = data
   },

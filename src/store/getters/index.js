@@ -37,6 +37,9 @@ export default {
   phoneShow: state => {
     return state.phoneShow
   },
+  mediaPath: state => {
+    return state.mediaPath
+  },
   name: state => {
     return state.user.name
   },

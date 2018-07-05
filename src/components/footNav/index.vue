@@ -8,7 +8,7 @@
 
       </div>
     </div>
-
+    <audio id="music"></audio>
     <div class="span_large">
       <div class="location_indicator"></div>
     </div>
@@ -210,7 +210,8 @@
     computed: {
       ...mapGetters({
         play: 'play',
-        playlist: 'playlist'
+        playlist: 'playlist',
+        mediaPath: 'mediaPath'
       }),
     },
     watch: {
@@ -259,6 +260,7 @@
         this.$router.push('/setting')
       },
       prev() {
+        console.log(this.mediaPath);
         if(this.playlist.length > 1) {
           if(this.activeIndex - 1 >= 0) {
             this.activeIndex = this.activeIndex - 1
@@ -286,6 +288,9 @@
 
       },
       playToggle() {
+        var audio = document.getElementById("music");
+        audio.src = this.mediaPath;
+        audio.play();
         if(this.playlist.length != 0) {
           if(this.playSwitch) {
             this.$refs.audio.play()

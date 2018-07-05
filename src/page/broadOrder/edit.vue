@@ -137,10 +137,10 @@
         <div class="settingTitle">播放文件类型</div>
         <div class="settingCon">
           <span class="moudle"
-                :class="xData.cmdtype==1 ? 'moudleSelected' : ''"
+                :class="xData.cmdtype==2 ? 'moudleSelected' : ''"
                 @click="textPlay">文本播放</span>
           <span class="moudle"
-                :class="xData.cmdtype==2 ? 'moudleSelected' : ''"
+                :class="xData.cmdtype==1 ? 'moudleSelected' : ''"
                 @click="musicPlay">音乐播放</span>
         </div>
       </div>
@@ -305,10 +305,10 @@
         _this.deviceList = Object.assign([], deviceList)
       },
       textPlay() {
-        this.xData.cmdtype = 1
+        this.xData.cmdtype = 2
       },
       musicPlay() {
-        this.xData.cmdtype = 2
+        this.xData.cmdtype = 1
       },
       subtract() {
         if(this.cycleIndex > 0) {
@@ -399,7 +399,7 @@
         this.xData.time = this.formData.PlanPreTime.toString()
         this.xData.meeting = '9111'
         console.log(this.xData.type);
-        if(this.xData.cmdtype == 2) {
+        if(this.xData.cmdtype == 1) {
            this.selectSongList.forEach(function(c,i) {
              path = path + ' ' + c.MediaPath
            }.bind(this))

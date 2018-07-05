@@ -65,6 +65,10 @@ export default {
   setGroupUsers ({ commit }, data) {
     commit('SET_GROUP_USERS', data)
   },
+  // 设置要播放的歌曲或者录音的路径
+  setMediaPath ({ commit }, data) {
+    commit('SET_MEDIA_PATH', data)
+  },
   // 设置所有数据
   setDeviceList ({ commit }, data) {
     commit('SET_DEVICE_LIST', data)

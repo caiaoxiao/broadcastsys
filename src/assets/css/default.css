@@ -262,6 +262,7 @@ ul.nav li {
 .content {
     width: 100%;
     position: relative;
+    overflow-y:auto;
 }
 
 @media(min-width:200px) {

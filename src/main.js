@@ -14,6 +14,7 @@ Vue.prototype.$ajax = axios
 // 导入JQ
 import $ from 'jquery'
 // 引入 bootstrap
+//import 'element-ui/lib/theme-default/tree.css'
 import 'assets/css/bootstrap.css'
 // 引入 font-awesome
 import 'assets/css/font-awesome.css'

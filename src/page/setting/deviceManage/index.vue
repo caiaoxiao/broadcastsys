@@ -26,6 +26,7 @@
             <td>设备编号</td>
             <td>设备名称</td>
             <td>设备类型</td>
+            <td>所属组织id</td>
             <td>操作</td>
           </tr>
         </thead>
@@ -36,6 +37,7 @@
             <td>
               {{ item.type == 0 ? '单话机' : '视频话机' }}
             </td>
+            <td> {{item.OrganizationID}} </td>
             <td>
               <button type="submit" class="btn btn-sm btn-info" @click="openModal(item.deviceId)">修改</button>
               <button type="submit" class="btn btn-sm btn-default" @click="deleteItem(item.deviceId)">删除</button>
@@ -95,7 +97,21 @@ export default {
       this.$ajax.post('Device/List', request)
         .then(res => {
           if (res.data.code === 1) {
-            this.dataAll = res.data.result
+            let data = res.data.result
+	    console.log(data)
+            let axios = []
+            data.forEach((device)=>{
+              axios.push(this.$ajax.get(`Feature/Detail/${device.deviceId}`))
+            })
+            this.$ajax.all(axios)
+                  .then((res) => {
+                      for (let i = 0 ; i< res.length ; i++){
+			if(res[i].data.result!=null)
+                        data[i].OrganizationID = res[i].data.result.organizationId
+                      }
+		    console.log(data)
+                    this.dataAll = data
+               })
           }
         })
     },

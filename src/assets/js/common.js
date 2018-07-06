@@ -204,13 +204,12 @@ Vue.prototype.submitFrom = ((self, pid, CreatedApi, EditApi, formData, updateSta
         if (valid) {
             if (pid == 0) {
                 self.$AjaxPost(CreatedApi, formData, function(data) {
-		    console.log(data)
                     if (data.code != 0) {
                         self.$message.success("新增成功")
                         if (!updateState) {
-                            self.update(2)
+                            self.$store.dispatch('update', 2)
                         } else {
-                            self.update(updateState)
+                            self.$store.dispatch('update', updateState)
                         }
                     } else {
                         self.$message.success("新增失败")
@@ -222,9 +221,9 @@ Vue.prototype.submitFrom = ((self, pid, CreatedApi, EditApi, formData, updateSta
                     if (data.code != 0) {
                         self.$message.success("修改成功")
                         if (!updateState) {
-                            self.update(2)
+                            self.$store.dispatch('update', 2)
                         } else {
-                            self.update(updateState)
+                            self.$store.dispatch('update', updateState)
                         }
                     } else {
                         self.$message.success("修改失败")

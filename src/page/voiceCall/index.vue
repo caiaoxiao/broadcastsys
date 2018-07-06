@@ -104,14 +104,14 @@ import parseXML from 'utils/xml_parser';
 import { mapGetters, mapActions } from 'vuex'
 import { getHeight } from 'utils/height'
 import { getHeights, itemClick } from 'utils/page/voiceCall'
-import { leftPhone, rightPhone, deviceList, switchs } from 'components'
+import { leftPhone, rightPhone, deviceList, switchs} from 'components'
 
 export default {
   components: {
     leftPhone,
     rightPhone,
     deviceList,
-    switchs
+    switchs,
   },
   data () {
     return {
@@ -148,7 +148,6 @@ export default {
       'userGroup',
     ])
   },
-  watch: {},
   methods: {
     // 获取设备分组数据
     reset(){
@@ -203,8 +202,10 @@ export default {
       this.userGroup.forEach((r, i) => {
               r.selected = false
             })
+      if(item){
       item.selected = true
       this.groupShow = item.deviceGroupId
+     }
     },
     itemClick (e, row) {
       let target = e.currentTarget

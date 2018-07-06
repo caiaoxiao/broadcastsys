@@ -84,19 +84,22 @@ const routes = [
         component: _import('setting/index'),
         children: [{
                 path: '/setting/userManage',
-                name: '用户管理',
+                name: '组织管理',
                 component: _import('setting/userManage/index')
             },
+	  /*
             {
                 path: '/setting/userGroupManage',
                 name: '用户组管理',
                 component: _import('setting/userGroupManage/index')
             },
+	  */
             {
                 path: '/setting/deviceManage',
                 name: '设备管理',
                 component: _import('setting/deviceManage/index')
             },
+		/*
             {
                 path: '/setting/deviceGroupManage',
                 name: '设备组管理',

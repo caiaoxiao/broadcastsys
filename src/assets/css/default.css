@@ -261,7 +261,7 @@ ul.nav li {
 
 .content {
     width: 100%;
-    position: relative
+    position: relative;
 }
 
 @media(min-width:200px) {
@@ -272,18 +272,19 @@ ul.nav li {
 
 @media(min-width:966px) {
     .phone,
-    .playList {
+    .playList,
+    .orgTreeList{
         width: 251px
     }
 }
 
 @media(min-width:1400px) {
     .phone,
-    .playList {
+    .playList,
+    .orgTreeList{
         width: 301px;
     }
 }
-
 .phone,
 .playList {
     position: absolute;
@@ -291,7 +292,9 @@ ul.nav li {
     background: #3C4044;
     z-index: 199;
 }
-
+.orgTreeList {
+    z-index: 201;
+}
 .playList {
     z-index: 201;
 }
@@ -315,13 +318,26 @@ ul.nav li {
     color: #fff;
     z-index: 1000
 }
-
+.orgTreeList>i {
+    position: absolute;
+    top: 50%;
+    right: 2px;
+    color: #fff;
+    z-index: 1000
+}
 .playList {
     top: 0px;
     right: -100%;
     border-left: 1px solid #000;
 }
-
+.orgTreeList {
+    top: 0px;
+    left: -100%;
+    height:100%;
+    position: absolute;
+    background: #3C4044;
+    border-left: 1px solid #000;
+}
 .openList {
     height: 100%;
     position: absolute;
@@ -336,7 +352,20 @@ ul.nav li {
     top: 50%;
     right: 1px;
 }
+.openTreeList {
+    height: 100%;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 20px;
+    z-index: 200
+}
 
+.openTreeList>i {
+    position: absolute;
+    top: 50%;
+    left: 1px;
+}
 @-webkit-keyframes ListRight {
     from {
         right: -100%
@@ -365,6 +394,33 @@ ul.nav li {
     right: -100%;
 }
 
+@-webkit-keyframes LeftListRight {
+    from {
+        left: -100%
+    }
+    to {
+        left: 0;
+    }
+}
+
+@-webkit-keyframes LeftListLeft {
+    from {
+        left: 0;
+    }
+    to {
+        left: -100%;
+    }
+}
+
+.treeListShow {
+    -webkit-animation: LeftListRight 0.7s;
+    left: 0;
+}
+
+.treeListHide {
+    -webkit-animation: LeftListLeft 0.7s;
+    left: -100%;
+}
 @media(min-width:200px) {
     .phoneDial {
         position: static;
@@ -1531,7 +1587,14 @@ ul.statusTpye>li>span {
     top: 5px;
     right: 0px;
 }
-
+.table caption span{
+    text-size:20px;
+    color : #ffffff;
+}
+.table caption button{
+    float:right;
+    margin: 0px 2px;
+}
 .table div.p {
     float: left;
     margin: 5px 15px 0px 0px

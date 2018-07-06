@@ -53,7 +53,7 @@
       }),
     },
     watch: {
-      'TreeData':function(data){this.$nextTick(()=> {this.refresh() })},
+      'TreeData':function(data){this.$nextTick(()=> {if(this.vertoHandle) this.refresh() })},
       'callQueue':function(conf) { 
 	},
       'confAlarm': function(conf) {
@@ -498,16 +498,25 @@
                           if(element.roleName == this.TreeData.OrgName){
                             this.targetUserGroupId = element.roleID
                           }
-                  if(this.targetUserGroupId!="")
-                      this.$ajax.get(`Feature/getFeatureByOrg/${this.TreeData.OrganizationID}`,{flag:false})
+                        })
+                      }
+                  if(this.targetUserGroupId!=""){
+                      let  organizationID_requests = []
+                      organizationID_requests.push(this.$ajax.get(`Feature/getFeatureByOrg/${this.TreeData.OrganizationID}?flag=true`))
+                      organizationID_requests.push(this.$ajax.get(`Feature/getFeatureByOrg/${this.TreeData.OrganizationID}?flag=false`))
+                      this.$ajax.all(organizationID_requests)
                         .then((res) => {
-                          if (res.data.code === 1) {
-                            let all_devices = res.data.result
+                            console.log(res)
+                            let all_devices 
+                            if (res[0].data.code == 1)
+                              all_devices = res[0].data.result
+                            else if (res[1].data.code == 1)
+                              all_devices = res[1].data.result
                             all_devices.forEach((r,i)=>{
                                 if(this.usermap.hasOwnProperty(r.deviceCode)){
                                   this.usermap[r.deviceCode].list.push(r.deviceGroupId)
                                   this.usermap[r.deviceCode].type =r.type
-                              this.usermap[r.deviceCode].name = r.deviceName
+                                  this.usermap[r.deviceCode].name = r.deviceName
                                 }
                                 else{
                                   this.usermap[r.deviceCode] = {}
@@ -521,18 +530,21 @@
                             if (res.data.code === 1) {
                               this.group_list = res.data.result
                               for(let g in this.group_list)
-                                this.group_list[g].selected = false
+                              this.group_list[g].selected = false
                               this.$store.dispatch('setUserGroup',this.group_list)
+                              let axios = []
                               this.group_list.forEach((item,index) => {
-                              this.$ajax.get(`DeviceGroup/Detail/${item.deviceGroupId}`)
+                              axios.append(this.$ajax.get(`DeviceGroup/Detail/${item.deviceGroupId}`))
+                              })
+                              this.$ajax.all(axios)
                               .then(res => {
-                                if (res.data.code === 1) {
-                                    let group  = res.data.result.deviceGroups
+                                    for (let i = 0 ; i<length ; i++){
+                                    let group  = res[i].data.result.deviceGroups
                                     group.forEach((r,i)=>{
                                       if(this.usermap.hasOwnProperty(r.deviceCode)){
                                         this.usermap[r.deviceCode].list.push(r.deviceGroupId)
                                         this.usermap[r.deviceCode].type =r.type
-                                    this.usermap[r.deviceCode].name = r.deviceName
+                                        this.usermap[r.deviceCode].name = r.deviceName
                                       }
                                       else{
                                         this.usermap[r.deviceCode] = {}
@@ -542,6 +554,9 @@
                                       }
                                     })
                                   }
+                                })
+                               }
+                              })
                               for(let index in deviceList){
                                 if(this.usermap.hasOwnProperty(deviceList[index].userID)){
                                   deviceList[index].groupid =  this.usermap[deviceList[index].userID].list
@@ -565,20 +580,14 @@
                                   user.name = this.usermap[item].name
                                   user.timer = {s:0,m:0,h:0,id:[],clock:false}
                                   deviceList.push(user)
-                                        }   
-                                    })
-                                })
-                              }
-                          })
-                          }
-                        })
+                                }
+                              })
+                  }
                 else
                 {
                   this.$store.dispatch('setUserGroup',[])
                 }
                   })
-                }
-            })
           this.$store.dispatch('setDeviceList',deviceList)
           }.bind(this),function(data) {
             console.log("error:"+data)
@@ -738,7 +747,6 @@
         let currentLoginUserChanged = false;
         let usersChanged = false;
         let _this = this;
-	console.log(channelCallState)
         if (callerNumber == "0000000000") return;
 
         if (channelCallState == "RINGING" || channelCallState == "EARLY" || channelCallState == "RING_WAIT") {

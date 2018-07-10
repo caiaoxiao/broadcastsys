@@ -181,14 +181,14 @@
             })
           console.log("asdf")
         
-          _this.$ajax.delete('QzTask/delete/'+s)
-            .then(res => {
-              if(res.data.code == 1) {
-                console.log("delete success");
-              }else {
-                console.log("delete failed");
-              } 
-           })
+   //       _this.$ajax.delete('QzTask/delete/'+s)
+   //         .then(res => {
+   //           if(res.data.code == 1) {
+   //             console.log("delete success");
+   //           }else {
+   //             console.log("delete failed");
+   //           } 
+   //        })
         })  
         this.$ajax.post('Plan/RemoveList', ids)
           .then(res => {

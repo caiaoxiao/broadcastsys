@@ -398,7 +398,6 @@
         let path = '';
         this.xData.time = this.formData.PlanPreTime.toString()
         this.xData.meeting = '9111'
-        console.log(this.xData.type);
         if(this.xData.cmdtype == 1) {
            this.selectSongList.forEach(function(c,i) {
              path = path + ' ' + c.MediaPath
@@ -408,7 +407,6 @@
         this.$ajax.post('QzTask/add',this.xData)
           .then((res) => {
             if(res.data.code == 1) {
-              console.log(res.data.result.id)
               this.$ajax.get('https://scc.ieyeplus.com:8082/api/scheds/'+res.data.result.id)
             }else {
             }

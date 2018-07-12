@@ -475,20 +475,17 @@
                       organizationID_requests.push(this.$ajax.get(`Feature/getFeatureByOrg/${this.TreeData.OrganizationID}?flag=false`))
                       this.$ajax.all(organizationID_requests)
                         .then((res) => {
-                            let all_devices 
+                            let all_devices = [] 
                             if (res[0].data.code == 1)
-                              all_devices = res[0].data.result
+                              all_devices = all_devices.concat(res[0].data.result)
                             else if (res[1].data.code == 1)
-                              all_devices = res[1].data.result
-                            all_devices.forEach((r,i)=>{
+                              all_devices = all_devices.concat(res[1].data.result)
+			    all_devices.forEach((r,i)=>{
                                 if(this.usermap.hasOwnProperty(r.deviceCode)){
-                                  this.usermap[r.deviceCode].list.push(r.deviceGroupId)
-                                  this.usermap[r.deviceCode].type =r.type
-                                  this.usermap[r.deviceCode].name = r.deviceName
                                 }
                                 else{
                                   this.usermap[r.deviceCode] = {}
-                                  this.usermap[r.deviceCode].list = [r.deviceGroupId]
+                                  this.usermap[r.deviceCode].list = []
                                   this.usermap[r.deviceCode].type =r.type
                                   this.usermap[r.deviceCode].name = r.deviceName
                                 }
@@ -507,7 +504,8 @@
                               })
                               this.$ajax.all(axios)
                               .then(res => {
-                                    for (let i = 0 ; i<length ; i++){
+				    console.log(res)
+                                    for (let i = 0 ; i<res.length ; i++){
                                     let group  = res[i]?res[i].data.result.deviceGroups:[]
                                     group.forEach((r,i)=>{
                                       if(this.usermap.hasOwnProperty(r.deviceCode)){
@@ -559,16 +557,14 @@
                                           deviceList[i].networkPort = r.network_port
                                           deviceList[i].operationState = 0
                                           deviceList[i].oppoChannelUUID = null
-                                          deviceList[i].groupid = []//this.usermap.hasOwnProperty(user.userID)?usermap[userID]:null
                                           deviceList[i].timer = {s:0,m:0,h:0,id:[],clock:false}
                                           deviceList[i].calling = null 
                                           deviceList[i].name = null 
-                                          
                                         }
                                       }
                                     }
                                   })
-                              
+                                 console.log(deviceList) 
                                 })
                                }
                               })

@@ -341,39 +341,32 @@
 
       playMusic() {
         this.$store.dispatch('setWhetherPlayAnotherSong','yes')
-        let phone = this.selectPhone[0].userID;
         let music = this.selectPlayList[0].MediaPath;
 
-        if(this.selectPhone.length!=0) {
+        
           if(this.anotherSong[0] == null){
             let usera = this.selectPlayList[0];
-            let users = this.selectPhone;
             let _this = this;
       
             usera.Files.forEach(function(usern){
               var x = usern.MediaPath.indexOf("IpBcFiles");
               var y = usern.MediaPath.substring(x);
               var z = "/var/lib/tomcat8/webapps/"+y;
-              users.forEach(function(user){
-                _this.fsAPI("conference"," " + _this.name + " " + "play" + " " + z,function(res){console.log("bofang")});
-              })
+              _this.fsAPI("conference"," " + _this.name + " " + "play" + " " + z,function(res){console.log("bofang")});
             });
           }else {
             this.selectPlayList[0] = this.anotherSong[0]
             let usera = this.selectPlayList[0];
-            let users = this.selectPhone;
             let _this = this;
             _this.fsAPI("conference"," " + _this.name + " " + "stop",function(res){console.log("qie ge")});
             usera.Files.forEach(function(usern){
               var x = usern.MediaPath.indexOf("IpBcFiles");
               var y = usern.MediaPath.substring(x);
               var z = "/var/lib/tomcat8/webapps/" + y;
-              users.forEach(function(user){
-                _this.fsAPI("conference"," " + _this.name + " " + "play" + " " + z,function(res){console.log("another song")});
-              })
+              _this.fsAPI("conference"," " + _this.name + " " + "play" + " " + z,function(res){console.log("another song")});
             });
           }
-        } 
+        
       },  
 
       pauseOrPlay() {

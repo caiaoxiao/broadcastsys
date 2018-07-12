@@ -35,7 +35,7 @@
             <td>被叫号码</td>
             <td>通话时长（秒）</td>
             <td>应答状态</td>
-            <td>录音</td>
+            
           </tr>
         </thead>
         <tbody>
@@ -45,7 +45,7 @@
             <td>{{item.calleeNumber}}</td>
             <td>{{item.duration}}</td>
             <td>应答</td>
-            <td>11.MP3</td>
+            
           </tr>
         </tbody>
       </table>

@@ -72,7 +72,8 @@ export default {
   },
   computed: {
     ...mapGetters({
-      updateState: 'updateState'
+      updateState: 'updateState',
+      get_user_info:'GET_USER_INFO'
     })
   },
   created () {
@@ -94,7 +95,8 @@ export default {
       if (fuzzyquery) {
         request.deviceCode = fuzzyquery
       }
-      this.$ajax.post('Device/List', request)
+      this.$ajax.get(`Feature/getFeatureByOrg/${this.$store.state.user_info.user.organizationID}?flag=true`)
+
         .then(res => {
           if (res.data.code === 1) {
             let data = res.data.result

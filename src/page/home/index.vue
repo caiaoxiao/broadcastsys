@@ -29,9 +29,9 @@
       this.$nextTick(()=> {
         // 初始化vertoHandle
         //if(this.vertoHandle==null)
-	  getHeights()
-	      console.log(this.$store.state.user_info)
+	        getHeights()
           $.verto.init({}, this.initVertoHandle);
+          $(".orgTreeList").removeClass("treeListHide").addClass("treeListShow");
         //else
         //  console.log('verto aleray not null')
 
@@ -53,7 +53,7 @@
       }),
     },
     watch: {
-      'TreeData':function(data){this.$nextTick(()=> {if(this.vertoHandle) this.refresh() })},
+      'TreeData':function(data){if(this.vertoHandle) this.refresh() },
       'callQueue':function(conf) { 
 	},
       'confAlarm': function(conf) {
@@ -113,7 +113,7 @@
             onWSLogin(verto, success) {
               // 登录回调
               _this.refresh()
-	      _this.handleGetCallOrRinging()
+	            _this.handleGetCallOrRinging()
               console.log('onWSLogin', success);
             },
             onWSClose(verto, success) {
@@ -428,7 +428,8 @@
       },
       // 查询所有设备 以及事件初始化
       refresh() {
-//      let xuiUsername = localStorage.getItem('xui.username')
+        //let xuiUsername = localStorage.getItem('xui.username')
+	//this.$ajax.post('Role/Create',{roleName:"湖北监控中心",childData:0})
         let xuiUsername = 9000 // 过滤掉登陆者
         this.$store.dispatch('setCurrentLoginUser',{
           deviceState: "registered",
@@ -457,38 +458,7 @@
                 registrations.push(msg);
               }
             }
-      registrations.forEach(function(r) {
-              let user = {}
-              if(r.reg_user != xuiUsername){ //(!deviceList.some((item)=>{return item.userID == r.reg_user})) 
-                user.deviceState = "registered"
-                user.userID = r.reg_user
-                user.callDirection = null
-                user.channelUUID = null
-                user.networkIP = r.network_ip
-                user.networkPort = r.network_port
-                user.operationState = 0
-                user.oppoChannelUUID = null
-                user.groupid = []//this.usermap.hasOwnProperty(user.userID)?usermap[userID]:null
-                user.timer = {s:0,m:0,h:0,id:[],clock:false}
-                user.calling = null 
-		            user.name = null 
-                deviceList.push(user)
-              }/*
-              else{
-                deviceList.forEach((item,index)=>{ if(item.userID == r.reg_user)
-                        deviceList[index].deviceState = "registered"
-                        deviceList[index].userID = r.reg_user
-                        deviceList[index].callDirection = null
-                        deviceList[index].channelUUID = null
-                        deviceList[index].networkIP = r.network_ip
-                        deviceList[index].networkPort = r.network_port
-                        deviceList[index].operationState = 0
-                        deviceList[index].oppoChannelUUID = null
-                        deviceList[index].groupid = this.usermap.hasOwnProperty(user.userID)?usermap[userID]:null
-                        })
 
-                }*/
-            })	
                   this.$ajax.post(`Role/List`)
                     .then((res) => {
                       if (res.data.code === 1) {
@@ -500,13 +470,11 @@
                           }
                         })
                       }
-                  if(this.targetUserGroupId!=""){
                       let  organizationID_requests = []
                       organizationID_requests.push(this.$ajax.get(`Feature/getFeatureByOrg/${this.TreeData.OrganizationID}?flag=true`))
                       organizationID_requests.push(this.$ajax.get(`Feature/getFeatureByOrg/${this.TreeData.OrganizationID}?flag=false`))
                       this.$ajax.all(organizationID_requests)
                         .then((res) => {
-                            console.log(res)
                             let all_devices 
                             if (res[0].data.code == 1)
                               all_devices = res[0].data.result
@@ -525,6 +493,7 @@
                                   this.usermap[r.deviceCode].name = r.deviceName
                                 }
                             })
+			    if(this.targetUserGroupId!="" || this.TreeData.ParentID=="0")
                             this.$ajax.get(`Role/getDeviceGroup/${this.targetUserGroupId}`)
                               .then((res) => {
                             if (res.data.code === 1) {
@@ -534,12 +503,12 @@
                               this.$store.dispatch('setUserGroup',this.group_list)
                               let axios = []
                               this.group_list.forEach((item,index) => {
-                              axios.append(this.$ajax.get(`DeviceGroup/Detail/${item.deviceGroupId}`))
+                              axios.push(this.$ajax.get(`DeviceGroup/Detail/${item.deviceGroupId}`))
                               })
                               this.$ajax.all(axios)
                               .then(res => {
                                     for (let i = 0 ; i<length ; i++){
-                                    let group  = res[i].data.result.deviceGroups
+                                    let group  = res[i]?res[i].data.result.deviceGroups:[]
                                     group.forEach((r,i)=>{
                                       if(this.usermap.hasOwnProperty(r.deviceCode)){
                                         this.usermap[r.deviceCode].list.push(r.deviceGroupId)
@@ -554,10 +523,7 @@
                                       }
                                     })
                                   }
-                                })
-                               }
-                              })
-                              for(let index in deviceList){
+                                for(let index in deviceList){
                                 if(this.usermap.hasOwnProperty(deviceList[index].userID)){
                                   deviceList[index].groupid =  this.usermap[deviceList[index].userID].list
                                   deviceList[index].type =  this.usermap[deviceList[index].userID].type
@@ -581,13 +547,38 @@
                                   user.timer = {s:0,m:0,h:0,id:[],clock:false}
                                   deviceList.push(user)
                                 }
+                                      registrations.forEach( (r) =>{
+                                        for (let i =0;i < deviceList.length;i++){
+                                        if (deviceList[i].userID == r.reg_user){
+                                        if(r.reg_user != xuiUsername){ //(!deviceList.some((item)=>{return item.userID == r.reg_user})) 
+                                          deviceList[i].deviceState = "registered"
+                                          deviceList[i].userID = r.reg_user
+                                          deviceList[i].callDirection = null
+                                          deviceList[i].channelUUID = null
+                                          deviceList[i].networkIP = r.network_ip
+                                          deviceList[i].networkPort = r.network_port
+                                          deviceList[i].operationState = 0
+                                          deviceList[i].oppoChannelUUID = null
+                                          deviceList[i].groupid = []//this.usermap.hasOwnProperty(user.userID)?usermap[userID]:null
+                                          deviceList[i].timer = {s:0,m:0,h:0,id:[],clock:false}
+                                          deviceList[i].calling = null 
+                                          deviceList[i].name = null 
+                                          
+                                        }
+                                      }
+                                    }
+                                  })
+                              
+                                })
+                               }
                               })
-                  }
-                else
-                {
+                              
+                              })
+                if(this.targetUserGroupId == "")
                   this.$store.dispatch('setUserGroup',[])
-                }
-                  })
+                  
+                })
+                  	
           this.$store.dispatch('setDeviceList',deviceList)
           }.bind(this),function(data) {
             console.log("error:"+data)
@@ -606,13 +597,12 @@
           let isContinue = true
           deviceList.forEach(function(d, i) {
             if(d.userID == e.data.username ) {
-	      if( deviceList[i].deviceState == "unregistered")
+	          if( deviceList[i].deviceState == "unregistered")
               deviceList[i].deviceState = "registered"
-              isContinue=false
               return;
             }
           })
-
+          /*
           if(isContinue) {
             let user = {}
             user.deviceState = "registered"
@@ -621,11 +611,12 @@
             user.channelUUID = null
             user.groupid = this.usermap.hasOwnProperty(user.userID)?usermap[userID].list:[]
             user.type = this.usermap.hasOwnProperty(user.userID)?usermap[userID].type:""
-	    user.timer = {s:0,m:0,h:0,id:[],clock:false}
-	    user.name = this.usermap.hasOwnProperty(user.userID)?usermap[userID].name:null
+	          user.timer = {s:0,m:0,h:0,id:[],clock:false}
+	          user.name = this.usermap.hasOwnProperty(user.userID)?usermap[userID].name:null
             deviceList.push(user)
 
           }
+          */
 
         }else if( e.eventChannel =='FSevent.custom::sofia::unregister') {
           deviceList.forEach(function(d, i) {
@@ -736,7 +727,6 @@
         }, success_cb, failed_cb);
       },
       handleFSEventChannel(v, e) {
-	//console.log(e)
         let callDirection = e.data["Call-Direction"];            //入栈还是出栈
         let callerNumber = e.data["Caller-Caller-ID-Number"];    //主叫号码
         let calleeNumber = e.data["Caller-Callee-ID-Number"];  //被叫号码

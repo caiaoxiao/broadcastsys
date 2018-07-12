@@ -14,8 +14,8 @@
                 {{songList.FolderName}}
               </p>
               <span class="musicNum" @click="qsss(songList, index)">[{{ songList.Files ? songList.Files.length :0}}]</span>
-              <span class="nameSetting" @click.stop="(()=>{ songList.contenteditable = true })">重命名</span>
-              <span  class="nameSetting" @click.stop="deleteSongList(songList.FolderID)">删除歌单</span>
+              <span class="nameSetting" @click.stop="(()=>{ songList.contenteditable = true })"><button class="btn btn-info" type="button">重命名</button></span>
+              <span  class="nameSetting" @click.stop="deleteSongList(songList.FolderID)"><button class="btn btn-info" type="button">删除歌单</button></span>
             </div>
           </div>
           <div v-if="songList.unfold">
@@ -23,7 +23,7 @@
               <li>
                 <p>{{ fileItem.FileName }}</p>
                 <ul class="musicListTools">
-                  <li @click="removeFile(songList, fileItem)"><i class="fa fa-times" aria-hidden="true"></i>移除</li>
+                  <li @click="removeFile(songList, fileItem)"><!-- <i class="fa fa-times" aria-hidden="true"></i> --><button class="btn btn-info" type="button">移除</button></li>
                 </ul>
                 <span class="totalTime Grid-cell">05:12</span>
               </li>
@@ -43,8 +43,10 @@
      
       <div class="addFiles">
         <span @click="uploadFile">
-          <i class="fa fa-file-o" aria-hidden='true'></i>
-          <input type="file" class="uploadFiles" @change="uploadFileChange($event)" style="display: none;" accept="audio/*" value="">上传文件
+          <!-- <i class="fa fa-file-o" aria-hidden='true'></i> -->
+          <button class="btn btn-info" type="button">
+            <input type="file" class="uploadFiles" @change="uploadFileChange($event)" style="display: none;" accept="audio/*" value="">上传文件
+          </button>
         </span>
       </div>
     <!--  <div class="tableTool Grid">
@@ -82,20 +84,20 @@
           <p class="Grid-cell" style="overflow:hidden;height: 35px;">{{ file.FileName }}</p>
           <ul class="musicListTools Grid-cell">
             <li v-if="file.MediaType == 3"  @click.stop="priview(file)">
-              <i class="fa fa-file-text-o" aria-hidden="true"></i>预览
+              <!-- <i class="fa fa-file-text-o" aria-hidden="true"></i> --><button class="btn btn-info" type="button">预览</button>
             </li>
             <li @click="prePlay(file)" v-if="file.MediaType == 1">
-              <i class="fa fa-play-circle" aria-hidden="true"></i>试听
+              <!-- <i class="fa fa-play-circle" aria-hidden="true"></i> --><button class="btn btn-info" type="button">试听</button>
             </li>
             <li @click="stopMusic(file)" v-if="file.MediaType == 1">
-              <i class="fa fa-pause-circle" aria-hidden="true"></i>停止
+              <!-- <i class="fa fa-pause-circle" aria-hidden="true"></i> --><button class="btn btn-info" type="button">停止</button>
             </li>
-            <li @click.stop="download(file)"><i class="fa fa-cloud-download" aria-hidden="true"></i>下载</li> 
-            <li @click.stop="deleteFile(file)"><i class="fa fa-times" aria-hidden="true"></i>删除</li>
+            <li @click.stop="download(file)"><!-- <i class="fa fa-cloud-download" aria-hidden="true"></i> --><button class="btn btn-info" type="button">下载</button></li> 
+            <li @click.stop="deleteFile(file)"><!-- <i class="fa fa-times" aria-hidden="true"></i> --><button class="btn btn-info" type="button">删除</button></li>
             <li id="add">
-              <i class="fa fa-plus" aria-hidden="true"></i>
-              <input type="button"
-                 @click.stop="addBlur(file)"  value="添加到">
+              <!-- <i class="fa fa-plus" aria-hidden="true"></i> -->
+              <button class="btn btn-info" type="button"
+                 @click.stop="addBlur(file)"  >添加到</button>
              <div>
               <div :class="songlist(songList.FolderID)" v-if="file.songListShow" v-for="songList in playList">
                 <span class="songlist(songList.FolderID)" value=songList.FolderName @click.self="addFileToPlaylist(file, songList)">{{songList.FolderName}}</span>

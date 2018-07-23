@@ -245,8 +245,7 @@ ul.userList>li.selected{color:#5cb85c;border-color: #5cb85c;background: none;}
 ul.userList>li.active{color:#c9302c;border-color: #c9302c;}
 .groupName{line-height: 2.5em;padding: 0px 10px;}
 .groupName>i{margin-right: 10px;}
-
-.table .el-table{background:#313439; border: none; color: #fff;}
+.table .el-table{background:#313439; border: none; color: #fff;margin-right:100px;}
 .table .el-table th{background: #222428; border-right: 1px solid #50545C;}
 .table .table .el-table th{    border-right: 1px solid #50545C;}
 .table .el-table__header-wrapper thead div{background: none; color: #7496B8;}

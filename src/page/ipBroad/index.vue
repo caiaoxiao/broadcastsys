@@ -112,6 +112,7 @@
   import {getHeights,itemClicks} from 'utils/page/ipBroad'
   import { mapGetters,mapActions } from 'vuex'
   import playList from './playList.vue'
+  import {GET_USER_INFO} from 'store/getters/type'
   import {leftPhone, rightPhone,switchs,callDivert} from 'components'
 
   export default {
@@ -121,15 +122,18 @@
       return {
         playState: '暂停',
         selectPhone: [],
-        name: '9111' + '-' + window.location.hostname,
+        name: "",
         playListShow: false,     //播放列表显示切换
-	groupShow:"",
+	      groupShow:"",
         playList: [],
         selectPlayList: [],
         anotherSong: [],
-	mute:"喊话",
-	selectNowCall: [],
+	      mute:"喊话",
+	      selectNowCall: [],
         selectRingCall: [],
+        verto:"",
+        broad:"",
+
       }
     },
     components: {
@@ -143,6 +147,9 @@
       this.$nextTick(function() {
         getHeight()
         getHeights()
+        this.verto = this.get_user_info.freeswitchData.VertoID
+        this.broad = this.get_user_info.freeswitchData.BroadID
+        this.name = this.broad + '-' + window.location.hostname
         this.reFresh()
       })
     },
@@ -150,16 +157,17 @@
       whetherPlayAnotherSong: 'pauseOrPlay',
     }, */
     computed: {
-      ...mapGetters([
-        'phoneShow',
-        'vertoHandle',           // verto初始化
-        'deviceList',                       // 所有设备
-        'currentLoginUser',  // 当前用户
-	'callQueue',
-	'userGroup',
-	'confIpBoard',
-        'whetherPlayAnotherSong'
-      ]),
+      ...mapGetters({
+        phoneShow:'phoneShow',
+        vertoHandle:'vertoHandle',           // verto初始化
+        deviceList:'deviceList',                       // 所有设备
+        currentLoginUser:'currentLoginUser',  // 当前用户
+	      callQueue:'callQueue',
+	      userGroup:'userGroup',
+	      confIpBoard:'confIpBoard',
+        whetherPlayAnotherSong:'whetherPlayAnotherSong',
+        get_user_info: GET_USER_INFO,
+      }),
     },
     methods: {
       reset(){
@@ -167,15 +175,15 @@
     	$('.onlineSelected').removeClass('onlineSelected').addClass('online')
       },
       returnVertoState(){
-	if(this.confIpBoard.some((item,index)=>{return item.caller_id_number=='9000' && item.muted == true})){
+	if(this.confIpBoard.some((item,index)=>{return item.caller_id_number==this.verto && item.muted == true})){
 		this.mute = "喊话"
 		return  "fa fa-bullhorn fa-2x"
 	    }
-	 else if(this.confIpBoard.some((item,index)=>{return item.caller_id_number=='9000' && item.muted == false})){
+	 else if(this.confIpBoard.some((item,index)=>{return item.caller_id_number==this.verto && item.muted == false})){
 		this.mute = "静音"
 		return  "fa fa-window-close fa-2x"	
 		}
-	 else if(!this.confIpBoard.some((item,index)=>{return item.caller_id_number=='9000'})){ 
+	 else if(!this.confIpBoard.some((item,index)=>{return item.caller_id_number==this.verto})){ 
 		this.mute = "喊话"
 		return "fa fa-bullhorn fa-2x"
 		}
@@ -341,39 +349,32 @@
 
       playMusic() {
         this.$store.dispatch('setWhetherPlayAnotherSong','yes')
-        let phone = this.selectPhone[0].userID;
         let music = this.selectPlayList[0].MediaPath;
 
-        if(this.selectPhone.length!=0) {
+        
           if(this.anotherSong[0] == null){
             let usera = this.selectPlayList[0];
-            let users = this.selectPhone;
             let _this = this;
       
             usera.Files.forEach(function(usern){
               var x = usern.MediaPath.indexOf("IpBcFiles");
               var y = usern.MediaPath.substring(x);
               var z = "/var/lib/tomcat8/webapps/"+y;
-              users.forEach(function(user){
-                _this.fsAPI("conference"," " + _this.name + " " + "play" + " " + z,function(res){console.log("bofang")});
-              })
+              _this.fsAPI("conference"," " + _this.name + " " + "play" + " " + z,function(res){console.log("bofang")});
             });
           }else {
             this.selectPlayList[0] = this.anotherSong[0]
             let usera = this.selectPlayList[0];
-            let users = this.selectPhone;
             let _this = this;
             _this.fsAPI("conference"," " + _this.name + " " + "stop",function(res){console.log("qie ge")});
             usera.Files.forEach(function(usern){
               var x = usern.MediaPath.indexOf("IpBcFiles");
               var y = usern.MediaPath.substring(x);
               var z = "/var/lib/tomcat8/webapps/" + y;
-              users.forEach(function(user){
-                _this.fsAPI("conference"," " + _this.name + " " + "play" + " " + z,function(res){console.log("another song")});
-              })
+              _this.fsAPI("conference"," " + _this.name + " " + "play" + " " + z,function(res){console.log("another song")});
             });
           }
-        } 
+        
       },  
 
       pauseOrPlay() {
@@ -396,9 +397,9 @@
 
       shout() {
         this.vertoHandle.newCall({
-          destination_number: '9111',
-          caller_id_name: '9000',
-          caller_id_number: '9000',
+          destination_number: this.broad,
+          caller_id_name: this.verto,
+          caller_id_number: this.verto,
           outgoingBandwidth: 'default',
           incomingBandwidth: 'default',
           useStereo: true,
@@ -415,37 +416,8 @@
       startIpbroad() {
         // 喊话
         const laChannelName = this.getChannelName("liveArray");
-        if(!this.confIpBoard.some((item,index)=>{return item.caller_id_number=='9000'})){ 
-	  //this.fsAPI('conference',this.name + ' ' + 'bgdial' + ' ' + "user/9000")
-	 /* this.vertoHandle.newCall({
-          // Extension to dial.
-          destination_number: '9111',
-          caller_id_name: '9000',
-          caller_id_number: '9000',
-          outgoingBandwidth: 'default',
-          incomingBandwidth: 'default',
-          useStereo: true,
-          dedEnc: false,
-          tag: "video-container",
-          deviceParams: {
-            useMic: "any",
-            useSpeak: "any",
-            useCamera: "any"
-          }
-          })  
-	 
-	 if(this.selectPhone.length>0)
-          //  批量邀请设备开始会议
-          this.selectPhone.forEach(function(s, i){
-            var op =   this.name + '+flags{mute}'+  " " + "bgdial" + " " + "user/"+this.selectPhone[i].userID
-	    console.log("************************************************",op)
-            this.fsAPI("conference",op,
-              function(res){
-		console.log("邀请返回*********************************")
-              });
-          }.bind(this))
-          //  重置勾选话机数组
-          */ 
+        if(!this.confIpBoard.some((item,index)=>{return item.caller_id_number==this.verto})){ 
+	  
 	  $('.onlineSelected').removeClass('onlineSelected').addClass('online')
 
           // 创建会议室
@@ -458,9 +430,9 @@
             }
           });
         }
-	else if(this.confIpBoard.some((item,index)=>{return item.caller_id_number=='9000' && item.muted == true}))
+	else if(this.confIpBoard.some((item,index)=>{return item.caller_id_number==this.verto && item.muted == true}))
 	  this.tmute()
-	 else if(this.confIpBoard.some((item,index)=>{return item.caller_id_number=='9000' && item.muted == false}))
+	 else if(this.confIpBoard.some((item,index)=>{return item.caller_id_number==this.verto && item.muted == false}))
 	  this.tmute()
       },
       broadcast(channel, params) {
@@ -489,15 +461,15 @@
       },
       allOver() {
         // 结束全部喊话和播放
-	this.fsAPI('conference','9111-scc.ieyeplus.com'+' '+'hup'+' '+'all')
+	this.fsAPI('conference',this.broad+'-scc.ieyeplus.com'+' '+'hup'+' '+'all')
 	this.selectPhone = []
 	$('.onlineSelected').removeClass('onlineSelected').addClass('online')
       },
       tmute(){
           // this.fsAPI("conference",this.name + " " + "pause_play" + "all",function(res) {console.log("zan ting")}.bind(this));
         this.confIpBoard.forEach((item,index)=>{	
-	if(item.caller_id_number=='9000')
-	this.fsAPI('conference','9111-scc.ieyeplus.com'+' '+'tmute'+' '+item.conf_id)
+	if(item.caller_id_number==this.verto)
+	this.fsAPI('conference',this.broad+'-scc.ieyeplus.com'+' '+'tmute'+' '+item.conf_id)
 	})
 	}
     }

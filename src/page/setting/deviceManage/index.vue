@@ -47,7 +47,7 @@
       </table>
     </div>
     <div v-if="modolType != null && modolType !=2">
-      <modal :modolType='modolType' :transferData='transferData' @close="close"></modal>
+      <modal :modolType='modolType' :transferData='transferData' @close="close" @getHeight="getHeight"></modal>
     </div>
     <div v-if="modolType ==2">
       <basechange :modolType='modolType'  @close="close"></basechange>
@@ -58,6 +58,7 @@
 import { mapGetters } from 'vuex'
 import modal from './edit.vue'
 import basechange from './base.vue'
+import {getHeights} from 'utils/page/setting'
 export default {
   data () {
     return {
@@ -72,10 +73,12 @@ export default {
   },
   computed: {
     ...mapGetters({
-      updateState: 'updateState'
+      updateState: 'updateState',
+      get_user_info:'GET_USER_INFO'
     })
   },
   created () {
+    getHeights()
     this.refresh()
   },
   watch: {
@@ -94,7 +97,8 @@ export default {
       if (fuzzyquery) {
         request.deviceCode = fuzzyquery
       }
-      this.$ajax.post('Device/List', request)
+      this.$ajax.get(`Feature/getFeatureByOrg/${this.$store.state.user_info.user.organizationID}?flag=true`)
+
         .then(res => {
           if (res.data.code === 1) {
             let data = res.data.result
@@ -137,6 +141,9 @@ export default {
     },
     close () {
       this.modolType = null
+    },
+    getHeight () {
+      getHeights()
     }
   }
 }

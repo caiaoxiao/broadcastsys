@@ -72,6 +72,7 @@
       this.$nextTick(function() {
         getHeight()
         getHeights()
+	$(".orgTreeList").removeClass("treeListShow").addClass("treeListHide")
         this.refresh()
       })
     },

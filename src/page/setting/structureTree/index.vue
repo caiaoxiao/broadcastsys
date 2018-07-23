@@ -40,7 +40,6 @@
     },
     watch:{
       targetUserGroupId:(targetUserGroupId)=>{
-        console.log(targetUserGroupId)
       }
     },
     data() {
@@ -74,7 +73,6 @@
         this.$ajax.get('https://scc.ieyeplus.com:8443/IpBc/' + 'Organization/Data/' + this.get_user_info.user.organizationID)
           .then((res) => {
             let data = res.data.result
-            console.log(data)
             this.data = data
             // 初始化树对象
             this.$emit('setInitData', data[0])
@@ -156,26 +154,49 @@
       let children = node.parent.data.Children
       children[children.length-1].OrgName = text
       //if (text !== '新建设备分组') {
-        this.$ajax.post('Organization/Create',{orgCode:data.OrganizationID.slice(-4,)+String(children.length),OrgName:text,parentID:data.OrganizationID})
+      this.$ajax.post('Organization/List',{pageIndex:1,pageSize:1000})
         .then((res)=>{
-          console.log(res)
-          if(res.data.code == 1){
-            let organizationID = res.data.result.organizationID
-            data.OrganizationID = organizationID
-            let request = {
-              roleName: text,
-              childData: false
-            }
-            this.$ajax.post('Role/Create', request)
-            .then(res => {
-              console.log(res)
-              if (res.data.code === 1) {
-                let result = res.data.result
-                this.$emit("refresh")
-                }
-            })
+          if (res.data.code == 1)
+            {
+              let total = res.data.result.length
+              let id = String(Number(total)+1).length > 1?String(Number(total) + 1):"0"+String(Number(total) + 1)
+              let vertoNum = "90" + id
+              let alarmNum = "91" + id
+              let voiceNum = "92" + id
+              let broadNum = "93" + id
+              let meetingNum = "94" + id
+            
+              this.$ajax.post('Organization/Create',{
+                orgCode:"00000"+ String(Number(total)+1),
+                OrgName:text,
+                parentID:data.OrganizationID,
+                VertoID:vertoNum,
+                VoiceCallID:voiceNum,
+                MeetingID: meetingNum,
+                BroadID:broadNum,
+                AlarmID:alarmNum
+                })
+              .then((res)=>{
+                console.log(res)
+                if(res.data.code == 1){
+                  let organizationID = res.data.result.organizationID
+                  data.OrganizationID = organizationID
+                  let request = {
+                    roleName: text,
+                    childData: false
+                  }
+                  this.$ajax.post('Role/Create', request)
+                  .then(res => {
+                    console.log(res)
+                    if (res.data.code === 1) {
+                      let result = res.data.result
+                      this.$emit("refresh")
+                      }
+                  })
+              }
+          })
         }
-     })
+      })
      event.target.contentEditable = "false"
     },
       renderContent(h, { node, data, store }) {
@@ -203,7 +224,7 @@
 .el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content {
     background: #5bc0de;
 }
-<style>
+</style>
 <style scoped>
 .custom-tree-node {
     flex: 1;

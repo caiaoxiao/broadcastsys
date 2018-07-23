@@ -55,7 +55,6 @@ export default {
         .then((res) => {
           if (res.data.code === 1) {
             let result = res.data.result
-            console.log(result)
             result.forEach((r, i) => {  
               r.selected = false
             })

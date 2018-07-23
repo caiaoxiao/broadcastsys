@@ -104,6 +104,7 @@ import parseXML from 'utils/xml_parser';
 import { mapGetters, mapActions } from 'vuex'
 import { getHeight } from 'utils/height'
 import { getHeights, itemClick } from 'utils/page/voiceCall'
+import {GET_USER_INFO} from 'store/getters/type'
 import { leftPhone, rightPhone, deviceList, switchs} from 'components'
 
 export default {
@@ -127,26 +128,30 @@ export default {
       deviceGroup: [],
       num: 0,
       groupShow:"",
+      verto: "",
     }
   },
   created () {
     this.$nextTick(function () {
       getHeight()
       getHeights()
+      this.verto = this.get_user_info.freeswitchData.VertoID
       //this.initData()
     })
   },
   computed: {
-    ...mapGetters([
-      'dialogShow',
-      'callQueue',
-      'vertoHandle',
-      'group_users',
-      'users',
-      'deviceList',
-      'currentLoginUser',
-      'userGroup',
-    ])
+
+    ...mapGetters({
+      dialogShow:'dialogShow',
+      callQueue:'callQueue',
+      vertoHandle:'vertoHandle',
+      group_users:'group_users',
+      users:'users',
+      deviceList:'deviceList',
+      currentLoginUser:'currentLoginUser',
+      userGroup:'userGroup',
+      get_user_info: GET_USER_INFO,
+    })
   },
   methods: {
     // 获取设备分组数据
@@ -272,8 +277,8 @@ export default {
       if (userChanged) this.$store.dispatch('setDeviceList', users)
       this.vertoHandle.newCall({
         destination_number: '9001' + select.channelUUID,
-        caller_id_name: '9000',
-        caller_id_number: '9000',
+        caller_id_name: this.verto,
+        caller_id_number: this.verto,
         outgoingBandwidth: 'default',
         incomingBandwidth: 'default',
         useStereo: true,
@@ -302,8 +307,8 @@ export default {
       let select = this.selectNowCall[0];
       this.vertoHandle.newCall({
         destination_number: '9003' + select.channelUUID,
-        caller_id_name: '9000',
-        caller_id_number: '9000',
+        caller_id_name: this.verto,
+        caller_id_number: this.verto,
         outgoingBandwidth: 'default',
         incomingBandwidth: 'default',
         useStereo: true,
@@ -326,8 +331,8 @@ export default {
       console.log(this.selectNowCall[0].channelUUID);
       this.vertoHandle.newCall({
         destination_number: '9002' + select.channelUUID,
-        caller_id_name: '9000',
-        caller_id_number: '9000',
+        caller_id_name: this.verto,
+        caller_id_number: this.verto,
         outgoingBandwidth: 'default',
         incomingBandwidth: 'default',
         useStereo: true,
@@ -353,8 +358,8 @@ export default {
 
       this.vertoHandle.newCall({
         destination_number: '9004' + this.selectRingCall[0].oppoChannelUUID,
-        caller_id_name: '9000',
-        caller_id_number: '9000',
+        caller_id_name: this.verto,
+        caller_id_number: this.verto,
         outgoingBandwidth: 'default',
         incomingBandwidth: 'default',
         useStereo: true,
@@ -390,8 +395,8 @@ export default {
       call() {
        this.vertoHandle.newCall({
         destination_number : this.selectPhone[0].userID,
-        caller_id_name: '9000',
-        caller_id_number: '9000',
+        caller_id_name: this.verto,
+        caller_id_number: this.verto,
         outgoingBandwidth: 'default',
         incomingBandwidth: 'default',
         useStereo: true,

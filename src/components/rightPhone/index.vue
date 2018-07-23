@@ -14,7 +14,7 @@
         <div class="numList">
           <div>
             <ul class="callNum">
-                <li class ="unselected" v-if="item.caller_id_number!='9000'" v-for="item in confAlarm" @click.stop="select($event,item)">	
+                <li class ="unselected" v-if="item.caller_id_number!=verto" v-for="item in confAlarm" @click.stop="select($event,item)">	
 		<i class="fa fa-circle red" aria-hidden="true"></i>
 		{{ item.caller_id_number}}
               </li>
@@ -61,7 +61,7 @@
 <script>
   import { mapGetters, mapActions } from "vuex";
   import { getHeight } from "utils/height";
-
+  import {GET_USER_INFO} from 'store/getters/type'
   export default {
     props:{
        },
@@ -83,17 +83,27 @@
           {name: 0},
           {name: '#'},
         ],
-	flag_callqueue:false,
-	flag_confleft:false,
-	flag_confalarm:false,
-	flag_call:false,
-	nowCalling:""
+        flag_callqueue:false,
+        flag_confleft:false,
+        flag_confalarm:false,
+        flag_call:false,
+        nowCalling:"",
+        verto: "",
+        meeting: "",
+        voice: "",
+        broad: "",
+        alarm: "",
 
       };
     },
     created() {
       this.$nextTick(function () {
         getHeight();
+        this.verto = this.get_user_info.freeswitchData.VertoID
+        this.meeting = this.get_user_info.freeswitchData.MeetingID
+        this.voice = this.get_user_info.freeswitchData.VoiceCallID
+        this.alarm = this.get_user_info.freeswitchData.AlarmID
+        this.broad = this.get_user_info.freeswitchData.BroadID
         //$.verto.init({}, this.bootstrap);
       });
     },
@@ -103,17 +113,18 @@
         group_users: "group_users",
         users: "users",
         currentLoginUser: "currentLoginUser",
-	confLeft: "confLeft",
+	      confLeft: "confLeft",
         callQueue: "callQueue",
-	confAlarm: "confAlarm",
-	selectedAlarm: "selectedAlarm",
+	      confAlarm: "confAlarm",
+        selectedAlarm: "selectedAlarm",
+        get_user_info: GET_USER_INFO,
       })
     },
     watch: {
 	
 	callQueue:function(callqueue)
 	{
-	if(callqueue.length>0 && (callqueue[callqueue.length-1].des=='9000') )
+	if(callqueue.length>0 && (callqueue[callqueue.length-1].des==this.verto) )
 	  {
 	   this.flag_call = true
            this.nowCalling = callqueue[0].caller+"正在呼叫您，请及时接听"
@@ -123,7 +134,7 @@
 	   this.flag_call = false
 	}
 	if(callqueue.length>0){
-         if(callqueue[0].caller =='9000' || callqueue[0].des =='9000')
+         if(callqueue[0].caller ==this.verto || callqueue[0].des ==this.verto)
                 this.flag_callqueue = true
 	 else
 		this.flag_callqueue = false
@@ -134,7 +145,7 @@
 	confLeft:function(confleft)
 	{
 	for(var i = 0;i < confleft.length;i++)
-		  if(confleft[i].caller_id_number == '9000')
+		  if(confleft[i].caller_id_number == this.verto)
 			{   this.flag_confleft = true 
 			    break
 	                }
@@ -145,7 +156,7 @@
 	confAlarm:function(confalarm)
         {
         for(var i = 0;i < confalarm.length;i++)
-                  if(confalarm[i].caller_id_number == '9000')
+                  if(confalarm[i].caller_id_number == this.verto)
                         {   this.flag_confalarm = true
                             break
                         }
@@ -157,17 +168,16 @@
     },
      methods: {
       toggle_enter(){
-      let _this = this
       if(this.flag_confalarm ==true)
- 	this.confAlarm.forEach(function(item,index,array){
-	if(item.caller_id_number=='9000')
-          _this.fsAPI('conference',"9110-scc.ieyeplus.com"+" "+"hup"+" "+item.conf_id)
+ 	    this.confAlarm.forEach((item,index,array)=>{
+	    if(item.caller_id_number==this.verto)
+          this.fsAPI('conference',this.alarm+"-scc.ieyeplus.com"+" "+"hup"+" "+item.conf_id)
 	})
       else if(this.confAlarm.length>0){
                this.vertoHandle.newCall({
-                        destination_number: "9110",
+                        destination_number: this.alarm,
                         caller_id_name: "LegalHigh",
-                        caller_id_number: "9000",
+                        caller_id_number: this.verto,
                         outgoingBandwidth: "default",
                         incomingBandwidth: "default",
                         useStereo: true,
@@ -226,7 +236,7 @@
           // Extension to dial.
           destination_number: this.destination_number,
           caller_id_name: "LegalHigh",
-          caller_id_number: "9000",
+          caller_id_number: this.verto,
           outgoingBandwidth: "default",
           incomingBandwidth: "default",
           useStereo: true,

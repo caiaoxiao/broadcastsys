@@ -33,6 +33,7 @@
         })
         getHeight()
         getHeights()
+	$(".orgTreeList").removeClass("treeListShow").addClass("treeListHide")
       })
     },
     watch: {

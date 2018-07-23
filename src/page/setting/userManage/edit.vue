@@ -28,6 +28,14 @@
               </div>
             </div>
           </div>
+	<div class="col-md-6">
+            <div class="form-group">
+              <label class="col-sm-4 control-label">密码</label>
+              <div class="col-sm-8">
+                <input type="text" class="form-control" v-model="formData.password">
+              </div>
+            </div>
+          </div>
         </div>
         <div class="row">
           <div class="col-md-6">
@@ -66,6 +74,7 @@ export default {
       formData: {
         deviceCode: '',
         deviceName: '',
+	password:'',
         type: 0,
         deviceVedios: [{ vedioUrl: '' }, { vedioUrl: '' }, { vedioUrl: '' }, { vedioUrl: '' }],
         feature:{ organizationID :  this.transferdata.targetMenuId , aliasName:""}

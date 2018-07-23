@@ -83,6 +83,7 @@
   import {getHeights,itemClick} from 'utils/page/meeting'
   import {isArray,isObject,isString} from 'utils/tool.js'
   import { mapGetters,mapActions } from 'vuex'
+  import {GET_USER_INFO} from 'store/getters/type'
   import {leftPhone,rightPhone,confirmDialog,callDivert} from 'components'
   export default {
 
@@ -91,24 +92,26 @@
       return {
         shows: false,
         deviceAll: [],
-        name: '9112' + '-' + window.location.hostname,
+        name:"",
         nowSession: [],       // 正在开会的话机
         selectNowSession: [], // 会议中选中的话机
         selectPhone: [],
-	groupShow:"",       // 选中待会议的话机
-	selectNowCall: [],
+	      groupShow:"",       // 选中待会议的话机
+	      selectNowCall: [],
         selectRingCall: [],
+        meeting: "",
       }
     },
     computed: {
-      ...mapGetters([
-        'dialogShow',
-        'vertoHandle',           // verto初始化
-        'deviceList',           // 分组设备(不包括当前用户)
-        'phoneShow',             // 话机显示或隐藏
-	'userGroup',
-	'confMeeting'
-      ]),
+      ...mapGetters({
+        dialogShow:'dialogShow',
+        vertoHandle:'vertoHandle',           // verto初始化
+        deviceList:'deviceList',           // 分组设备(不包括当前用户)
+        phoneShow:'phoneShow',             // 话机显示或隐藏
+	      userGroup:'userGroup',
+        confMeeting:'confMeeting',
+        get_user_info: GET_USER_INFO,
+      }),
     },
     components: {
       leftPhone,
@@ -120,6 +123,8 @@
       this.$nextTick(function() {
         getHeight()
         getHeights()
+        this.name = this.get_user_info.freeswitchData.MeetingID + '-' + window.location.hostname
+        this.meeting = this.get_user_info.freeswitchData.MeetingID
       })
     },
     methods: {
@@ -187,9 +192,9 @@
         if($(target).hasClass('online')) {
           if($(target).hasClass("onlineSelected") ){
             $(target).removeClass("onlineSelected")
-            this.selectPhone.forEach(function(s,i) {
+            this.selectPhone.forEach((s,i) =>{
               if(s.userID == row.userID) {
-                _this.selectPhone.splice(i, 1)
+                this.selectPhone.splice(i, 1)
               }
             })
 //            this.selectPhone.splice(this.selectPhone.indexOf(row.userExten));
@@ -227,12 +232,12 @@
           //  赋值到会议话机数组
           this.nowSession = Object.assign([], this.selectPhone);
           //  单个设备开始会议
-          this.selectPhone.forEach(function(s, i){
+          this.selectPhone.forEach((s, i)=>{
             this.fsAPI("conference",
               this.name + " " + "bgdial" + " " + "user/"+this.selectPhone[i].userID,function(res){
               console.log("邀请会议",res)
             });
-          }.bind(this))
+          })
 
           //  重置勾选话机数组
           this.selectPhone = []

@@ -4,7 +4,13 @@ export function getHeights() {
 	  var windowHeight = $(window).height();
 	  var maxHeight = windowHeight - $(".sysName").outerHeight(); 
 	  var contentHeight = $(".content").outerHeight()
-	  console.log(maxHeight,contentHeight)
+	  var popUp = $(".popUp")
+	  var popUpHeight = 0
+	  if (popUp!=undefined){
+	  popUpHeight = popUp.offsetTop + popUp.offsetHeight
+          contentHeight = Math.max( contentHeight,popUpHeight)
+	  }
+	  
 	  if(contentHeight > maxHeight)
 	{
 		  $(".content").css('height',maxHeight)

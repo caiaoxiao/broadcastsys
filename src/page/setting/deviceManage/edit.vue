@@ -20,7 +20,23 @@
               </div>
             </div>
           </div>
-        </div>
+	<div class="col-md-6">
+            <div class="form-group">
+              <label class="col-sm-4 control-label">所属组织id</label>
+              <div class="col-sm-8">
+                <input type="text" class="form-control" v-model="formData.feature.organizationId">
+              </div>
+            </div>
+          </div>
+	<div class="col-md-6">
+            <div class="form-group">
+              <label class="col-sm-4 control-label">密码</label>
+              <div class="col-sm-8">
+                <input type="text" class="form-control" v-model="formData.password">
+              </div>
+            </div>
+          </div>
+	</div>
         <div class="row">
           <div class="col-md-6">
             <div class="form-group">
@@ -33,14 +49,6 @@
                 <label class="radio-inline">
                   <input type="radio" value="1" v-model="formData.type">视频终端
                 </label>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="form-group">
-              <label class="col-sm-4 control-label">所属组织id</label>
-              <div class="col-sm-8">
-                <input type="text" class="form-control" v-model="formData.feature.organizationID">
               </div>
             </div>
           </div>
@@ -66,9 +74,10 @@ export default {
       formData: {
         deviceCode: '',
         deviceName: '',
+	password:"",
         type: 0,
         deviceVedios: [{ vedioUrl: '' }, { vedioUrl: '' }, { vedioUrl: '' }, { vedioUrl: '' }],
-        feature:{organizationID:"",aliasName:""}
+        feature:{organizationId:"",aliasName:""}
 
       },
       rules: {},
@@ -77,6 +86,7 @@ export default {
   },
   created () {
     this.$nextTick(() => {
+      this.$emit("getHeight")
       let documentHeight = document.documentElement.clientHeight
       $('.popUp').css('top', documentHeight * 0.3 + 'px')
       if (this.modolType === 1) {
@@ -87,7 +97,7 @@ export default {
               this.$ajax.get(`Feature/Detail/${this.transferData.deviceId}`)
               .then(res => {
                   if (res.data.code === 1) {
-                    this.formData.feature.organizationID = res.data.result.organizationId
+                    this.formData.feature.organizationId = res.data.result.organizationId
                   }
               })
             }

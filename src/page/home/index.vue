@@ -13,6 +13,7 @@
   import { mapGetters,mapActions } from 'vuex'
   import {isArray,isObject,isString} from 'utils/tool'
   import { topMenu, footNav, container,treeList,switchLeft } from 'components'
+  import {GET_USER_INFO} from 'store/getters/type'
   import {getHeights} from 'utils/page/home'
   export default {
     data () {
@@ -23,18 +24,24 @@
 	      usermap:{},
 	      last_id:"",	
         targetUserGroupId:"",
+        verto: "",
+        meeting: "",
+        voice: "",
+        broad: "",
+        alarm: "",
+
       }
     },
     created() {
       this.$nextTick(()=> {
-        // 初始化vertoHandle
-        //if(this.vertoHandle==null)
-	  getHeights()
-	      console.log(this.$store.state.user_info)
-          $.verto.init({}, this.initVertoHandle);
-        //else
-        //  console.log('verto aleray not null')
-
+	        getHeights()
+          this.verto = this.get_user_info.freeswitchData.VertoID
+          this.meeting = this.get_user_info.freeswitchData.MeetingID
+          this.voice = this.get_user_info.freeswitchData.VoiceCallID
+          this.alarm = this.get_user_info.freeswitchData.AlarmID
+          this.broad = this.get_user_info.freeswitchData.BroadID
+          $.verto.init({}, this.initVertoHandle)
+          $(".orgTreeList").removeClass("treeListHide").addClass("treeListShow");
       })
     },
     computed: {
@@ -49,23 +56,25 @@
         confLeft:'confLeft',
         confAlarm:'confAlarm',
 	      confIpBoard: 'confIpBoard',
-	      TreeData:'TreeData'
+        TreeData:'TreeData',
+        freeswitchData:'freeswitchData',
+        get_user_info: GET_USER_INFO,
       }),
     },
     watch: {
-      'TreeData':function(data){this.$nextTick(()=> {this.refresh() })},
+      'TreeData':function(data){if(this.vertoHandle) this.refresh() },
       'callQueue':function(conf) { 
 	},
       'confAlarm': function(conf) {
-        if(conf.length>0 && !conf.some(function(item,indexs,array){return item.caller_id_number=='9000'}))
+        if(conf.length>0 && !conf.some((item,indexs,array)=>{return item.caller_id_number==this.verto}))
         {
-          if(this.callQueue.some(function(item,index,array){return  item.des=='9000'}))
+          if(this.callQueue.some((item,index,array)=>{return  item.des==this.verto}))
           this.vertoHandle.hangup()
           this.vertoHandle.newCall({
           // Extension to dial.
-          destination_number: '9110',
+          destination_number: this.alarm,
           caller_id_name: "LegalHigh",
-          caller_id_number: "9000",
+          caller_id_number: this.verto,
           outgoingBandwidth: "default",
           incomingBandwidth: "default",
           useStereo: true,
@@ -79,11 +88,10 @@
         }) 
           
         }
-       else if(conf.length>0 && conf.every(function(item,index,array){return item.caller_id_number=='9000'}))
+       else if(conf.length>0 && conf.every((item,index,array)=>{return item.caller_id_number ==this.verto}))
 	{	
-	   let _this = this
-	   conf.forEach(function(item){
-           _this.fsAPI('conference','9110-scc.ieyeplus.com'+' ' +'hup'+' '+item.conf_id) 
+	   conf.forEach((item)=>{
+           this.fsAPI('conference',+this.alarm+'-scc.ieyeplus.com'+' ' +'hup'+' '+item.conf_id) 
 		})
 	   this.$store.dispatch('setConfAlarm',[])
 	}
@@ -94,7 +102,7 @@
         let _this = this
         this.$store.dispatch('setVertoInit',
           new jQuery.verto({
-            login: '9000'+'@'+ window.location.hostname,
+            login: _this.verto +'@'+ window.location.hostname,
             passwd: '1234',
             socketUrl: 'wss://'+ window.location.hostname +':8082',
             ringFile: 'sounds/bell_ring2.wav',
@@ -113,7 +121,7 @@
             onWSLogin(verto, success) {
               // 登录回调
               _this.refresh()
-	      _this.handleGetCallOrRinging()
+	            _this.handleGetCallOrRinging()
               console.log('onWSLogin', success);
             },
             onWSClose(verto, success) {
@@ -230,22 +238,22 @@
 		let action = ""
 		let arr =[]
 		let hash = Object.keys(liveArrayObj.hash())
-			if(liveArrayObj.name == '9100-scc.ieyeplus.com')
+			if(liveArrayObj.name == _this.voice+'-scc.ieyeplus.com')
                                 {
 				arr = _this.$store.getters.confLeft
 				action = 'setConfLeft'
 				}
-			else if(liveArrayObj.name =='9110-scc.ieyeplus.com')
+			else if(liveArrayObj.name ==_this.alarm+'-scc.ieyeplus.com')
 				{
 				arr = _this.$store.getters.confAlarm
 				action = 'setConfAlarm'
 				}
-			else if(liveArrayObj.name =='9111-scc.ieyeplus.com')
+			else if(liveArrayObj.name ==_this.broad+'-scc.ieyeplus.com')
 				{
 				arr = _this.$store.getters.confIpBoard
 				action = 'setConfIpBoard'
 				}
-			else if(liveArrayObj.name =='9112-scc.ieyeplus.com')
+			else if(liveArrayObj.name ==_this.meeting+'-scc.ieyeplus.com')
                                 {
                                 arr = _this.$store.getters.confMeeting
                                 action = 'setConfMeeting'
@@ -259,11 +267,11 @@
 
                       // New user joined conference.
                       case "add":
-		      if(args.data[1]!='9000'){
+		      if(args.data[1]!=_this.verto){
                       device.forEach(function(user) {
                             if(user.userID == args.data[1])  {
                                 user.deviceState = 'active'
-				user.calling = liveArrayObj.name.slice(0,liveArrayObj.name.indexOf('-'))
+			                        	user.calling = liveArrayObj.name.slice(0,liveArrayObj.name.indexOf('-'))
 				                if(user.timer.clock == false){
                                 var t = setInterval(()=>{
                                  user.timer.s+=1
@@ -293,18 +301,18 @@
 
                         })
                         _this.$store.dispatch(action,arr)
-			if( liveArrayObj.name =='9110-scc.ieyeplus.com' && args.data[1]!='9000')
+      if( liveArrayObj.name ==_this.alarm+'-scc.ieyeplus.com' && args.data[1]!=_this.verto)
 			{
-			let deviceCode = args.data[1]
-			_this.$ajax.post('Basic/List')
-				.then(res=>{
+          let deviceCode = args.data[1]
+          _this.$ajax.post('Basic/List')
+          .then(res=>{
 					if (res.data.code === 1 && res.data.result.length>0){ 
 								let url = "http://scc.ieyeplus.com:8080/"+res.data.result[0].uniqueId+"/"+deviceCode 
 								window.open(url,'newwindow','height=1920,width=1080,top=0,left=0,toolbar=no,menubar=no,scrollbars=no,location=no, status=no')
 						}
 					})//device获取videourl
 		}//liveArrayObj.name =='9110-scc.ieyeplus.com'i && args.data[1]!='9000'
-			if((liveArrayObj.name =='9100-scc.ieyeplus.com')  && args.data[1]!='9000'){ 
+			if((liveArrayObj.name ==_this.voice+'-scc.ieyeplus.com')  && _this.verto){ 
                         _this.fsAPI('conference',liveArrayObj.name+' '+'stop'+' '+'all'+' '+ parseInt(args.data[0]).toString())
 			_this.fsAPI('conference',liveArrayObj.name+' '+'play'+' '+'/usr/local/freeswitch/sounds/music/8000/danza-espanola-op-37-h-142-xii-arabesca.wav'+ ' '+ parseInt(args.data[0]).toString()) 
 			}
@@ -410,10 +418,10 @@
                   // Fired when the server has finished re-attaching any active sessions.
                   // data.reattached_sessions contains an array of session IDs for all
                   // sessions that were re-attached.
-                  initLiveArray(verto, dialog, data,"conference-liveArray.9100-scc.ieyeplus.com@scc.ieyeplus.com","9100-scc.ieyeplus.com");
-                  initLiveArray(verto, dialog, data,"conference-liveArray.9110-scc.ieyeplus.com@scc.ieyeplus.com","9110-scc.ieyeplus.com");
-                  initLiveArray(verto, dialog, data,"conference-liveArray.9111-scc.ieyeplus.com@scc.ieyeplus.com","9111-scc.ieyeplus.com");
-                  initLiveArray(verto, dialog, data,"conference-liveArray.9112-scc.ieyeplus.com@scc.ieyeplus.com","9112-scc.ieyeplus.com");
+                  initLiveArray(verto, dialog, data,"conference-liveArray."+_this.voice+"-scc.ieyeplus.com@scc.ieyeplus.com",_this.voice+"-scc.ieyeplus.com");
+                  initLiveArray(verto, dialog, data,"conference-liveArray."+_this.alarm+"-scc.ieyeplus.com@scc.ieyeplus.com",_this.alarm+"-scc.ieyeplus.com");
+                  initLiveArray(verto, dialog, data,"conference-liveArray."+_this.broad+"-scc.ieyeplus.com@scc.ieyeplus.com",_this.broad+"-scc.ieyeplus.com");
+                  initLiveArray(verto, dialog, data,"conference-liveArray."+_this.meeting+"-scc.ieyeplus.com@scc.ieyeplus.com",_this.meeting+"-scc.ieyeplus.com");
                   console.log('verto channel ready')
                   break;
               }
@@ -428,8 +436,9 @@
       },
       // 查询所有设备 以及事件初始化
       refresh() {
-//      let xuiUsername = localStorage.getItem('xui.username')
-        let xuiUsername = 9000 // 过滤掉登陆者
+        //let xuiUsername = localStorage.getItem('xui.username')
+	//this.$ajax.post('Role/Create',{roleName:"湖北监控中心",childData:0})
+        let xuiUsername = this.verto // 过滤掉登陆者
         this.$store.dispatch('setCurrentLoginUser',{
           deviceState: "registered",
           userID: xuiUsername,
@@ -445,6 +454,7 @@
 
             let registrations = [];
             let deviceList = []
+            this.usermap = new Object()
             if(msg) {
               if (isArray(msg.row)) {
                 registrations = msg.row;
@@ -456,38 +466,7 @@
                 registrations.push(msg);
               }
             }
-      registrations.forEach(function(r) {
-              let user = {}
-              if(r.reg_user != xuiUsername){ //(!deviceList.some((item)=>{return item.userID == r.reg_user})) 
-                user.deviceState = "registered"
-                user.userID = r.reg_user
-                user.callDirection = null
-                user.channelUUID = null
-                user.networkIP = r.network_ip
-                user.networkPort = r.network_port
-                user.operationState = 0
-                user.oppoChannelUUID = null
-                user.groupid = []//this.usermap.hasOwnProperty(user.userID)?usermap[userID]:null
-                user.timer = {s:0,m:0,h:0,id:[],clock:false}
-                user.calling = null 
-		            user.name = null 
-                deviceList.push(user)
-              }/*
-              else{
-                deviceList.forEach((item,index)=>{ if(item.userID == r.reg_user)
-                        deviceList[index].deviceState = "registered"
-                        deviceList[index].userID = r.reg_user
-                        deviceList[index].callDirection = null
-                        deviceList[index].channelUUID = null
-                        deviceList[index].networkIP = r.network_ip
-                        deviceList[index].networkPort = r.network_port
-                        deviceList[index].operationState = 0
-                        deviceList[index].oppoChannelUUID = null
-                        deviceList[index].groupid = this.usermap.hasOwnProperty(user.userID)?usermap[userID]:null
-                        })
 
-                }*/
-            })	
                   this.$ajax.post(`Role/List`)
                     .then((res) => {
                       if (res.data.code === 1) {
@@ -497,68 +476,113 @@
                           if(element.roleName == this.TreeData.OrgName){
                             this.targetUserGroupId = element.roleID
                           }
-                  if(this.targetUserGroupId!="")
-                      this.$ajax.get(`Role/getDeviceGroup/${this.targetUserGroupId}`)
+                        })
+                      }
+                      let  organizationID_requests = []
+                      organizationID_requests.push(this.$ajax.get(`Feature/getFeatureByOrg/${this.TreeData.OrganizationID}?flag=true`))
+                      organizationID_requests.push(this.$ajax.get(`Feature/getFeatureByOrg/${this.TreeData.OrganizationID}?flag=false`))
+                      this.$ajax.all(organizationID_requests)
                         .then((res) => {
-                      if (res.data.code === 1) {
-                        this.group_list = res.data.result
-                        for(let g in this.group_list)
-                          this.group_list[g].selected = false
-                        this.$store.dispatch('setUserGroup',this.group_list)
-                        this.group_list.forEach((item,index) => {
-                        this.$ajax.get(`DeviceGroup/Detail/${item.deviceGroupId}`)
-                        .then(res => {
-                          if (res.data.code === 1) {
-                              let group  = res.data.result.deviceGroups
-                              group.forEach((r,i)=>{
+                            let all_devices = [] 
+                            if (res[0].data.code == 1)
+                              all_devices = all_devices.concat(res[0].data.result)
+                            else if (res[1].data.code == 1)
+                              all_devices = all_devices.concat(res[1].data.result)
+			    all_devices.forEach((r,i)=>{
                                 if(this.usermap.hasOwnProperty(r.deviceCode)){
-                                  this.usermap[r.deviceCode].list.push(r.deviceGroupId)
-                                  this.usermap[r.deviceCode].type =r.type
-                              this.usermap[r.deviceCode].name = r.deviceName
                                 }
                                 else{
                                   this.usermap[r.deviceCode] = {}
-                                  this.usermap[r.deviceCode].list = [r.deviceGroupId]
+                                  this.usermap[r.deviceCode].list = []
                                   this.usermap[r.deviceCode].type =r.type
                                   this.usermap[r.deviceCode].name = r.deviceName
                                 }
+                            })
+			    if(this.targetUserGroupId!="" || this.TreeData.ParentID=="0")
+                            this.$ajax.get(`Role/getDeviceGroup/${this.targetUserGroupId}`)
+                              .then((res) => {
+                            if (res.data.code === 1) {
+                              this.group_list = res.data.result
+                              for(let g in this.group_list)
+                              this.group_list[g].selected = false
+                              this.$store.dispatch('setUserGroup',this.group_list)
+                              let axios = []
+                              this.group_list.forEach((item,index) => {
+                              axios.push(this.$ajax.get(`DeviceGroup/Detail/${item.deviceGroupId}`))
                               })
-                            }
-                        for(let index in deviceList){
-                          if(this.usermap.hasOwnProperty(deviceList[index].userID)){
-                            deviceList[index].groupid =  this.usermap[deviceList[index].userID].list
-                            deviceList[index].type =  this.usermap[deviceList[index].userID].type
-                            deviceList[index].name = this.usermap[deviceList[index].userID].name
-                            delete this.usermap[deviceList[index].userID] }
-                        }
-                        for(let item in this.usermap){
-                          let user = {}
-                            user.deviceState = "unregistered"
-                            user.calling = ""
-                            user.userID = item
-                            user.callDirection = null
-                            user.channelUUID = null
-                            user.networkIP = null
-                            user.networkPort = null
-                            user.operationState = 0
-                            user.oppoChannelUUID = null
-                            user.groupid = this.usermap[item].list
-                            user.type = this.usermap[item].type
-                            user.name = this.usermap[item].name
-                            user.timer = {s:0,m:0,h:0,id:[],clock:false}
-                            deviceList.push(user)
-                                  }   
+                              this.$ajax.all(axios)
+                              .then(res => {
+				    console.log(res)
+                                    for (let i = 0 ; i<res.length ; i++){
+                                    let group  = res[i]?res[i].data.result.deviceGroups:[]
+                                    group.forEach((r,i)=>{
+                                      if(this.usermap.hasOwnProperty(r.deviceCode)){
+                                        this.usermap[r.deviceCode].list.push(r.deviceGroupId)
+                                        this.usermap[r.deviceCode].type =r.type
+                                        this.usermap[r.deviceCode].name = r.deviceName
+                                      }
+                                      else{
+                                        this.usermap[r.deviceCode] = {}
+                                        this.usermap[r.deviceCode].list = [r.deviceGroupId]
+                                        this.usermap[r.deviceCode].type =r.type
+                                        this.usermap[r.deviceCode].name = r.deviceName
+                                      }
+                                    })
+                                  }
+                                for(let index in deviceList){
+                                if(this.usermap.hasOwnProperty(deviceList[index].userID)){
+                                  deviceList[index].groupid =  this.usermap[deviceList[index].userID].list
+                                  deviceList[index].type =  this.usermap[deviceList[index].userID].type
+                                  deviceList[index].name = this.usermap[deviceList[index].userID].name
+                                  delete this.usermap[deviceList[index].userID] }
+                              }
+                              for(let item in this.usermap){
+                                let user = {}
+                                  user.deviceState = "unregistered"
+                                  user.calling = ""
+                                  user.userID = item
+                                  user.callDirection = null
+                                  user.channelUUID = null
+                                  user.networkIP = null
+                                  user.networkPort = null
+                                  user.operationState = 0
+                                  user.oppoChannelUUID = null
+                                  user.groupid = this.usermap[item].list
+                                  user.type = this.usermap[item].type
+                                  user.name = this.usermap[item].name
+                                  user.timer = {s:0,m:0,h:0,id:[],clock:false}
+                                  deviceList.push(user)
+                                }
+                                      registrations.forEach( (r) =>{
+                                        for (let i =0;i < deviceList.length;i++){
+                                        if (deviceList[i].userID == r.reg_user){
+                                        if(r.reg_user != xuiUsername){ //(!deviceList.some((item)=>{return item.userID == r.reg_user})) 
+                                          deviceList[i].deviceState = "registered"
+                                          deviceList[i].userID = r.reg_user
+                                          deviceList[i].callDirection = null
+                                          deviceList[i].channelUUID = null
+                                          deviceList[i].networkIP = r.network_ip
+                                          deviceList[i].networkPort = r.network_port
+                                          deviceList[i].operationState = 0
+                                          deviceList[i].oppoChannelUUID = null
+                                          deviceList[i].timer = {s:0,m:0,h:0,id:[],clock:false}
+                                          deviceList[i].calling = null 
+                                          deviceList[i].name = null 
+                                        }
+                                      }
+                                    }
+                                  })
+                                 console.log(deviceList) 
+                                })
+                               }
                               })
-                          })
-                        }
-                    })
-                else
-                {
+                              
+                              })
+                if(this.targetUserGroupId == "")
                   this.$store.dispatch('setUserGroup',[])
-                }
-                  })
-                }
-            })
+                  
+                })
+                  	
           this.$store.dispatch('setDeviceList',deviceList)
           }.bind(this),function(data) {
             console.log("error:"+data)
@@ -577,13 +601,12 @@
           let isContinue = true
           deviceList.forEach(function(d, i) {
             if(d.userID == e.data.username ) {
-	      if( deviceList[i].deviceState == "unregistered")
+	          if( deviceList[i].deviceState == "unregistered")
               deviceList[i].deviceState = "registered"
-              isContinue=false
               return;
             }
           })
-
+          /*
           if(isContinue) {
             let user = {}
             user.deviceState = "registered"
@@ -592,11 +615,12 @@
             user.channelUUID = null
             user.groupid = this.usermap.hasOwnProperty(user.userID)?usermap[userID].list:[]
             user.type = this.usermap.hasOwnProperty(user.userID)?usermap[userID].type:""
-	    user.timer = {s:0,m:0,h:0,id:[],clock:false}
-	    user.name = this.usermap.hasOwnProperty(user.userID)?usermap[userID].name:null
+	          user.timer = {s:0,m:0,h:0,id:[],clock:false}
+	          user.name = this.usermap.hasOwnProperty(user.userID)?usermap[userID].name:null
             deviceList.push(user)
 
           }
+          */
 
         }else if( e.eventChannel =='FSevent.custom::sofia::unregister') {
           deviceList.forEach(function(d, i) {
@@ -628,19 +652,19 @@
                     let arr = []
                     let conf_name = item.application_data.slice(0,item.application_data.indexOf('+'))
                     switch(conf_name){
-                    case "9100-scc.ieyeplus.com":
+                    case this.voice+"-scc.ieyeplus.com":
                       application_des = "setConfLeft"
                       arr = this.$store.getters.confLeft
                       break
-                    case "9110-scc.ieyeplus.com":
+                    case this.alarm+"-scc.ieyeplus.com":
                       application_des = "setConfAlarm"
                       arr = this.$store.getters.confAlarm
                       break
-                    case "9111-scc.ieyeplus.com":
+                    case this.broad+"-scc.ieyeplus.com":
                       application_des = "setConfIpBoard"
                       arr = this.$store.getters.confIpBoard
                       break
-                    case "9112-scc.ieyeplus.com":
+                    case this.meeting+"-scc.ieyeplus.com":
                       application_des = "setConfMeeting"
                       arr = this.$store.getters.confMeeting
                       break
@@ -707,7 +731,6 @@
         }, success_cb, failed_cb);
       },
       handleFSEventChannel(v, e) {
-	//console.log(e)
         let callDirection = e.data["Call-Direction"];            //入栈还是出栈
         let callerNumber = e.data["Caller-Caller-ID-Number"];    //主叫号码
         let calleeNumber = e.data["Caller-Callee-ID-Number"];  //被叫号码
@@ -718,7 +741,6 @@
         let currentLoginUserChanged = false;
         let usersChanged = false;
         let _this = this;
-	console.log(channelCallState)
         if (callerNumber == "0000000000") return;
 
         if (channelCallState == "RINGING" || channelCallState == "EARLY" || channelCallState == "RING_WAIT") {

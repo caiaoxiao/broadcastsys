@@ -40,7 +40,6 @@
     },
     watch:{
       targetUserGroupId:(targetUserGroupId)=>{
-        console.log(targetUserGroupId)
       }
     },
     data() {
@@ -74,7 +73,6 @@
         this.$ajax.get('https://scc.ieyeplus.com:8443/IpBc/' + 'Organization/Data/' + this.get_user_info.user.organizationID)
           .then((res) => {
             let data = res.data.result
-            console.log(data)
             this.data = data
             // 初始化树对象
             this.$emit('setInitData', data[0])

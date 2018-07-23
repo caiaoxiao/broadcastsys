@@ -8,20 +8,22 @@
       <tree :deviceGroupsDelete="deviceGroupsDelete" :users="dataAll" :targetUserGroupId ="targetUserGroupId" :status = status :addr="OrgUrl" ref="tree" :lable="labels" @setInitData="initDatas" @refresh="refresh"></tree>
     </div>
     <div class="singleDevice">
-      <div class="tableTool">
-        <span><button type="submit" class="btn btn-sm btn-info" @click="openModal(1 ,0)">新增用户</button></span>
-        <div class="operate" >
+      <!--div class="tableTool">
+        <!--div class="operate" >
               <p @click="open">
                 <button type="button" class="btn btn-sm btn-info" >添加设备组</button></p>
           <!--<button type="submit" class="btn btn-sm btn-info" @click="openModal(-1)">新增设备组</button>-->
           <!--<button type="submit" class="btn btn-sm btn-info" :disabled="batch_select.length === 0" @click="on_batch_del">
               <i class="fa fa-search" aria-hidden="true"></i>批量删除
             </button>-->
-        </div>
-      </div>
+        </div-->
+      </div-->
       <div class="table">
-        <h3> 用户 </h3> 
         <table class="table">
+	<caption>
+        <h3> 用户 </h3> 
+        <span><button type="submit" class="btn btn-sm btn-info" @click="openModal(1 ,0)">新增用户</button></span>
+	</caption>
           <thead>
             <tr>
               <td>用户名</td>
@@ -42,10 +44,11 @@
             </tr>
           </tbody>
         </table>
-        <h3 v-if = "allDevices.length>0">全部设备</h3>
-        <table class = "table" >
+        <h3 v-if = "allDevices.length>=0">全部设备</h3>
+        <table class = "table" alt="暂无记录">
           <caption>
           <span> {{this.targetUserGroup}} </span>
+          <button type="button" class="btn btn-sm btn-info" @click="open">添加设备组</button>
           <button type="button" class="btn btn-sm btn-info" @click="openModal(-1 ,0)">添加设备</button>
           </caption>
           <thead>
@@ -183,7 +186,7 @@ export default {
     this.$nextTick(()=> {
     	this.refresh()
     	getHeights()
-        })
+        })  
     this.targetUserGroup = this.$store.state.user_info.user.OrgName
     this.OrgUrl = 'Organization/TreeRoot/' + this.$store.state.user_info.user.organizationID
   },

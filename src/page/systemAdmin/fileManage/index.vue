@@ -43,8 +43,10 @@
      
       <div class="addFiles">
         <span @click="uploadFile">
-          <i class="fa fa-file-o" aria-hidden='true'></i>
-          <input type="file" class="uploadFiles" @change="uploadFileChange($event)" style="display: none;" accept="audio/*" value="">上传文件
+          <!-- <i class="fa fa-file-o" aria-hidden='true'></i> -->
+          <button class="btn btn-sm btn-info" type="button">
+            <input type="file" class="uploadFiles" @change="uploadFileChange($event)" style="display: none;" accept="audio/*" value="">上传文件
+          </button>
         </span>
       </div>
     <!--  <div class="tableTool Grid">

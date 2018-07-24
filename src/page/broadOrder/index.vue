@@ -29,7 +29,7 @@
                 <td>{{ plan.PlanPreTime }}</td>
                 <!-- <td>{{ plan.PlanModel == 1 ? '循环播放' : '按次播放' }}</td>
                 <td>{{ plan.PlanTime }}</td> -->
-                <td>9111</td>
+                <td>{{broad}}</td>
                 <!-- <td>
                   <span @click.stop="nowPlay">立即播放</span>
                 </td> -->
@@ -58,12 +58,17 @@
   import {getHeights} from 'utils/page/broadOrder'
   import { confirmDialog } from 'components'
   import { mapGetters,mapActions } from 'vuex'
+  import {GET_USER_INFO} from 'store/getters/type'
   export default {
     data() {
       return {
         editShow: false,    //编辑框显示或隐藏
         selectPlan: [],
-        
+        verto: '',
+	meeting: '',
+	voice: '',
+	alarm: '',
+	broad: '',
         xPlanData: [],
         showPlanData: [],
       }
@@ -74,11 +79,17 @@
         getHeights()
 	$(".orgTreeList").removeClass("treeListShow").addClass("treeListHide")
         this.refresh()
+	this.verto = this.get_user_info.freeswitchData.VertoID
+	this.meeting = this.get_user_info.freeswitchData.MeetingID
+	this.voice = this.get_user_info.freeswitchData.VoiceCallID
+	this.alarm = this.get_user_info.freeswitchData.AlarmID
+	this.broad = this.get_user_info.freeswitchData.BroadID
       })
     },
     computed: {
       ...mapGetters({
         dialogShow: 'dialogShow',
+	get_user_info: GET_USER_INFO,
       }),
     },
     components: {

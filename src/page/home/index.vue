@@ -486,12 +486,14 @@
                             let all_devices = [] 
                             if (res[0].data.code == 1)
                               all_devices = all_devices.concat(res[0].data.result)
-                            else if (res[1].data.code == 1)
+                            if (res[1].data.code == 1)
                               all_devices = all_devices.concat(res[1].data.result)
+			    console.log(all_devices)
 			    all_devices.forEach((r,i)=>{
-                                if(this.usermap.hasOwnProperty(r.deviceCode)){
+					
+                                if(r!=null && this.usermap.hasOwnProperty(r.deviceCode)){
                                 }
-                                else{
+                                else if(r!=null){
                                   this.usermap[r.deviceCode] = {}
                                   this.usermap[r.deviceCode].list = []
                                   this.usermap[r.deviceCode].type =r.type

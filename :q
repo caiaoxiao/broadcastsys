@@ -197,11 +197,13 @@
           cmdtype: 0,
           period: '',
         },
+        
         verto: '',
         meeting: '',
-	voice: '',
-	alarm: '',
-	broad: '',
+        voice: '',
+        alarm: '',
+        broad: '',
+
         dialogShow: false,
         dialogText: null,
       }
@@ -212,21 +214,20 @@
         getHeights()
         this.refresh()
         this.verto = this.get_user_info.freeswitchData.VertoID
-	this.meeting = this.get_user_info.freeswitchData.MeetingID
-	this.voice = this.get_user_info.freeswitchData.VoiceCallID
-    	this.alarm = this.get_user_info.freeswitchData.AlarmID
-	this.broad = this.get_user_info.freeswitchData.BroadID
+        this.meeting = this.get_user_info.freeswitchData.MeetingID
+        this.voice = this.get_user_info.freeswitchData.VoiceCallID
+        this.alarm = this.get_user_info.freeswitchData.AlarmID
+        this.broad = this.get_user_info.freeswitchData.BroadID
       })
     },
     components: {
       toolTip
     },
     computed: {
-      ...mapGetters({
-        vertoHandle:'vertoHandle',
-        currentLoginUser: 'currentLoginUser',
-	get_user_info: GET_USER_INFO,
-      }),
+      ...mapGetters([
+        'vertoHandle',
+        'currentLoginUser'
+      ]),
     },
     methods: {
       refresh() {
@@ -405,7 +406,7 @@
         this.dialogShow = false
       },
       submitPlan() {
- 	console.log("broad is:" ,this.broad)
+        console.log("broad is:",this.broad);
         this.xData.period = String(this.cycleIndex * 86400);
         let path = '';
         this.xData.time = this.formData.PlanPreTime.toString()

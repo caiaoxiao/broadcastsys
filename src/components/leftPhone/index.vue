@@ -175,7 +175,7 @@
 		return 'fa fa-circle orange'
       },
       toggle_enter(){
-	if(this.confname.num==this.alarm && this.conf.length>0)
+	if(this.conf.length>0)
 	this.fsAPI('conference',this.confname.num+"-scc.ieyeplus.com"+" "+"pause_play"+" " +this.conf[0].conf_id) 
         let _this = this
 	if(this.flag_conf==true)

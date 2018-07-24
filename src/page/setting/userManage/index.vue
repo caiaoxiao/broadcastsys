@@ -186,6 +186,7 @@ export default {
     	this.refresh()
     	getHeights()
         })  
+    this.targetMenu = this.TreeData
     this.targetUserGroup = this.$store.state.user_info.user.OrgName
     this.OrgUrl = 'Organization/TreeRoot/' + this.$store.state.user_info.user.organizationID
   },

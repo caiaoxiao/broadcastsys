@@ -80,6 +80,7 @@
             for(let i in data) {
               this.defaultExpanded.push(data[i]['OrganizationID'])
             }
+	    this.TreeChange({ data:data[0]  , node:this.$refs.tree.$children[0]})
             this.$nextTick(()=> {
               this.$refs.tree.$children[0].$el.className = this.$refs.tree.$children[0].$el.className + ' ' + 'is-current'
             })
@@ -158,9 +159,12 @@
         .then((res)=>{
           if (res.data.code == 1)
             {
-              let total = res.data.result.length
-              let id = String(Number(total)+1).length > 1?String(Number(total) + 1):"0"+String(Number(total) + 1)
-              let vertoNum = "90" + id
+	      let vertos = []
+              res.data.result.forEach((org)=>{
+                vertos.push(Number(org.VertoID.slice(2)))
+              })
+              let id = String(Math.max(vertos)+1).length > 1?String(Math.max(vertos)+1):"0"+String(Math.max(vertos)+1)
+              let vertoNum = "99" + id
               let alarmNum = "91" + id
               let voiceNum = "92" + id
               let broadNum = "93" + id

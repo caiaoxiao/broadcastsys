@@ -31,7 +31,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="item in dataAll" :key="item.deviceId">
+          <tr  v-for="item in dataAll" :key="item.deviceId">
             <td>{{item.deviceCode}}</td>
             <td>{{item.deviceName}}</td>
             <td>
@@ -97,14 +97,15 @@ export default {
       if (fuzzyquery) {
         request.deviceCode = fuzzyquery
       }
-      this.$ajax.get(`Feature/getFeatureByOrg/${this.$store.state.user_info.user.organizationID}?flag=true`)
+      this.$ajax.get(`Feature/getFeatureByOrg/${this.$store.state.user_info.user.organizationID}?flag=false`)
 
         .then(res => {
           if (res.data.code === 1) {
             let data = res.data.result
-	    console.log(data)
             let axios = []
+            if(data!=null)
             data.forEach((device)=>{
+	      if(device!=null)
               axios.push(this.$ajax.get(`Feature/Detail/${device.deviceId}`))
             })
             this.$ajax.all(axios)
@@ -113,8 +114,7 @@ export default {
 			if(res[i].data.result!=null)
                         data[i].OrganizationID = res[i].data.result.organizationId
                       }
-		    console.log(data)
-                    this.dataAll = data
+                    this.dataAll = this.dataAll.concat(data)
                })
           }
         })

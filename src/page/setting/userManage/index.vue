@@ -1,7 +1,7 @@
 <template>
   <div class="content">
     <div v-if="modolType!=null && modolType >=0 ">
-        <modal :targetMenu="targetMenu" :modolType='modolType' @close="closeModal" @refresh="refresh"></modal>
+        <modal :targetUserGroupId="targetUserGroupId" :targetMenu="targetMenu" :modolType='modolType' @close="closeModal" @refresh="refresh"></modal>
       </div>
       <div v-if="modolType!=null && modolType < 0">
         <edit :transferdata="transferdata" :modolType='modolType' @close="closeModal" @refresh="refresh"></edit>
@@ -10,7 +10,7 @@
     <div class="groupList">
       <div class="menuType">
         <i class="fa fa-list-ul" aria-hidden="true"></i>组织机构
-        <i id ="change" @click="changeStatus" class="fa fa-pencil" aria-hidden="true"></i> 修改
+        <span><button type="button" class="btn btn-sm btn-info" @click="changeStatus">修改</button></span> 
       </div>
       <tree :deviceGroupsDelete="deviceGroupsDelete" :users="dataAll" :targetUserGroupId ="targetUserGroupId" :status = status :addr="OrgUrl" ref="tree" :lable="labels" @setInitData="initDatas" @refresh="refresh"></tree>
     </div>
@@ -55,7 +55,7 @@
         <table class = "table" alt="暂无记录">
           <caption>
           <span> {{this.targetUserGroup}} </span>
-          <button type="button" class="btn btn-sm btn-info" @click="open">添加设备组</button>
+          <button type="button" class="btn btn-sm btn-info" @click="open">设备分组</button>
           <button type="button" class="btn btn-sm btn-info" @click="openModal(-1 ,0)">添加设备</button>
           </caption>
           <thead>

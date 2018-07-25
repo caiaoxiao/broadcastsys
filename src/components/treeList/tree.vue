@@ -85,12 +85,10 @@
 
   };
 </script>
-<style>
-.el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content {
-    background: #5bc0de;
-}
-<style>
 <style scoped>
+.el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content {
+    background:#313439;
+}
 .custom-tree-node {
     flex: 1;
     display: flex;

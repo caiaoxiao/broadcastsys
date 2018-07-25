@@ -100,6 +100,7 @@
 	      selectNowCall: [],
         selectRingCall: [],
         meeting: "",
+	org:""
       }
     },
     computed: {
@@ -125,6 +126,7 @@
         getHeights()
         this.name = this.get_user_info.freeswitchData.MeetingID + '-' + window.location.hostname
         this.meeting = this.get_user_info.freeswitchData.MeetingID
+	this.org =  this.get_user_info.user.OrgName
       })
     },
     methods: {
@@ -234,7 +236,7 @@
           //  单个设备开始会议
           this.selectPhone.forEach((s, i)=>{
             this.fsAPI("conference",
-              this.name + " " + "bgdial" + " " + "user/"+this.selectPhone[i].userID,function(res){
+              this.name + " " + "bgdial" + " " + "user/"+this.selectPhone[i].userID+" " + this.meeting+"-"+this.org+"会议呼叫",function(res){
               console.log("邀请会议",res)
             });
           })

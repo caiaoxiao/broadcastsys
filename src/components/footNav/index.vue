@@ -2,7 +2,7 @@
   <div class="bottomTools">
     <div class="userInfo">
       <div class="userName">
-        <span>张三<a @click="logout">[退出]</a>
+        <span>您好 {{this.username}}<a @click="logout()"> [退出]</a>
           所属机构
           <a @click="setting()"><i class="fa fa-cogs"></i>系统设置</a></span>
 
@@ -156,8 +156,15 @@
 
 <script>
   import { mapGetters,mapActions } from 'vuex'
+  import {GET_USER_INFO} from 'store/getters/type'
   import {SET_USER_INFO} from 'store/actions/type'
   export default {
+    props: {
+    username: {
+      type: String,
+      required: true
+    }
+},
     data() {
       return {
         activeIndex: -1,            //  当前播放歌曲角标
@@ -165,7 +172,7 @@
         playSwitch: true,
         totalTime: "00:00",
         now: "00:00",
-        caonima: null
+        caonima: null,
 
       }
     },
@@ -247,6 +254,7 @@
         this.$confirm('此操作将退出登录, 是否继续?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
+	  cancelButtonClass:'el-button--primary',
           type: 'warning'
         }).then(() => {
           this.$message.success("退出成功")

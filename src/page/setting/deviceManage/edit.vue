@@ -8,7 +8,15 @@
             <div class="form-group">
               <label class="col-sm-4 control-label">设备号</label>
               <div class="col-sm-8">
-                <input type="text" class="form-control" v-model="formData.deviceCode">
+                <input type="text" placeholder="1000-1100" class="form-control" v-model="formData.deviceCode">
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="col-sm-4 control-label">添加范围</label>
+              <div class="col-sm-8">
+                <input type="text" placeholder="添加设备时填写，默认为1" class="form-control" v-model="range">
               </div>
             </div>
           </div>
@@ -16,15 +24,7 @@
             <div class="form-group">
               <label class="col-sm-4 control-label">设备名称</label>
               <div class="col-sm-8">
-                <input type="text" class="form-control" v-model="formData.deviceName">
-              </div>
-            </div>
-          </div>
-	<div class="col-md-6">
-            <div class="form-group">
-              <label class="col-sm-4 control-label">所属组织id</label>
-              <div class="col-sm-8">
-                <input type="text" class="form-control" v-model="formData.feature.organizationId">
+                <input type="text" placeholder="" class="form-control" v-model="formData.deviceName">
               </div>
             </div>
           </div>
@@ -36,7 +36,7 @@
               </div>
             </div>
           </div>
-	</div>
+        </div>
         <div class="row">
           <div class="col-md-6">
             <div class="form-group">
@@ -56,7 +56,8 @@
       </el-form>
     </div>
     <div class="btnDiv">
-      <button type="button" class="btn btn-sm btn-info" @click="submitFrom(self, modolType, 'Device/Create', 'Device/Edit', formData)">确定</button>
+      <button type="button" class="btn btn-sm btn-info" @click="userEdit"
+      >确定</button>
       <button type="button" class="btn btn-sm btn-default" @click="close">取消</button>
     </div>
   </div>
@@ -67,39 +68,40 @@ import { mapActions } from 'vuex'
 export default {
   props: {
     modolType:{type:Number},
-    transferData:{type:Object}
+    transferdata:{type:Object}
   },
   data () {
     return {
       formData: {
         deviceCode: '',
         deviceName: '',
-	password:"",
+	      password:'',
         type: 0,
         deviceVedios: [{ vedioUrl: '' }, { vedioUrl: '' }, { vedioUrl: '' }, { vedioUrl: '' }],
-        feature:{organizationId:"",aliasName:""}
+        feature:{ organizationID :  this.transferdata.targetMenuId }
 
       },
       rules: {},
-      self: this
+      self: this,
+      range:1,
     }
   },
   created () {
     this.$nextTick(() => {
-      this.$emit("getHeight")
       let documentHeight = document.documentElement.clientHeight
       $('.popUp').css('top', documentHeight * 0.3 + 'px')
-      if (this.modolType === 1) {
-        this.$ajax.get(`Device/Detail/${this.transferData.deviceId}`)
+      if (this.modolType === -2) {
+        this.$ajax.get(`Device/Detail/${this.transferdata.deviceId}`)
           .then(res => {
             if (res.data.code === 1) {
               this.formData = res.data.result
-              this.$ajax.get(`Feature/Detail/${this.transferData.deviceId}`)
+              this.formData.feature.organizationID = this.transferdata.targetMenuId
+              /*this.$ajax.get(`Feature/Detail/${this.transferdata.deviceId}`)
               .then(res => {
                   if (res.data.code === 1) {
-                    this.formData.feature.organizationId = res.data.result.organizationId
+                    this.formData.feature.organizationID = res.data.result.organizationID
                   }
-              })
+              })*/
             }
           })
       }
@@ -111,7 +113,34 @@ export default {
     ]),
     close () {
       this.$emit('close')
+    },
+    userEdit () {
+       if (this.modolType!=-2) {
+       let axios = []
+       for(let i = 0;i < parseInt(this.range);i++){
+        temp = new Object()
+        temp.deviceCode = String(parseInt(this.formData.deviceCode)+i)
+        deviceName = this.formData.deviceName
+	      password = this.formData.password
+        type = this.formData.type
+        deviceVedios = this.formData.deviceVedios
+        feature = this.formData.feature
+        axios.push(this.$ajax.post('Device/Create',temp))
+       }
+       this.$ajax.all(axios).then(res => {
+         console.log(res)
+       })
     }
+    else{
+        let request = Object.assign(this.formData,{deviceId:this.transferdata.deviceId})
+        this.$ajax.put(`Device/Edit`,request)
+          .then(res => {
+            if (res.data.code === 1) {
+              console.log(修改成功)
+            }
+          })
+      }
+    },
   }
 }
 </script>

@@ -78,6 +78,7 @@
         voice: "",
         broad: "",
         alarm: "",
+	org:"",
       }
     },
     created() {
@@ -89,17 +90,18 @@
         this.voice = this.get_user_info.freeswitchData.VoiceCallID
         this.alarm = this.get_user_info.freeswitchData.AlarmID
         this.broad = this.get_user_info.freeswitchData.BroadID
+	this.org = this.get_user_info.user.OrgName
         if(this.$router.history.current.fullPath=="/voiceCall"){
           this.conf = this.$store.getters.confLeft
-          this.confname = {name:'confleft',num: this.voice}
+          this.confname = {name:'confleft',num: this.voice,show:"通话"}
         }
         else if(this.$router.history.current.fullPath=="/ipBroad") {
           this.conf = this.$store.getters.confIpBoard
-          this.confname = {name:'confipboard',num:this.broad}
+          this.confname = {name:'confipboard',num:this.broad,show:"广播"}
         }
 	else if(this.$router.history.current.fullPath=="/meeting") {
           this.conf = this.$store.getters.confMeeting
-          this.confname = {name:'confmeeting',num:this.meeting}
+          this.confname = {name:'confmeeting',num:this.meeting,show:"会议"}
         }
 	
       })
@@ -310,12 +312,12 @@
 	   case '邀请成员':
 		if(this.selectPhone.length > 0 && this.flag_confalarm == true){
                  this.selectPhone.forEach((a,i)=>{
-                  this.fsAPI('conference',this.alarm+"-scc.ieyeplus.com"+" "+"bgdial"+" "+"user/"+  a.userID)
+                  this.fsAPI('conference',this.alarm+"-scc.ieyeplus.com"+" "+"bgdial"+" "+"user/"+  a.userID+" "+this.alarm + "warning")
                 })
                 }
 		else if(this.selectPhone.length > 0 ){
                  this.selectPhone.forEach((a,i)=>{
-                  this.fsAPI('conference',this.confname.num+"-scc.ieyeplus.com"+(this.confname.num==this.broad ? '+flags{mute}' :'') +" "+"bgdial"+" "+"user/"+  a.userID)
+                  this.fsAPI('conference',this.confname.num+"-scc.ieyeplus.com"+(this.confname.num==this.broad ? '+flags{mute}' :'') +" "+"bgdial"+" "+"user/"+  a.userID+" " + this.confname.num + "-"+this.org+this.confname.show+"呼叫"  )
                 })
                 }
 		this.$emit('reset')

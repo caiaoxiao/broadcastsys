@@ -9,11 +9,8 @@
 	  <button type="button" class="btn btn-info" @click="openModal(-1)">
             <i class="fa fa-bolt" aria-hidden="true"></i>修改联动密匙
           </button>
-          <button type="button" class="btn btn-info" @click="refresh(fuzzyquery)">
+          <button type="button" class="btn btn-info" @click="refresh()">
             <i class="fa fa-search" aria-hidden="true"></i>查询
-          </button>
-          <button type="button" class="btn btn-info" @click="openModal(0)">
-            <i class="fa fa-plus" aria-hidden="true"></i>新增
           </button>
         </form>
       </div>
@@ -37,9 +34,8 @@
             <td>
               {{ item.type == 0 ? '单话机' : '视频话机' }}
             </td>
-            <td> {{item.OrganizationID}} </td>
+            <td> {{item.organizationId}} </td>
             <td>
-              <button type="submit" class="btn btn-sm btn-info" @click="openModal(item.deviceId)">修改</button>
               <button type="submit" class="btn btn-sm btn-default" @click="deleteItem(item.deviceId)">删除</button>
             </td>
           </tr>
@@ -78,8 +74,10 @@ export default {
     })
   },
   created () {
+    this.$nextTick(()=> {
     getHeights()
     this.refresh()
+    })
   },
   watch: {
     'updateState': function () {
@@ -92,32 +90,41 @@ export default {
     basechange
   },
   methods: {
-    refresh (fuzzyquery) {
-      let request = {}
-      if (fuzzyquery) {
-        request.deviceCode = fuzzyquery
-      }
-      this.$ajax.get(`Feature/getFeatureByOrg/${this.$store.state.user_info.user.organizationID}?flag=false`)
-
-        .then(res => {
-          if (res.data.code === 1) {
-            let data = res.data.result
+    refresh () {
+      
+      let  organizationID_requests = []
+      organizationID_requests.push(this.$ajax.get(`Feature/getFeatureByOrg/${this.$store.state.user_info.user.organizationID}?flag=false`))
+      organizationID_requests.push(this.$ajax.get(`Feature/getFeatureByOrg/${this.$store.state.user_info.user.organizationID}?flag=true`))
+      this.$ajax.all(organizationID_requests)
+            .then((res) => {
+            let all_devices = [] 
+            if (res[0].data.code == 1)
+              res[0].data.result.forEach((re)=>{
+                if(re.deviceCode == this.fuzzyquery || re.deviceName == this.fuzzyquery || re.orgName == this.fuzzyquery  || this.fuzzyquery == "")
+                all_devices.push(re)
+              })
+            if (res[1].data.code == 1)
+              res[1].data.result.forEach((re)=>{
+                if(re.deviceCode == this.fuzzyquery || re.deviceName == this.fuzzyquery || re.orgName == this.fuzzyquery  || this.fuzzyquery == "")
+                all_devices.push(re)
+              })
+            this.dataAll = all_devices
+            /*
             let axios = []
-            if(data!=null)
-            data.forEach((device)=>{
-	      if(device!=null)
+            all_devices.forEach((device)=>{
+	            if(device!=null)
               axios.push(this.$ajax.get(`Feature/Detail/${device.deviceId}`))
             })
             this.$ajax.all(axios)
                   .then((res) => {
                       for (let i = 0 ; i< res.length ; i++){
-			if(res[i].data.result!=null)
-                        data[i].OrganizationID = res[i].data.result.organizationId
+			                    if(res[i].data.result!=null)
+                          all_devices[i].OrganizationID = res[i].data.result.organizationId
                       }
-                    this.dataAll = this.dataAll.concat(data)
+                    this.dataAll = all_devices
                })
-          }
-        })
+          */
+          })
     },
     openModal (id) {
       if (id === 0) {

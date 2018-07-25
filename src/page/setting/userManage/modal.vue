@@ -22,16 +22,6 @@
           </div>
         </div>
       </el-form>
-      <div class="menuChoose">
-        <h5>
-          <i class="fa fa-address-card"></i>用户组
-        </h5>
-        <ol class="menuItem clearfix">
-          <li :class="{selected: item.selected}" v-for='item in groupList' :key='item.roleID' @click='selectUserGroup(item)'>{{item.roleName}}
-          </li>
-
-        </ol>
-      </div>
     </div>
     <div class="btnDiv">
       <button type="button" class="btn btn-sm btn-info" @click="submitFrom(self, modolType, 'User/Create', 'User/Edit', formData,1) & refresh">确定</button>
@@ -50,7 +40,11 @@ export default {
     modolType: {
       type: Number,
       required: true
-    }
+    },
+    targetUserGroupId:{
+      type: String,
+      required: true
+    },
   },
   data () {
     return {
@@ -69,10 +63,10 @@ export default {
     }
   },
   created () {
-    this.initData()
     let documentHeight = document.documentElement.clientHeight
     $('.popUp').css('top', documentHeight * 0.3 + 'px')
-
+    let userroleid = this.targetUserGroupId
+    this.formData.userRoles = [{roleID :  userroleid}]
     if (this.modolType === 0) { // 如果为新增，拿到当前的组织机构ID
       this.formData.OrganizationID = this.targetMenu.OrganizationID
     } else { // 如果为编辑，拿到当前的用户的userId
@@ -81,35 +75,11 @@ export default {
           if (res.data.code === 1) {
             let result = res.data.result
             this.formData = result
-
-            this.groupList.forEach((g) => {
-              if (g.roleID === result.userRoles[0].roleID) {
-                g.selected = true
-              }
-            })
           }
         })
     }
   },
   methods: {
-    initData () {
-      this.$ajax.post(`Role/List`)
-        .then((res) => {
-          if (res.data.code === 1) {
-            let result = res.data.result
-            result.forEach((r) => {
-              r.selected = false
-            })
-            this.groupList = result
-          }
-        })
-    },
-    selectUserGroup (item) {
-      if (!item.selected) {
-        this.formData.userRoles = [item]
-      }
-      item.selected = !item.selected
-    },
     close () {
       this.$emit('close')
     },

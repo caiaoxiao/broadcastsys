@@ -2,7 +2,7 @@
   <div>
     <topMenu></topMenu>
     <container></container>
-    <footNav></footNav>
+    <footNav :username = "username"></footNav>
     <switch-left></switch-left>
     <tree-list></tree-list>
   </div>
@@ -21,27 +21,28 @@
         liveArray:{},
         vertoConf:{},
         group_list:[],
-	      usermap:{},
-	      last_id:"",	
+	usermap:{},
+	last_id:"",	
         targetUserGroupId:"",
         verto: "",
         meeting: "",
         voice: "",
         broad: "",
         alarm: "",
+	username:""
 
       }
     },
     created() {
       this.$nextTick(()=> {
 	        getHeights()
+	  this.username = this.get_user_info.user.userName
           this.verto = this.get_user_info.freeswitchData.VertoID
           this.meeting = this.get_user_info.freeswitchData.MeetingID
           this.voice = this.get_user_info.freeswitchData.VoiceCallID
           this.alarm = this.get_user_info.freeswitchData.AlarmID
           this.broad = this.get_user_info.freeswitchData.BroadID
           $.verto.init({}, this.initVertoHandle)
-          $(".orgTreeList").removeClass("treeListHide").addClass("treeListShow");
       })
     },
     computed: {
@@ -55,7 +56,7 @@
         callQueue:'callQueue',
         confLeft:'confLeft',
         confAlarm:'confAlarm',
-	      confIpBoard: 'confIpBoard',
+        confIpBoard: 'confIpBoard',
         TreeData:'TreeData',
         freeswitchData:'freeswitchData',
         get_user_info: GET_USER_INFO,
@@ -569,7 +570,7 @@
                                           deviceList[i].oppoChannelUUID = null
                                           deviceList[i].timer = {s:0,m:0,h:0,id:[],clock:false}
                                           deviceList[i].calling = null 
-                                          deviceList[i].name = null 
+                                          //deviceList[i].name = null 
                                         }
                                       }
                                     }

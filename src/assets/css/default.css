@@ -1280,11 +1280,12 @@ span.times {
 
 .musicMenuHalf {
     width: 48%;
+    height: 660px;
     margin: 1%;
     float: left;
     border-radius: 4px;
     background-color: #313439;
-    position: relative
+    position: relative;
 }
 
 .musicMenuHalf ul.musicList>li.selected {
@@ -1304,6 +1305,12 @@ span.times {
 .menuType>p {
     float: right;
     margin-right: 10px;
+}
+.menuType>span>button {
+	    float: right;
+	    margin-top:5px;
+	    padding:3px 5px;
+	    margin-right: 10px;
 }
 
 .songSheet {

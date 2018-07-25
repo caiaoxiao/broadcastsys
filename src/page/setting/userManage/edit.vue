@@ -8,7 +8,15 @@
             <div class="form-group">
               <label class="col-sm-4 control-label">设备号</label>
               <div class="col-sm-8">
-                <input type="text" class="form-control" v-model="formData.deviceCode">
+                <input type="text" placeholder="1000-1100" class="form-control" v-model="formData.deviceCode">
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <label class="col-sm-4 control-label">添加范围</label>
+              <div class="col-sm-8">
+                <input type="text" placeholder="默认为1" class="form-control" v-model="range">
               </div>
             </div>
           </div>
@@ -16,15 +24,7 @@
             <div class="form-group">
               <label class="col-sm-4 control-label">设备名称</label>
               <div class="col-sm-8">
-                <input type="text" class="form-control" v-model="formData.deviceName">
-              </div>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <div class="form-group">
-              <label class="col-sm-4 control-label">所属组织id</label>
-              <div class="col-sm-8">
-                <input type="text" class="form-control" v-model="formData.feature.organizationID">
+                <input type="text" placeholder="" class="form-control" v-model="formData.deviceName">
               </div>
             </div>
           </div>
@@ -56,7 +56,8 @@
       </el-form>
     </div>
     <div class="btnDiv">
-      <button type="button" class="btn btn-sm btn-info" @click="submitFrom(self, modolType==-2?1:0, 'Device/Create', 'Device/Edit', formData,1)">确定</button>
+      <button type="button" class="btn btn-sm btn-info" @click="userEdit"
+      >确定</button>
       <button type="button" class="btn btn-sm btn-default" @click="close">取消</button>
     </div>
   </div>
@@ -74,14 +75,15 @@ export default {
       formData: {
         deviceCode: '',
         deviceName: '',
-	password:'',
+	      password:'',
         type: 0,
         deviceVedios: [{ vedioUrl: '' }, { vedioUrl: '' }, { vedioUrl: '' }, { vedioUrl: '' }],
-        feature:{ organizationID :  this.transferdata.targetMenuId , aliasName:""}
+        feature:{ organizationID :  this.transferdata.targetMenuId ,aliasName:""}
 
       },
       rules: {},
-      self: this
+      self: this,
+      range:'',
     }
   },
   created () {
@@ -111,7 +113,38 @@ export default {
     ]),
     close () {
       this.$emit('close')
+    },
+    userEdit () {
+       if (this.modolType!=-2) {
+       let axios = []
+       let flag = this.formData.deviceName == this.formData.deviceCode?true:false
+       let range = this.range==''?1:parseInt(this.range)
+       for(let i = 0;i < range;i++){
+        let temp = new Object()
+        temp.deviceCode = String(parseInt(this.formData.deviceCode)+i)
+        temp.deviceName =  flag == true ? temp.deviceCode : this.formData.deviceName+"-"+String(i+1)
+	      temp.password = this.formData.password
+        temp.type = this.formData.type
+        temp.deviceVedios = this.formData.deviceVedios
+        temp.feature = this.formData.feature
+        axios.push(this.$ajax.post('Device/Create',temp))
+       }
+       this.$ajax.all(axios).then(res => {
+         this.$message.success("新增成功")
+         this.$store.dispatch('update', 1)
+       })
     }
+    else{
+        let request = Object.assign(this.formData,{deviceId:this.transferdata.deviceId})
+        this.$ajax.put(`Device/Edit`,request)
+          .then(res => {
+            if (res.data.code === 1) {
+              this.$message.success("修改成功")
+              this.$store.dispatch('update', 1)
+            }
+          })
+      }
+    },
   }
 }
 </script>

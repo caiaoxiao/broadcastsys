@@ -80,7 +80,6 @@
             for(let i in data) {
               this.defaultExpanded.push(data[i]['OrganizationID'])
             }
-            this.TreeChange({data:data[0], node:this.$refs.tree.$children[0]})
             this.$nextTick(()=> {
               this.$refs.tree.$children[0].$el.className = this.$refs.tree.$children[0].$el.className + ' ' + 'is-current'
             })
@@ -216,7 +215,7 @@
         if(this.status=="change")
         return (
             <span class="custom-tree-node">
-            <span contenteditable = {node.label=='新建组织机构'?true:false}  onkeydown={()=>this.enter($event,data,node)}  >  {node.label} </span>
+            <span contenteditable = {node.label=='新建组织机构'?true:false}  onblur = {() => this.renameDeviceGroupList($event,data,node)} >  {node.label} </span>
             <span>
               <el-button size="mini" type="text" on-click={ () => this.append(data) }><i class = "fa fa-plus"></i></el-button>
               <el-button size="mini" type="text" on-click={ () => this.remove(node, data) }><i class = "fa fa-minus"></i></el-button>
@@ -227,23 +226,13 @@
           <span class="custom-tree-node">
             <span>{node.label}</span>
           </span>)
-      },
-      enter(event,data,node){
-	if(event.keyCode == 13){
-	  console.log(event,data,node) 
-	  this.renameDeviceGroupList(event,data,node)
-	  }
-
-      },
+      }
 
     },
 
   };
 </script>
 <style scoped>
-.el-tree--highlight-current .el-tree-node.is-current>.el-tree-node__content {
-    background: #313439;
-}
 .custom-tree-node {
     flex: 1;
     display: flex;

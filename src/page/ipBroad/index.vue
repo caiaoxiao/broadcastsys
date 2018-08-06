@@ -63,13 +63,13 @@
       <div class="functionMenu">
         <ul class="nav nav-justified menuList">
          <!-- <li id="a1" @click="tmute" @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-user-circle fa-2x" aria-hidden="true"></i><span>管理员静音</span></li>-->
-          <li id="a2" @click="startIpbroad" @mousedown="$btnMousedown" @mouseup="$btnMouseup">
+          <li id="a2" @click="startIpbroad" @mousedown="$btnMousedown" @mouseup="$btnMouseup" @touchend = "$btnMouseup" @touchstart = "$btnMousedown">
 		<i :class="returnVertoState()"  aria-hidden="true"></i>
 		<span>{{mute}}</span></li>
-          <li id="a3" @click="play" @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-play-circle-o fa-2x" aria-hidden="true"></i><span>播放</span></li>
-          <li id="a4" @click="pauseOrPlay" @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i :class="ifPlay(playState)" aria-hidden="true"></i><span>{{playState}}</span></li>
-          <li id="a5" @click="allOver" @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-window-close fa-2x" aria-hidden="true"></i><span>全部结束</span></li>
-          <li id="a5" @click="selectAll" @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-group fa-2x" aria-hidden="true"></i><span>全选</span></li>
+          <li id="a3" @click="play" @mousedown="$btnMousedown" @mouseup="$btnMouseup" @touchend = "$btnMouseup" @touchstart = "$btnMousedown"><i class="fa fa-play-circle-o fa-2x" aria-hidden="true"></i><span>播放</span></li>
+          <li id="a4" @click="pauseOrPlay" @mousedown="$btnMousedown" @mouseup="$btnMouseup" @touchend = "$btnMouseup" @touchstart = "$btnMousedown"><i :class="ifPlay(playState)" aria-hidden="true"></i><span>{{playState}}</span></li>
+          <li id="a5" @click="allOver" @mousedown="$btnMousedown" @mouseup="$btnMouseup" @touchend = "$btnMouseup" @touchstart = "$btnMousedown"><i class="fa fa-window-close fa-2x" aria-hidden="true"></i><span>全部结束</span></li>
+          <li id="a5" @click="selectAll" @mousedown="$btnMousedown" @mouseup="$btnMouseup" @touchend = "$btnMouseup" @touchstart = "$btnMousedown"><i class="fa fa-group fa-2x" aria-hidden="true"></i><span>全选</span></li>
         </ul>
       </div>
     </div>

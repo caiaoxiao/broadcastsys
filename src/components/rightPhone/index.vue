@@ -37,8 +37,10 @@
           <div class="dialDisplay">
             <div v-for="(item,index) in btnData"
             @click="keypad(item.name)"
-            @mousedown="$btnMousedown"
-            @mouseup="$btnMouseup"
+	    @touchstart = "$btnMousedown" 
+            @touchend = "$btnMouseup"
+	    @mousedown="$btnMousedown" 
+	    @mouseup="$btnMouseup"
             class="dial">{{item.name}}</div>
           </div>
           <div class="dialAction">
@@ -48,10 +50,12 @@
 	      @click ="!(flag_confleft || flag_callqueue)? makeCall():(flag_call?answerCall():'')" 
 	      @mouseup = "!(flag_confleft || flag_callqueue)? $btnMouseup($event) :(flag_call?$btnMouseup($event):'')" 
 	      @mousedown = "!(flag_confleft || flag_callqueue)? $btnMousedown($event) : (flag_call?$btnMousedown($event):'')" 
+	      @touchstart = "!(flag_confleft || flag_callqueue)? $btnMousedown($event) : (flag_call?$btnMousedown($event):'')"
+	      @touchend = "!(flag_confleft || flag_callqueue)? $btnMouseup($event) :(flag_call?$btnMouseup($event):'')"	
 		 >
               <i :class="!(flag_confleft || flag_callqueue)? 'fa fa-phone fa-2x' : (flag_call?'fa fa-phone fa-2x':'fa fa-microphone fa-2x')" aria-hidden="true"></i>
             </div>
-            <div class="dial hangup" @click="hangupCall" @mousedown="$btnMousedown" @mouseup="$btnMouseup">挂断</div>
+            <div class="dial hangup" @click="hangupCall" @mousedown="$btnMousedown" @mouseup="$btnMouseup" @touchstart = "$btnMousedown" @touchend = "$btnMouseup">挂断</div>
           </div>
         </div>
         </div>

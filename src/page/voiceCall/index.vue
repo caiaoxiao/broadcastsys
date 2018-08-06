@@ -62,31 +62,31 @@
       </div>
       <div class="functionMenu">
         <ul class="nav nav-justified menuList">
-          <li id="a1" @click="call" @mousedown="$btnMousedown" @mouseup="$btnMouseup">
+          <li id="a1" @click="call" @mousedown="$btnMousedown" @mouseup="$btnMouseup" @touchend = "$btnMouseup" @touchstart = "$btnMousedown">
             <i class="fa fa-phone fa-2x" aria-hidden="true"></i>
             <span>呼叫</span>
           </li>
-          <li id="a2" @click="strongCall" @mousedown="$btnMousedown" @mouseup="$btnMouseup">
+          <li id="a2" @click="strongCall" @mousedown="$btnMousedown" @mouseup="$btnMouseup" @touchend = "$btnMouseup" @touchstart = "$btnMousedown">
             <i class="fa fa-volume-control-phone fa-2x" aria-hidden="true"></i>
             <span>强行通话</span>
           </li>
-          <li id="a3" @click="strongDelete" @mousedown="$btnMousedown" @mouseup="$btnMouseup">
+          <li id="a3" @click="strongDelete" @mousedown="$btnMousedown" @mouseup="$btnMouseup" @touchend = "$btnMouseup" @touchstart = "$btnMousedown">
             <i class="fa fa-window-close fa-2x" aria-hidden="true" onclick="$('#eeee').show();"></i>
             <span>强拆</span>
           </li>
-          <li id="a4" @click="strongJoin" @mousedown="$btnMousedown" @mouseup="$btnMouseup">
+          <li id="a4" @click="strongJoin" @mousedown="$btnMousedown" @mouseup="$btnMouseup" @touchend = "$btnMouseup" @touchstart = "$btnMousedown">
             <i class="fa fa-deaf fa-2x" aria-hidden="true"></i>
             <span>强插</span>
           </li>
-          <li id="a5" @click="observe" @mousedown="$btnMousedown" @mouseup="$btnMouseup">
+          <li id="a5" @click="observe" @mousedown="$btnMousedown" @mouseup="$btnMouseup" @touchend = "$btnMouseup" @touchstart = "$btnMousedown">
             <i class="fa fa-headphones fa-2x" aria-hidden="true"></i>
             <span>监听</span>
           </li>
-          <li id="a6" @click="daiJie" @mousedown="$btnMousedown" @mouseup="$btnMouseup">
+          <li id="a6" @click="daiJie" @mousedown="$btnMousedown" @mouseup="$btnMouseup" @touchend = "$btnMouseup" @touchstart = "$btnMousedown">
             <i class="fa fa-phone-square fa-2x" aria-hidden="true"></i>
             <span>代接</span>
           </li>
-          <li id="a7" @click="callTraverse" @mousedown="$btnMousedown" @mouseup="$btnMouseup">
+          <li id="a7" @click="callTraverse" @mousedown="$btnMousedown" @mouseup="$btnMouseup" @touchend = "$btnMouseup" @touchstart = "$btnMousedown">
             <i class="fa fa-reply fa-2x" aria-hidden="true" onclick="$('#noNum').show();"></i>
             <span>转到</span>
           </li>

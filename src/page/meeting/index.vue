@@ -57,15 +57,15 @@
         </div>
         <div class="functionMenu">
           <ul class="nav nav-justified menuList">
-            <li id="a1" @click="startMeeting" @mousedown="$btnMousedown" @mouseup="$btnMouseup">
+            <li id="a1" @click="startMeeting" @mousedown="$btnMousedown" @mouseup="$btnMouseup" @touchend = "$btnMouseup" @touchstart = "$btnMousedown">
               <i class="fa fa-fire fa-2x" aria-hidden="true"></i>
               <span>开始会议</span>
             </li>
-            <li id="a2" @click="startMeeting"  @mousedown="$btnMousedown" @mouseup="$btnMouseup">
+            <li id="a2" @click="startMeeting"  @mousedown="$btnMousedown" @mouseup="$btnMouseup" @touchend = "$btnMouseup" @touchstart = "$btnMousedown">
               <i class="fa fa-user-plus fa-2x" aria-hidden="true"></i>
               <span>加入成员</span>
             </li>
-	    <li id="a3" @click="selectAll" @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-group fa-2x" aria-hidden="true"></i><span>全选</span></li>
+	    <li id="a3" @click="selectAll" @mousedown="$btnMousedown" @mouseup="$btnMouseup" @touchend = "$btnMouseup" @touchstart = "$btnMousedown"><i class="fa fa-group fa-2x" aria-hidden="true"></i><span>全选</span></li>
 
           </ul>
       </div>

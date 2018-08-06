@@ -31,7 +31,7 @@
 
     </div>
     <div class="phoneDial">
-      <div class="dial rightdial" v-for="(item,index) in btnData" @click.stop='buttonclick(item.name)' @mousedown="$btnMousedown" @mouseup="$btnMouseup">
+      <div class="dial rightdial" v-for="(item,index) in btnData" @click.stop='buttonclick(item.name)' @touchstart = "$btnMousedown" @touchend = "$btnMouseup" @mousedown="$btnMousedown" @mouseup="$btnMouseup">
         <i aria-hidden="true" class="fa" :class="item.class"></i>
         <span>{{item.name}}</span>
       </div>
@@ -392,5 +392,4 @@
 </script>
 
 <style type="text/scss" rel="stylesheet/scss" lang="scss">
-
 </style>

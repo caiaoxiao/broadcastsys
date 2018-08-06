@@ -8,7 +8,7 @@
             <div class="form-group">
               <label class="col-sm-4 control-label">设备号</label>
               <div class="col-sm-8">
-                <input type="text" placeholder="1000-1100" class="form-control" v-model="formData.deviceCode">
+                <input type="text" placeholder="1000" class="form-control" v-model="formData.deviceCode">
               </div>
             </div>
           </div>

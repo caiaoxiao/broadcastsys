@@ -179,9 +179,8 @@ export default {
         case "register":
           return "online"
           break
-	case undefined:
+	default:
 	  return "online"
-	  break
       }
     },
     returnState(status){

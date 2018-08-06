@@ -26,6 +26,31 @@
         </div-->
       </div-->
       <div class="table">
+        <h3> 号码分配 </h3>
+        <table class="table">
+         <caption>
+        </caption>
+          <thead>
+            <tr>
+              <td>页面verto号码</td>
+              <td>告警号码</td>
+              <td>语音呼叫号码</td>
+              <td>广播号码</td>
+              <td>会议呼叫号码</td>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>{{verto}}</td>
+              <td>{{alarm}}</td>
+              <td>{{voice}}</td>
+              <td>{{broad}}</td>
+              <td>{{meeting}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="table">
         <h3> 用户 </h3> 
         <span style="float:right"><button type="submit" class="btn btn-sm btn-info" @click="openModal(1 ,0)">新增用户</button></span>
         <table class="table">
@@ -143,7 +168,12 @@ export default {
       allDevices:[],
       targetUserGroupId:"",
       transferdata: {deviceId: '' ,targetMenuId:'' },
-      deviceGroupsDelete:[]
+      deviceGroupsDelete:[],
+      verto: "",
+      meeting: "",
+      voice: "",
+      broad: "",
+      alarm: "",
     }
   },
   watch: {
@@ -208,6 +238,17 @@ export default {
             this.dataAll = res.data.result
           }
         })
+      this.$ajax.get(`Organization/Detail/${this.transferdata.targetMenuId}`)
+        .then((res) => {
+	  console.log(res)
+          if (res.data.code === 1) {
+		this.verto = res.data.result.VertoID
+    		this.meeting = res.data.result.MeetingID
+    		this.voice = res.data.result.VoiceCallID
+    		this.alarm = res.data.result.AlarmID
+    		this.broad = res.data.result.BroadID
+          }
+      })
       this.$ajax.get(`Feature/getFeatureByOrg/${this.targetMenu.OrganizationID}`)
         .then((res) => {
           if (res.data.code === 1) {
@@ -229,18 +270,22 @@ export default {
           .then((res) => {
             if (res.data.code === 1) {
               let result = res.data.result
+	      console.log(result)
               let length = result.length
               this.deviceGroups = []
               let axios = []
               for (let i = 0 ; i < length ; i++){
-		            axios.push(this.$ajax.get(`DeviceGroup/Detail/${result[i].deviceGroupId}`))
+		   axios.push(this.$ajax.get(`DeviceGroup/Detail/${result[i].deviceGroupId}`))
 	            }
               this.$ajax.all(axios)
                   .then((res) => {
                       for (let i = 0 ; i<length ; i++){
+			if(!this.deviceGroups.some((item)=>{return item.deviceGroupId == res[i].data.result.deviceGroupId})){
                         this.deviceGroups.push(res[i].data.result)
                         this.deviceGroupsDelete.push(res[i].data.result.deviceGroupId)
+			}
                       }
+		     console.log(this.deviceGroups)
                })
             }
           })

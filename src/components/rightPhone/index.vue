@@ -2,7 +2,7 @@
   <div>
       <div class="phone right">
 	    <div class="phoneTitle">
-       <i class="fa fa-phone" aria-hidden="true"></i>语音
+       <i class="fa fa-phone" aria-hidden="true"></i>告警
       <div
                 :class="(!this.flag_confalarm)&&(this.confAlarm.length>0)?'phoneMeeting meetingOut':(this.flag_confalarm?'phoneMeeting meetingIn':'phoneMeeting')"
                 @click="toggle_enter"><!--进入为phoneMeeting 离开添加meetingOut-->

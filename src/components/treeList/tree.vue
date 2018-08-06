@@ -72,6 +72,7 @@
           }
         }
         // 提交树对象，以及当前点击树菜单的数据至仓库
+	this.$emit("click")
         this.TreeChange({data, node})
       },
       renderContent(h, { node, data, store }) {

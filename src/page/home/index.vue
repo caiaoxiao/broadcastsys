@@ -4,7 +4,7 @@
     <container></container>
     <footNav :username = "username"></footNav>
     <switch-left></switch-left>
-    <tree-list></tree-list>
+    <tree-list @refresh = "refresh"> </tree-list>
   </div>
 </template>
 
@@ -22,21 +22,21 @@
         vertoConf:{},
         group_list:[],
 	usermap:{},
-	last_id:"",	
+	      last_id:"",	
         targetUserGroupId:"",
         verto: "",
         meeting: "",
         voice: "",
         broad: "",
         alarm: "",
-	username:""
+	username:"",
 
       }
     },
     created() {
       this.$nextTick(()=> {
 	        getHeights()
-	  this.username = this.get_user_info.user.userName
+	        this.username = this.get_user_info.user.userName
           this.verto = this.get_user_info.freeswitchData.VertoID
           this.meeting = this.get_user_info.freeswitchData.MeetingID
           this.voice = this.get_user_info.freeswitchData.VoiceCallID
@@ -62,7 +62,7 @@
         get_user_info: GET_USER_INFO,
       }),
     },
-    watch: {
+    watch: { 
       'TreeData':function(data){if(this.vertoHandle) this.refresh() },
       'callQueue':function(conf) { 
 	},
@@ -122,7 +122,6 @@
             onWSLogin(verto, success) {
               // 登录回调
               _this.refresh()
-	            _this.handleGetCallOrRinging()
               console.log('onWSLogin', success);
             },
             onWSClose(verto, success) {
@@ -489,8 +488,7 @@
                               all_devices = all_devices.concat(res[0].data.result)
                             if (res[1].data.code == 1)
                               all_devices = all_devices.concat(res[1].data.result)
-			    console.log(all_devices)
-			    all_devices.forEach((r,i)=>{
+			                      all_devices.forEach((r,i)=>{
 					
                                 if(r!=null && this.usermap.hasOwnProperty(r.deviceCode)){
                                 }
@@ -501,7 +499,7 @@
                                   this.usermap[r.deviceCode].name = r.deviceName
                                 }
                             })
-			    if(this.targetUserGroupId!="" || this.TreeData.ParentID=="0")
+			                    if(this.targetUserGroupId!="" || this.TreeData.ParentID=="0")
                             this.$ajax.get(`Role/getDeviceGroup/${this.targetUserGroupId}`)
                               .then((res) => {
                             if (res.data.code === 1) {
@@ -515,7 +513,6 @@
                               })
                               this.$ajax.all(axios)
                               .then(res => {
-				    console.log(res)
                                     for (let i = 0 ; i<res.length ; i++){
                                     let group  = res[i]?res[i].data.result.deviceGroups:[]
                                     group.forEach((r,i)=>{
@@ -575,12 +572,107 @@
                                       }
                                     }
                                   })
-                                 console.log(deviceList) 
+                                //这时deviceList已经更新
+                                this.vertoHandle.sendMethod("jsapi",{command:"fsapi", data:{cmd:"show", arg:"channels as xml"}},
+                                  (data) => {
+                                    const parser = new DOMParser()
+                                    const doc = parser.parseFromString(data.message, "text/xml")
+                                    const msg = parseXML(doc)
+                                    if(msg != 0) {
+                                      let channel_data = msg.row
+                                      if(!(channel_data instanceof Array))
+                                      channel_data = [channel_data]
+                                      channel_data.forEach( (item,index) => {
+                                        let application_des = ""
+                                        let arr = []
+                                        if(item.application == "conference"){
+                                        if(item.application_data.slice(0,2)=="93"){
+                                          item.application_data = item.application_data.slice(0,item.application_data.indexOf('-'))+"-scc.ieyeplus.com"
+                                        }
+                                        this.vertoHandle.sendMethod("jsapi",{command:"fsapi", data:{cmd:"conference", arg:item.application_data  +  " " + "list as xml"}},
+                                        (data)=>{
+                                            switch(item.application_data){
+                                            case this.voice+"-scc.ieyeplus.com":
+                                            application_des = "setConfLeft"
+                                            arr = this.$store.getters.confLeft
+                                            break
+                                            case this.alarm+"-scc.ieyeplus.com":
+                                            application_des = "setConfAlarm"
+                                            arr = this.$store.getters.confAlarm
+                                            break
+                                            case this.broad+"-scc.ieyeplus.com":
+                                            application_des = "setConfIpBoard"
+                                            arr = this.$store.getters.confIpBoard
+                                            break
+                                            case this.meeting+"-scc.ieyeplus.com":
+                                            application_des = "setConfMeeting"
+                                            arr = this.$store.getters.confMeeting
+                                            break
+                                            }
+                                          let conferences = data.message.split('\n')
+                                          conferences.forEach( (element,index) => {
+                                          if( element!= ""){
+                                          let conference_data = element.split(";")
+                                          let sound = conference_data[5].split("|")
+                                          if(conference_data[4] == item.presence_id.slice(0,item.presence_id.indexOf('@'))){
+                                              if(arr.length == 0 ||  arr.every(function(item,index,array){return item.key!=conference_data[2]}))
+                                              arr.push({
+                                                conf_id : conference_data[0],
+                                                caller_id_number : conference_data[4],
+                                                muted : sound.findIndex((item)=>{return item =="speak"})==-1?true:false,
+                                                deaf :  sound.findIndex((item)=>{return item =="hear"})==-1?true:false,
+                                                talking : false,
+                                                channel_uuid : conference_data[2],
+                                                key : conference_data[2] 
+                                              })
+                                          }
+                                          }
+                                        })
+                                        this.$store.dispatch(application_des,arr)
+                                        })
+                                        }
+                                        let deviceList = this.$store.getters.deviceList
+                                        deviceList.forEach((device,index) => {
+                                          if(device.userID == item.presence_id.slice(0,item.presence_id.indexOf('@'))){
+                                            if(item.callstate == "RINGING"  || item.callstate == "EARLY" || item.callstate =="RING_WAIT")
+                                              device.deviceState = "ringing"
+                                            else if(item.callstate == "ACTIVE"){
+                                            device.deviceState = "active"
+                                            device.channelUUID = item.call_uuid
+                                            device.calling = item.sent_callee_num
+                                            if(device.timer.clock == false){
+                                              item.created = item.created.replace(/\-/g, "/")
+                                              let time = new Date(item.created)
+                                              let now = new Date()
+                                              device.timer.h = parseInt(parseInt(now - time)/1000/60/60)
+                                              device.timer.m = parseInt(parseInt(now - time - device.timer.h*1000*60*60)/1000/60)
+                                              device.timer.s = parseInt(parseInt(now - time - device.timer.h*1000*60*60-device.timer.m*1000*60)/1000)
+                                              var t = setInterval(()=>{
+                                                  device.timer.s+=1
+                                                  if(device.timer.s>59.5){
+                                                      device.timer.s=0
+                                                      device.timer.m+=1}
+                                                      if(device.timer.s>59.5 || device.timer.m>59){
+                                                          device.timer.m=0
+                                                          device.timer.h+=1}
+                                                          },1000)
+                                              device.timer.clock = true
+                                              device.timer.id.push(t) 
+                                              } //开启计时器
+                                            } //通话状态
+                                          } //遍历userid
+                                      }) //deviceList
+                                      this.$store.dispatch('setDeviceList',deviceList)
+                                      }) // 遍历启动的channel
+                                    
+                                    } //msg
+                                  }
+                                )
                                 })
+
                                }
                               })
-                              
-                              })
+                            })
                 if(this.targetUserGroupId == "")
                   this.$store.dispatch('setUserGroup',[])
                   
@@ -638,90 +730,7 @@
       //  获取正在振铃或者通话中的状态
       handleGetCallOrRinging() {
         let _this = this;
-        this.vertoHandle.sendMethod("jsapi",{command:"fsapi", data:{cmd:"show", arg:"channels as xml"}},
-          (data) => {
-            const parser = new DOMParser()
-            const doc = parser.parseFromString(data.message, "text/xml")
-            const msg = parseXML(doc)
-            if(msg != 0) {
-              let channel_data = msg.row
-              if(!(channel_data instanceof Array))
-                channel_data = [channel_data]
-              channel_data.forEach( (item,index) => {
-                if(item.application == 'conference'){
-                this.vertoHandle.sendMethod("jsapi",{command:"fsapi", data:{cmd:"conference", arg: item.application_data.slice(0,item.application_data.indexOf('+')) +" " + "list as xml"}},
-                  (data)=>{
-                    let application_des = ""
-                    let arr = []
-                    let conf_name = item.application_data.slice(0,item.application_data.indexOf('+'))
-                    switch(conf_name){
-                    case this.voice+"-scc.ieyeplus.com":
-                      application_des = "setConfLeft"
-                      arr = this.$store.getters.confLeft
-                      break
-                    case this.alarm+"-scc.ieyeplus.com":
-                      application_des = "setConfAlarm"
-                      arr = this.$store.getters.confAlarm
-                      break
-                    case this.broad+"-scc.ieyeplus.com":
-                      application_des = "setConfIpBoard"
-                      arr = this.$store.getters.confIpBoard
-                      break
-                    case this.meeting+"-scc.ieyeplus.com":
-                      application_des = "setConfMeeting"
-                      arr = this.$store.getters.confMeeting
-                      break
-                    }
-                    let conference_data = data.message.split(";")
-                    let sound  = conference_data[5].split("|")
-                    let user = {}
-                    user.conf_id = conference_data[0],
-                    user.caller_id_number = conference_data[4],
-                    user.muted = sound.findIndex((item)=>{return item =="speak"})==-1?true:false,
-                    user.deaf =  sound.findIndex((item)=>{return item =="hear"})==-1?true:false,
-                    user.talking = false,
-                    user.channel_uuid = conference_data[2],
-                    user.key = conference_data[2] 
-                    arr.push(user)
-                    this.$store.dispatch(application_des,arr) 
-                })
-                } //会议channel需要单独处理
-              let deviceList = this.$store.getters.deviceList
-              deviceList.forEach((device,index) => {
-                  if(device.userID == item.presence_id.slice(0,item.presence_id.indexOf('@'))){
-                    if(item.callstate == "RINGING"  || item.callstate == "EARLY" || item.callstate =="RING_WAIT")
-                      device.deviceState = "ringing"
-                    else if(item.callstate == "ACTIVE"){
-                    device.deviceState = "active"
-                    device.channelUUID = item.call_uuid
-                    device.calling = item.sent_callee_num
-                    if(device.timer.clock == false){
-                      item.created = item.created.replace(/\-/g, "/")
-                      let time = new Date(item.created)
-                      let now = new Date()
-                      device.timer.h = parseInt(parseInt(now - time)/1000/60/60)
-                      device.timer.m = parseInt(parseInt(now - time - device.timer.h*1000*60*60)/1000/60)
-                      device.timer.s = parseInt(parseInt(now - time - device.timer.h*1000*60*60-device.timer.m*1000*60)/1000)
-                      var t = setInterval(()=>{
-                          device.timer.s+=1
-                          if(device.timer.s>59.5){
-                              device.timer.s=0
-                              device.timer.m+=1}
-                              if(device.timer.s>59.5 || device.timer.m>59){
-                                  device.timer.m=0
-                                  device.timer.h+=1}
-                                  },1000)
-                      device.timer.clock = true
-                      device.timer.id.push(t) 
-                      } //开启计时器
-                    } //通话状态
-                  } //遍历userid
-              }) //deviceList
-              this.$store.dispatch('setDeviceList',deviceList)
-              }) // 遍历启动的channel
-            } //msg
-          }
-        )
+        
       },
 
       fsAPI(cmd, arg, success_cb, failed_cb) {

@@ -6,8 +6,8 @@
       highlight-current 
       :props="defaultProps"
       :default-expanded-keys="defaultExpanded"
+      @node-click="handleNodeClick" 
       node-key="OrganizationID"
-      @node-click="handleNodeClick"
       :expand-on-click-node="false"
       :render-content="renderContent"
     >
@@ -159,6 +159,7 @@
         .then((res)=>{
           if (res.data.code == 1)
             {
+	      console.log(res)
               let total = res.data.result.length
               let vertos = []
               let axios = []
@@ -169,9 +170,10 @@
               .then(res => {
               res.forEach((re)=>{
                 if(re!=null && re.data.result!=null)
-                vertos.push(re.data.result.VertoID.slice(2))
+                vertos.push(Number(re.data.result.VertoID.slice(2)))
               })
-              let id = String(Math.max(vertos)+1).length > 1?String(Math.max(vertos)+1):"0"+String(Math.max(vertos)+1)
+              let id = String(Math.max(...vertos)+1).length > 1?String(Math.max(...vertos)+1):"0"+String(Math.max(...vertos)+1)
+	      console.log(vertos,id)
               let vertoNum = "99" + id
               let alarmNum = "91" + id
               let voiceNum = "92" + id

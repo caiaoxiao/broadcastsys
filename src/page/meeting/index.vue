@@ -4,7 +4,7 @@
     <div class="middleCon">
 	<div class="module">
           <ul class="nav nav-justified choose" data-name="title">
-            <li class="on">全部</li>
+	    <li @click="refresh(null)" class="on">全部</li>
             <li @click="refresh(userGroup[0])">分组</li>
           </ul>
           <div data-name="con">
@@ -65,6 +65,7 @@
               <i class="fa fa-user-plus fa-2x" aria-hidden="true"></i>
               <span>加入成员</span>
             </li>
+	    <li id="a3" @click="selectAll" @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-group fa-2x" aria-hidden="true"></i><span>全选</span></li>
 
           </ul>
       </div>
@@ -186,6 +187,8 @@
       item.selected = true
       this.groupShow = item.deviceGroupId
      }
+     else
+      this.groupShow = ""
     },
       itemClick(e, row) {
         let target = e.currentTarget
@@ -338,9 +341,14 @@
 
         }.bind(this))
       },
-      test() {
-
-      },
+      selectAll() {
+        this.selectPhone = []
+        this.deviceList.forEach((device)=>{
+                if(this.groupShow=="" || this.returnGroup(device) == true)
+                this.selectPhone.push(device)
+                })
+        $('.online').addClass('onlineSelected')
+        },
       // 会议录音
       meetingRecord(type) {
         this.vertoHandle.fsAPI("conference",this.name + " recording "+ type + " /tmp/record.wav", function(res){

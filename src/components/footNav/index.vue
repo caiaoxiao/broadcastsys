@@ -3,8 +3,9 @@
     <div class="userInfo">
       <div class="userName">
         <span>您好 {{this.username}}<a @click="logout()"> [退出]</a>
-          所属机构
-          <a @click="setting()"><i class="fa fa-cogs"></i>系统设置</a></span>
+          <a @click="setting()"><i class="fa fa-cogs"></i>系统设置</a>
+	  <a @click="$router.go(0)"><i class="fa fa-refresh"></i>刷新页面</a></span>
+	  
 
       </div>
     </div>

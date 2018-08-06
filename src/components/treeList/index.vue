@@ -1,7 +1,7 @@
 <template>
   <div class="orgTreeList">
-    <div class="listTitle">播放设备列表</div>
-    <tree></tree>
+    <div class="listTitle">组织机构列表</div>
+    <tree @click = "click"></tree>
     <i class="fa fa-chevron-left" aria-hidden="true"  @click="close"></i>
   </div>
 </template>
@@ -29,7 +29,10 @@
       },
       removeAll() {
         $('#end').html('');
-      }
+      },
+      click(){
+        this.$emit('refresh')
+     }
     }
   }
 </script>

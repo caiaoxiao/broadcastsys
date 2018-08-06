@@ -5,7 +5,7 @@
 
       <div class="module">
         <ul class="nav nav-justified choose" data-name="title">
-          <li class="on">全部</li>
+          <li @click="refresh(null)" class="on">全部</li>
           <li @click="refresh(userGroup[0])">分组</li>
         </ul>
         <div data-name="con">
@@ -50,7 +50,6 @@
               </div>
                   </div>
                 </div>
-                <div class="selectAll">全部选择</div>
             </div>
             </div>
           </div>
@@ -70,6 +69,7 @@
           <li id="a3" @click="play" @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-play-circle-o fa-2x" aria-hidden="true"></i><span>播放</span></li>
           <li id="a4" @click="pauseOrPlay" @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i :class="ifPlay(playState)" aria-hidden="true"></i><span>{{playState}}</span></li>
           <li id="a5" @click="allOver" @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-window-close fa-2x" aria-hidden="true"></i><span>全部结束</span></li>
+          <li id="a5" @click="selectAll" @mousedown="$btnMousedown" @mouseup="$btnMouseup"><i class="fa fa-group fa-2x" aria-hidden="true"></i><span>全选</span></li>
         </ul>
       </div>
     </div>
@@ -124,12 +124,12 @@
         selectPhone: [],
         name: "",
         playListShow: false,     //播放列表显示切换
-	      groupShow:"",
+	groupShow:"",
         playList: [],
         selectPlayList: [],
         anotherSong: [],
-	      mute:"喊话",
-	      selectNowCall: [],
+	mute:"喊话",
+	selectNowCall: [],
         selectRingCall: [],
         verto:"",
         broad:"",
@@ -240,6 +240,8 @@
       item.selected = true
       this.groupShow = item.deviceGroupId
      }
+      else
+      this.groupShow = ""
     },
 
     reFresh() {
@@ -333,6 +335,14 @@
           })
         }
       },
+      selectAll() {
+	this.selectPhone = []
+	this.deviceList.forEach((device)=>{
+		if(this.groupShow=="" || this.returnGroup(device) == true)
+		this.selectPhone.push(device)	
+		})
+	$('.online').addClass('onlineSelected') 
+	},
       
       addMusic(item) {
         if(this.selectPlayList[0] == null) {

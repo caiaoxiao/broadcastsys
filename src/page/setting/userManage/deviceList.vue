@@ -2,8 +2,8 @@
   <div class="allDevice ">
     <div class="menuType">
       <i class="fa fa-list-ul" aria-hidden="true"></i>设备列表
-      <p @click="confirmAdd">确定添加</p>
-      <p @click="confirmAddAll">全部添加</p>
+      <button  type="button" class="btn btn-sm btn-info" @click="confirmAddAll">全部添加</button>
+      <button  type="button" class="btn btn-sm btn-info" @click="confirmAdd">确定添加</button>
     </div>
     <form style="padding:5px 10px">
       <span>请输入新设备组名称</span>
@@ -79,6 +79,12 @@ export default {
         }
         
       }
+      else{
+      this.selectDevice.forEach((de,index)=>{
+       if(device.deviceId == de.deviceId) 
+	this.selectDevice.splice(index,1)	
+       })
+      }
       device.selected = !device.selected
     },
     confirmAdd () {
@@ -98,3 +104,7 @@ export default {
   }
 }
 </script>
+<style scoped>
+.menuType button{
+float:right;}
+</style>

@@ -8,7 +8,7 @@
             <div class="form-group">
               <label class="col-sm-4 control-label">设备号</label>
               <div class="col-sm-8">
-                <input type="text" placeholder="1000" class="form-control" v-model="formData.deviceCode">
+                <input type="text" class="form-control" v-model="formData.deviceCode">
               </div>
             </div>
           </div>
@@ -16,7 +16,7 @@
             <div class="form-group">
               <label class="col-sm-4 control-label">添加范围</label>
               <div class="col-sm-8">
-                <input type="text" placeholder="默认为1" class="form-control" v-model="range">
+                <input type="text"  class="form-control" v-model="range">
               </div>
             </div>
           </div>
@@ -130,7 +130,12 @@ export default {
         axios.push(this.$ajax.post('Device/Create',temp))
        }
        this.$ajax.all(axios).then(res => {
-         this.$message.success("新增成功")
+	 res.forEach((re)=>{
+         if(re.data.code == 0)
+	   setTimeout(()=>{this.$message.success("某个设备已存在,请勿重复添加")},500)
+	 else
+	  setTimeout(()=>{this.$message.success(re.data.result.deviceCode+"添加成功")},500)
+	})
          this.$store.dispatch('update', 1)
        })
     }

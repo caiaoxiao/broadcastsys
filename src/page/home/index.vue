@@ -234,7 +234,6 @@
                 _this.liveArray = new $.verto.liveArray(verto,pbx,room, config);
                 // Subscribe to live array changes.
                 _this.liveArray.onChange = function(liveArrayObj, args) {
-		console.log(liveArrayObj, args)
                 let device = _this.$store.getters.deviceList
 		let action = ""
 		let arr =[]

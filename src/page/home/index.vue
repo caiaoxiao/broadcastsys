@@ -685,17 +685,28 @@
           }.bind(this))
 
         // 订阅注册事件
+        this.vertoHandle.subscribe("FSevent.custom::sofia::expire",{handler: this.handleExpire.bind(this)});
         this.vertoHandle.subscribe("FSevent.custom::sofia::register", {handler: this.handleFSEventRegister.bind(this)});
         // 订阅取消注册事件
         this.vertoHandle.subscribe("FSevent.custom::sofia::unregister", {handler: this.handleFSEventRegister.bind(this)});
         this.vertoHandle.subscribe("FSevent.channel_callstate", {handler: this.handleFSEventChannel.bind(this)});
       },
       // 注册事件 和 取消注册事件
+      handleExpire(v,e){
+        let deviceList = this.deviceList
+        deviceList.forEach((d, i) => {
+            if(d.userID == e.data.username ) {
+              deviceList[i].deviceState = "unregistered"
+            }
+          })
+        this.$store.dispatch('setDeviceList',deviceList)
+
+      },
       handleFSEventRegister(v, e) {
         let deviceList = this.deviceList
         if (e.eventChannel == 'FSevent.custom::sofia::register') {
           let isContinue = true
-          deviceList.forEach(function(d, i) {
+          deviceList.forEach((d, i)=> {
             if(d.userID == e.data.username ) {
 	          if( deviceList[i].deviceState == "unregistered")
               deviceList[i].deviceState = "registered"

@@ -58,6 +58,7 @@
         </tbody>
       </table>
     </div>
+    <page></page>
     <audio id="music"></audio>
   </div>
 </template>

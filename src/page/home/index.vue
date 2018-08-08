@@ -312,7 +312,7 @@
 						}
 					})//device获取videourl
 		}//liveArrayObj.name =='9110-scc.ieyeplus.com'i && args.data[1]!='9000'
-			if((liveArrayObj.name ==_this.voice+'-scc.ieyeplus.com')  && _this.verto){ 
+			if((liveArrayObj.name ==_this.voice+'-scc.ieyeplus.com')  && args.data[1]!=_this.verto){ 
                         _this.fsAPI('conference',liveArrayObj.name+' '+'stop'+' '+'all'+' '+ parseInt(args.data[0]).toString())
 			_this.fsAPI('conference',liveArrayObj.name+' '+'play'+' '+'/usr/local/freeswitch/sounds/music/8000/danza-espanola-op-37-h-142-xii-arabesca.wav'+ ' '+ parseInt(args.data[0]).toString()) 
 			}

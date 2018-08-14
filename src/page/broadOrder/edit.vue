@@ -134,7 +134,7 @@
 
       </div>
       <div class="settingMoudle">
-        <div class="settingTitle">循环次数</div>
+        <div class="settingTitle">循环次数(-1为循环播放)</div>
         <div class="settingCon">
           <span class="times" @click="subtractTime">-</span>
           <input type="text" v-model="cycleTime" class="cycleIndex"/>
@@ -186,7 +186,7 @@
         isSelectAll: false, // 是否全选
         playCount: 0,
         cycleIndex: 0,      // 预案循环次数
-        cycleTime:1,
+        cycleTime:-1,
         formData: {
           CreateUserID: '133585596bb04c9cbe311d0859dd7196',
           PlanName: '',
@@ -333,12 +333,18 @@
         this.xData.cmdtype = 1
       },
       subtractTime() {
+	if(this.cycleTime == 1){
+	  this.cycleTime = -1
+	}
         if(this.cycleTime> 1) {
           this.cycleTime = this.cycleTime -1
         }
       },
       addTime() {
-        if(this.cycleTime < 10) {
+	 if(this.cycleTime == -1){
+           this.cycleTime = 1
+        }
+        else if(this.cycleTime < 10 ) {
           this.cycleTime = this.cycleTime +1
         }
       },
@@ -490,5 +496,20 @@
 </script>
 
 <style type="text/scss" rel="stylesheet/scss" lang="scss">
+.content{overflow-y:auto;}
+::-webkit-scrollbar{
+  width: 5px;
+  background: #4E545A
 
+}
+::-webkit-scrollbar-button{  }
+::-webkit-scrollbar-track{ }
+::-webkit-scrollbar-track-piece {}
+::-webkit-scrollbar-thumb{
+  background:#6F7882;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-corner {  }
+::-webkit-resizer{}
 </style>

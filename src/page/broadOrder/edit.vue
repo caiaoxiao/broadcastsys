@@ -292,7 +292,6 @@
         this.vertoHandle.subscribe("FSevent.custom::sofia::register", {handler: this.handleFSEventRegister.bind(this)});
         // 订阅取消注册事件
         this.vertoHandle.subscribe("FSevent.custom::sofia::unregister", {handler: this.handleFSEventRegister.bind(this)});
-        this.vertoHandle.subscribe("FSevent.custom::conference::maintenance", {handler: this.closeMeeting.bind(this)});
       },
       // 注册事件 和 取消注册事件
       handleFSEventRegister(v, e) {
@@ -486,9 +485,6 @@
       close() {
         this.$emit('close')
       },
-      closeMeeting(v,e) {
-        console.log(e.data.Action)
-      }
     }
   }
 </script>

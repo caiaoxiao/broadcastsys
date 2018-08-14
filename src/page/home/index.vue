@@ -745,8 +745,11 @@
         
       },
       closeMeeting(v,e) {
-        if (e.data.Action == "play-file-done" && e.data.Conference-Name == this.broad + "-scc.ieyeplus.com")
+        if (e.data["Action"] == "play-file-done" && e.data["Conference-Name"] == this.broad + "-scc.ieyeplus.com")
+            {
+            console.log("ordered file playing is finished")
             this.fsAPI('conference',this.broad+'-scc.ieyeplus.com'+' ' +'hup'+' '+'all') 
+            }
       },
       fsAPI(cmd, arg, success_cb, failed_cb) {
         this.vertoHandle.sendMethod("jsapi",{

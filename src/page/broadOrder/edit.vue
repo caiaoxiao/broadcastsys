@@ -134,6 +134,16 @@
 
       </div>
       <div class="settingMoudle">
+        <div class="settingTitle">循环次数</div>
+        <div class="settingCon">
+          <span class="times" @click="subtractTime">-</span>
+          <input type="text" v-model="cycleTime" class="cycleIndex"/>
+          <span class="times" @click="addTime">+</span>
+          <span>次</span>
+        </div>
+
+      </div>
+      <div class="settingMoudle">
         <div class="settingTitle">播放文件类型</div>
         <div class="settingCon">
           <span class="moudle"
@@ -176,6 +186,7 @@
         isSelectAll: false, // 是否全选
         playCount: 0,
         cycleIndex: 0,      // 预案循环次数
+        cycleTime:1,
         formData: {
           CreateUserID: '133585596bb04c9cbe311d0859dd7196',
           PlanName: '',
@@ -199,9 +210,9 @@
         },
         verto: '',
         meeting: '',
-	voice: '',
-	alarm: '',
-	broad: '',
+        voice: '',
+        alarm: '',
+        broad: '',
         dialogShow: false,
         dialogText: null,
       }
@@ -212,10 +223,10 @@
         getHeights()
         this.refresh()
         this.verto = this.get_user_info.freeswitchData.VertoID
-	this.meeting = this.get_user_info.freeswitchData.MeetingID
-	this.voice = this.get_user_info.freeswitchData.VoiceCallID
-    	this.alarm = this.get_user_info.freeswitchData.AlarmID
-	this.broad = this.get_user_info.freeswitchData.BroadID
+        this.meeting = this.get_user_info.freeswitchData.MeetingID
+        this.voice = this.get_user_info.freeswitchData.VoiceCallID
+    	  this.alarm = this.get_user_info.freeswitchData.AlarmID
+	      this.broad = this.get_user_info.freeswitchData.BroadID
       })
     },
     components: {
@@ -321,6 +332,16 @@
       musicPlay() {
         this.xData.cmdtype = 1
       },
+      subtractTime() {
+        if(this.cycleTime> 1) {
+          this.cycleTime = this.cycleTime -1
+        }
+      },
+      addTime() {
+        if(this.cycleTime < 10) {
+          this.cycleTime = this.cycleTime +1
+        }
+      },
       subtract() {
         if(this.cycleIndex > 0) {
           this.cycleIndex = this.cycleIndex -1
@@ -425,7 +446,7 @@
                 device_ids+="-"
                 device_ids+=element.userID
               })
-              this.$ajax.get('https://scc.ieyeplus.com:8082/api/scheds/'+res.data.result.id+'%'+device_ids)
+              this.$ajax.get('https://scc.ieyeplus.com:8082/api/schedsss/'+res.data.result.id+'%'+device_ids+'%'+this.cycleTime)
             }else {
             }
           })

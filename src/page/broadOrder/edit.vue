@@ -419,7 +419,13 @@
         this.$ajax.post('QzTask/add',this.xData)
           .then((res) => {
             if(res.data.code == 1) {
-              this.$ajax.get('https://scc.ieyeplus.com:8082/api/scheds/'+res.data.result.id)
+              let device_ids = ""
+              this.selectDevice.forEach((element,i) => {
+                if(i!=0)
+                device_ids+="-"
+                device_ids+=element.userID
+              })
+              this.$ajax.get('https://scc.ieyeplus.com:8082/api/scheds/'+res.data.result.id+'%'+device_ids)
             }else {
             }
           })

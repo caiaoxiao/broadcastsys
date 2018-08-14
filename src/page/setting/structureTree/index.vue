@@ -218,7 +218,7 @@
         if(this.status=="change")
         return (
             <span class="custom-tree-node">
-            <span contenteditable = {node.label=='新建组织机构'?true:false}  onkeydown={()=>this.enter($event,data,node)}  >  {node.label} </span>
+            <span contenteditable = {node.label=='新建组织机构'?true:false}  onkeydown={()=>this.enter($event,data,node)} onblur = {()=>this.renameDeviceGroupList(event,data,node)} >  {node.label} </span>
             <span>
               <el-button size="mini" type="text" on-click={ () => this.append(data) }><i class = "fa fa-plus"></i></el-button>
               <el-button size="mini" type="text" on-click={ () => this.remove(node, data) }><i class = "fa fa-minus"></i></el-button>

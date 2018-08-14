@@ -92,7 +92,7 @@
        else if(conf.length>0 && conf.every((item,index,array)=>{return item.caller_id_number ==this.verto}))
 	{	
 	   conf.forEach((item)=>{
-           this.fsAPI('conference',+this.alarm+'-scc.ieyeplus.com'+' ' +'hup'+' '+item.conf_id) 
+           this.fsAPI('conference',this.alarm+'-scc.ieyeplus.com'+' ' +'hup'+' '+item.conf_id) 
 		})
 	   this.$store.dispatch('setConfAlarm',[])
 	}
@@ -689,6 +689,7 @@
         // 订阅取消注册事件
         this.vertoHandle.subscribe("FSevent.custom::sofia::unregister", {handler: this.handleFSEventRegister.bind(this)});
         this.vertoHandle.subscribe("FSevent.channel_callstate", {handler: this.handleFSEventChannel.bind(this)});
+        this.vertoHandle.subscribe("FSevent.custom::conference::maintenance", {handler: this.closeMeeting.bind(this)});
       },
       // 注册事件 和 取消注册事件
       handleExpire(v,e){
@@ -743,7 +744,10 @@
         let _this = this;
         
       },
-
+      closeMeeting(v,e) {
+        if (e.data.Action == "file-play-done" && e.data.Conference-Name == this.broad + "-scc.ieyeplus.com")
+            this.fsAPI('conference',this.broad+'-scc.ieyeplus.com'+' ' +'hup'+' '+'all') 
+      }
       fsAPI(cmd, arg, success_cb, failed_cb) {
         this.vertoHandle.sendMethod("jsapi",{
           command: "fsapi",

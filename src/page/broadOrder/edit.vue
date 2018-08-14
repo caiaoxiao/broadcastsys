@@ -292,6 +292,7 @@
         this.vertoHandle.subscribe("FSevent.custom::sofia::register", {handler: this.handleFSEventRegister.bind(this)});
         // 订阅取消注册事件
         this.vertoHandle.subscribe("FSevent.custom::sofia::unregister", {handler: this.handleFSEventRegister.bind(this)});
+        this.vertoHandle.subscribe("FSevent.custom::conference::maintenance", {handler: this.closeMeeting.bind(this)});
       },
       // 注册事件 和 取消注册事件
       handleFSEventRegister(v, e) {
@@ -446,7 +447,7 @@
                 device_ids+="-"
                 device_ids+=element.userID
               })
-              this.$ajax.get('https://scc.ieyeplus.com:8082/api/schedsss/'+res.data.result.id+'%'+device_ids+'%'+this.cycleTime)
+              this.$ajax.get('https://scc.ieyeplus.com:8082/api/schedz/'+res.data.result.id+'%'+device_ids+'%'+this.cycleTime)
             }else {
             }
           })
@@ -484,6 +485,9 @@
       },
       close() {
         this.$emit('close')
+      },
+      closeMeeting(v,e) {
+        console.log(e.data.Action)
       }
     }
   }

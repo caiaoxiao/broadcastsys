@@ -490,26 +490,11 @@
       },
       close() {
         this.$emit('close')
-      },
+      }
     }
   }
 </script>
 
 <style type="text/scss" rel="stylesheet/scss" lang="scss">
-.content{overflow-y:auto;}
-::-webkit-scrollbar{
-  width: 5px;
-  background: #4E545A
 
-}
-::-webkit-scrollbar-button{  }
-::-webkit-scrollbar-track{ }
-::-webkit-scrollbar-track-piece {}
-::-webkit-scrollbar-thumb{
-  background:#6F7882;
-  border-radius: 5px;
-}
-
-::-webkit-scrollbar-corner {  }
-::-webkit-resizer{}
 </style>

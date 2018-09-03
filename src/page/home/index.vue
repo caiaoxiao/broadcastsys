@@ -267,6 +267,23 @@
 
                       // New user joined conference.
                       case "add":
+		      if(liveArrayObj.name ==_this.meeting+'-scc.ieyeplus.com'){
+			let preId = ""	
+			let length = arr.length
+			arr.forEach((co,index)=>{
+			   if(index<length-1) 
+				preId+=(co.conf_id+",")
+			   else
+				preId+=co.conf_id
+
+			})
+			if(args.data[1]!=_this.verto){
+			_this.fsAPI('conference',liveArrayObj.name+' '+'relate'+' '+parseInt(args.data[0]).toString()+' '+preId + ' '+'nohear')
+			_this.fsAPI('conference',liveArrayObj.name+' '+'relate'+' '+preId+' '+parseInt(args.data[0]).toString() + ' '+'nohear')
+			_this.fsAPI('conference',liveArrayObj.name+' '+'relate'+' '+parseInt(args.data[0]).toString()+' '+preId + ' '+'nospeak')
+			_this.fsAPI('conference',liveArrayObj.name+' '+'relate'+' '+preId+' '+parseInt(args.data[0]).toString() + ' '+'nospeak')
+		      		}
+			}
 		      if(args.data[1]!=_this.verto){
                       device.forEach(function(user) {
                             if(user.userID == args.data[1])  {

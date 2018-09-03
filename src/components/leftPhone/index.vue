@@ -103,6 +103,10 @@
           this.conf = this.$store.getters.confMeeting
           this.confname = {name:'confmeeting',num:this.meeting,show:"会议"}
         }
+	else if(this.$router.history.current.fullPath=="/radio") {
+          this.conf = this.$store.getters.confMeeting
+          this.confname = {name:'confmeeting',num:this.meeting,show:"对讲"}
+        }
 	
       })
     },
@@ -259,6 +263,7 @@
           case '排队等待':
               if(this.selected.length > 0){
                 this.selected.forEach((a,i)=>{
+		              this.fsAPI('conference',this.confname.num+"-scc.ieyeplus.com"+" "+"pause_play"+" "+a.conf_id)
                   this.fsAPI('conference',this.confname.num+"-scc.ieyeplus.com"+" "+"mute"+" "+a.conf_id		   )
                   this.fsAPI('conference',this.confname.num+"-scc.ieyeplus.com"+" "+"deaf"+" "+a.conf_id		   )
 		              this.fsAPI('conference',this.confname.num+"-scc.ieyeplus.com"+" "+"pause_play"+" "+a.conf_id)

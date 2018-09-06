@@ -278,6 +278,7 @@
       addSongList() {
         // 添加歌单
         let request = {
+	  FolderID: '',
           FolderName: '新建歌单',
           UserID: '133585596bb04c9cbe311d0859dd7196',
           FolderType: 1
@@ -286,14 +287,22 @@
           .then(res => {
             let result = res.data.result
             if(res.data.code == 1) {
-              result.FolderID
+	      request.FolderID=result.folderID
+              this.playList.push({
+		FolderName: '新建歌单',
+		FolderID: result.folderID,
+		contenteditable: false,
+		musicList: []
+	      }) 
             }
           })
+	/* console.log("request.FolderID is:",request.FolderID)
         this.playList.push({
           FolderName: '新建歌单',
-          contenteditable: true,
+	  FolderID: request.FolderID,
+          contenteditable: false,
           musicList: []
-        })
+        }) */
       },
 
       // 添加指定歌曲到指定歌单
@@ -334,6 +343,7 @@
 
       renameSongList(item, event) {
         // 歌单重命名
+	console.log("The item.FolderID is:",item.FolderID)
         item.contenteditable = true
         let request = {
           FolderName: event.target.textContent,
@@ -341,6 +351,7 @@
           FolderType: 1,
           FolderID: item.FolderID
         }
+	console.log("The request is:",request)
         this.$ajax.put('Folder/Edit',request)
           .then(res => {
             if(res.data.code == 1) {

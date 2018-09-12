@@ -103,6 +103,7 @@
             if(res.data.code == 1) {
               console.log("success");
               this.xPlanData = res.data.result
+	      console.log("The xPlanData is:",this.xPlanData)
             }else {
               console.log("failed");
             }
@@ -112,6 +113,8 @@
             if(res.data.code == 1) {
               console.log("success");
               this.showPlanData = res.data.result
+              this.showPlanData = this.showPlanData.reverse()
+              console.log("The showPlanData is:",this.showPlanData)
               let i = 0;
               let j = 0;
               let sum = 1;
@@ -120,7 +123,12 @@
               }
               for( i = 0, j = 0; i<res.data.result.length; i=i+sum,j++) {
                 this.showPlanData[j] = res.data.result[i]
-                this.showPlanData[j].PlanPreTime = this.xPlanData[i].time
+                console.log("The time is:",this.showPlanData[j].PlanName)
+                // var d = new Date(this.xPlanData[i].time)
+                // this.showPlanData[j].PlanPreTime = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds()
+                var moment = require('moment')
+                this.showPlanData[j].PlanPreTime = moment(this.xPlanData[i].time).format("YYYY-MM-DD HH:mm:ss") 
+                console.log("The perfect TIME:",this.showPlanData[j].PlanPreTime)
                 if(i+sum == res.data.result.length) {
                   this.showPlanData.splice(j+1,res.data.result.length-j-1)
                 }

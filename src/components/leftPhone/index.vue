@@ -342,8 +342,10 @@
 
       },
       select(e,item){
+	console.log(e)
         let _this = this
         let target = e.currentTarget
+	console.log(e.currentTarget.parentElement.nextElementSibling)
 	    if($(target).hasClass('unselected')){
             $(target).removeClass().addClass('selected')
             if(this.selected.findIndex(function(caller,index,array){return caller.conf_id==item.conf_id})==-1 ){

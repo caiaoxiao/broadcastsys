@@ -8,7 +8,7 @@
             <div class="form-group">
               <label class="col-sm-4 control-label">用户名</label>
               <div class="col-sm-8">
-                <input type="text" class="form-control" v-model="formData.userName">
+                <input type="text" class="form-control" v-model="formData.username">
               </div>
             </div>
           </div>
@@ -68,9 +68,9 @@ export default {
     let userroleid = this.targetUserGroupId
     this.formData.userRoles = [{roleID :  userroleid}]
     if (this.modolType === 0) { // 如果为新增，拿到当前的组织机构ID
-      this.formData.OrganizationID = this.targetMenu.OrganizationID
+      this.formData.OrganizationID = this.targetMenu.organizationid
     } else { // 如果为编辑，拿到当前的用户的userId
-      this.$ajax.get(`User/Detail/${this.targetMenu.userId}`)
+      this.$ajax.get(`User/Detail/${this.targetMenu.userid}`)
         .then((res) => {
           if (res.data.code === 1) {
             let result = res.data.result

@@ -65,13 +65,13 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="data in dataAll"  :key = "data.userID" >
-              <td>{{ data.userName }}</td>
-              <td>{{ data.roleName }}</td>
-              <td>{{ data.orgName }}</td>
+            <tr v-for="data in dataAll"  :key = "data.userid" >
+              <td>{{ data.username }}</td>
+              <td>{{ data.rolename }}</td>
+              <td>{{ data.orgname }}</td>
               <td width="170">
-                <button type="button" class="btn btn-sm btn-info" @click="openModal( 1 ,data.userID)">修改</button>
-                <button type="button" class="btn btn-sm btn-default" @click="deleteUser(data.userID)">删除</button>
+                <button type="button" class="btn btn-sm btn-info" @click="openModal( 1 ,data.userid)">修改</button>
+                <button type="button" class="btn btn-sm btn-default" @click="deleteUser(data.userid)">删除</button>
               </td>
             </tr>
           </tbody>
@@ -93,14 +93,14 @@
           </thead>
           <tbody>
             <tr v-for="device in allDevices" >
-              <td>{{device.deviceCode}}</td>
-              <td>{{device.deviceName}}</td>
+              <td>{{device.devicecode}}</td>
+              <td>{{device.devicename}}</td>
               <td>
                 {{ device.type == 0 ? '单话机' : '视频话机' }}
               </td>
               <td>
-                <button type="button" class="btn btn-sm btn-info" @click="openModal(-1 ,device.deviceId)">修改</button>
-                <button type="button" class="btn btn-sm btn-default" @click="deleteDevice(device.deviceId)">删除</button>
+                <button type="button" class="btn btn-sm btn-info" @click="openModal(-1 ,device.deviceid)">修改</button>
+                <button type="button" class="btn btn-sm btn-default" @click="deleteDevice(device.deviceid,device.devicecode)">删除</button>
               </td>
             </tr>
           </tbody>
@@ -108,7 +108,7 @@
         <h3 v-if = "deviceGroups.length>0">设备组</h3>
         <table class = "table" v-for = "group in deviceGroups" >
           <caption> <span> {{group.name}} </span> 
-          <button type="button" class="btn btn-sm btn-info" @click="deleteDeviceGroup(group.deviceGroupId)">删除</button>
+          <button type="button" class="btn btn-sm btn-info" @click="deleteDeviceGroup(group.devicegroupid)">删除</button>
           </caption>
           <thead>
             <tr>
@@ -119,8 +119,8 @@
           </thead>
           <tbody>
             <tr v-for="item in group.deviceGroups" >
-              <td>{{item.deviceCode}}</td>
-              <td>{{item.deviceName}}</td>
+              <td>{{item.devicecode}}</td>
+              <td>{{item.devicename}}</td>
               <td>
                 {{ item.type == 0 ? '单话机' : '视频话机' }}
               </td>
@@ -180,8 +180,8 @@ export default {
     'TreeData': {
       handler: function (data) {
         this.targetMenu = data
-        this.transferdata.targetMenuId = data.OrganizationID
-        this.targetUserGroup = data.OrgName
+        this.transferdata.targetMenuId = data.organizationid
+        this.targetUserGroup = data.orgname
         this.modolType =  null
         /*this.deviceGroups.forEach(
           (item,index)=>{
@@ -215,22 +215,23 @@ export default {
     this.$nextTick(()=> {
     	this.refresh()
     	getHeights()
-        })  
+    })  
     this.targetMenu = this.TreeData
-    this.targetUserGroup = this.$store.state.user_info.user.OrgName
-    this.OrgUrl = 'Organization/TreeRoot/' + this.$store.state.user_info.user.organizationID
+    this.targetUserGroup = this.$store.state.user_info.user.orgname
+    this.OrgUrl = 'Organization/TreeRoot/' + this.$store.state.user_info.user.organizationid
   },
   methods: {  //  组织机构树默认选中
     initDatas (data) {
-      if (!this.targetMenu.hasOwnProperty('OrganizationID') && data) {
+      if (!this.targetMenu.hasOwnProperty('organizationid') && data) {
         this.targetMenu = data
         this.refresh()
       }
     },
     // 渲染表格数据
     refresh () {
+      console.log(this.transferdata)
       let request = {
-        organizationID: this.targetMenu.OrganizationID
+        organizationid: this.targetMenu.organizationid
       }
       this.$ajax.post('User/List', request)
         .then((res) => {
@@ -238,18 +239,18 @@ export default {
             this.dataAll = res.data.result
           }
         })
+      if(this.transferdata.targetMenuId!=undefined && this.transferdata.targetMenuId!="")
       this.$ajax.get(`Organization/Detail/${this.transferdata.targetMenuId}`)
         .then((res) => {
-	  console.log(res)
           if (res.data.code === 1) {
-		this.verto = res.data.result.VertoID
-    		this.meeting = res.data.result.MeetingID
-    		this.voice = res.data.result.VoiceCallID
-    		this.alarm = res.data.result.AlarmID
-    		this.broad = res.data.result.BroadID
+		    this.verto = res.data.result.vertoid
+    		this.meeting = res.data.result.meetingid
+    		this.voice = res.data.result.voicecallid
+    		this.alarm = res.data.result.alarmid
+    		this.broad = res.data.result.broadid
           }
       })
-      this.$ajax.get(`Feature/getFeatureByOrg/${this.targetMenu.OrganizationID}`)
+      this.$ajax.get(`Feature/getFeatureByOrg/${this.targetMenu.organizationid}`)
         .then((res) => {
           if (res.data.code === 1) {
             this.allDevices = res.data.result
@@ -261,8 +262,8 @@ export default {
             let groupList = res.data.result
             this.targetUserGroupId = ""
             groupList.forEach(element => {
-              if(element.roleName == this.targetUserGroup){
-                this.targetUserGroupId = element.roleID
+              if(element.rolename == this.targetUserGroup){
+                this.targetUserGroupId = element.roleid
               }
             })
             if(this.targetUserGroupId!="")
@@ -270,22 +271,21 @@ export default {
           .then((res) => {
             if (res.data.code === 1) {
               let result = res.data.result
-	      console.log(result)
               let length = result.length
               this.deviceGroups = []
               let axios = []
               for (let i = 0 ; i < length ; i++){
-		   axios.push(this.$ajax.get(`DeviceGroup/Detail/${result[i].deviceGroupId}`))
+		   axios.push(this.$ajax.get(`DeviceGroup/Detail/${result[i].devicegroupid}`))
 	            }
               this.$ajax.all(axios)
                   .then((res) => {
                       for (let i = 0 ; i<length ; i++){
-			if(!this.deviceGroups.some((item)=>{return item.deviceGroupId == res[i].data.result.deviceGroupId})){
-                        this.deviceGroups.push(res[i].data.result)
-                        this.deviceGroupsDelete.push(res[i].data.result.deviceGroupId)
-			}
-                      }
-		     console.log(this.deviceGroups)
+			if(!this.deviceGroups.some((item)=>{return item.devicegroupid == res[i].data.result.devicegroupid})){
+          this.deviceGroups.push(res[i].data.result)
+          this.deviceGroupsDelete.push(res[i].data.result.devicegroupid)
+		        	}
+                }
+                console.log(this.deviceGroups)
                })
             }
           })
@@ -301,7 +301,7 @@ export default {
         this.modolType = 0
       } else {
         this.modolType = 1
-        this.targetMenu.userId = id
+        this.targetMenu.userid = id
       }
       }
         if (status == -1){
@@ -309,15 +309,18 @@ export default {
         this.modolType = -1
       } else {
         this.modolType = -2
-        this.transferdata.deviceId = id
+        this.transferdata.deviceid = id
       }
       }
     },
     closeModal () {
       this.modolType = null
     },
-    deleteDevice (deviceId){
-      this.$ajax.post('Device/RemoveList', [deviceId])
+    deleteDevice (deviceId,deviceCode){
+      let request = {}
+      request.deviceId = deviceId
+      request.deviceCode = deviceCode
+      this.$ajax.post('Device/deletes', [request])
         .then(res => {
           if (res.data.code === 1) {
             console.log('删除成功')
@@ -348,8 +351,8 @@ export default {
       this.$ajax.post('DeviceGroup/Create',{name:newDeviceGroupName,deviceGroups:selectDevice})
       .then(res => {
           if (res.data.code === 1) {
-            let targetDeviceGroup =  res.data.result.deviceGroupId
-            this.deviceGroups = this.deviceGroups.concat([{deviceGroupId:targetDeviceGroup}])
+            let targetDeviceGroup =  res.data.result.devicegroupid
+            this.deviceGroups = this.deviceGroups.concat([{devicegroupid:targetDeviceGroup}])
             this.$ajax.post(`Role/opRoleDevice/${this.targetUserGroupId}`,this.deviceGroups)              
               .then(res => {
                  if (res.data.code === 1) {

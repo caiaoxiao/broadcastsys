@@ -7,7 +7,7 @@
       :props="defaultProps"
       :default-expanded-keys="defaultExpanded"
       @node-click="handleNodeClick" 
-      node-key="OrganizationID"
+      node-key="organizationid"
       :expand-on-click-node="false"
       :render-content="renderContent"
     >
@@ -40,6 +40,7 @@
     },
     watch:{
       targetUserGroupId:(targetUserGroupId)=>{
+	console.log(targetUserGroupId)
       }
     },
     data() {
@@ -47,8 +48,8 @@
         data: [],
         defaultExpanded: [],
         defaultProps: {
-          children: 'Children',
-          label: 'OrgName'
+          children: 'children',
+          label: 'orgname'
         },
 
       };
@@ -70,15 +71,15 @@
         'setInitData'
       ]),
       refresh () {
-        this.$ajax.get('https://scc.ieyeplus.com:8443/IpBc/' + 'Organization/Data/' + this.get_user_info.user.organizationID)
+        this.$ajax.get('https://scc.ieyeplus.com:8443/IpBc/' + 'Organization/Data/' + this.get_user_info.user.organizationid)
           .then((res) => {
             let data = res.data.result
             this.data = data
             // 初始化树对象
-            this.$emit('setInitData', data[0])
+            //this.$emit('setInitData', data[0])
             //  循环出默认展开项的ID
             for(let i in data) {
-              this.defaultExpanded.push(data[i]['OrganizationID'])
+              this.defaultExpanded.push(data[i]['organizationid'])
             }
             this.TreeChange({data:data[0], node:this.$refs.tree.$children[0]})
             this.$nextTick(()=> {
@@ -96,17 +97,17 @@
         this.TreeChange({data, node})
       },
       append(data,node) {
-            const newChild = { OrganizationID:data.OrganizationID,ChildNum: 0, OrgName:"新建组织机构", Children: [] };
-            if (!data.Children) {
-              this.$set(data, 'Children', []);
+            const newChild = { organizationid:data.organizationid,childnum: 0, orgname:"新建组织机构", children: [] };
+            if (!data.children) {
+              this.$set(data, 'children', []);
             }
-            data.Children.push(newChild)
+            data.children.push(newChild)
             this.TreeChange({data, node})
           
       },
       remove(node, data) {
         let parent = node.parent
-        parent.data.Children.pop()
+        parent.data.children.pop()
         let request = []
         this.users.forEach((element) => {
           request.push(element.userID)
@@ -115,7 +116,7 @@
         this.$ajax.post(`User/RemoveList`,request)
         .then((res)=>{
           if(res.data.code == 1){
-          this.$ajax.delete(`Organization/Remove/${data.OrganizationID}`)
+          this.$ajax.delete(`Organization/Remove/${data.organizationid}`)
           .then((res)=>{
             console.log(res)
             if(res.data.code == 1){
@@ -124,7 +125,8 @@
               this.$ajax.delete(`Role/Remove/${this.targetUserGroupId}`)
               this.$ajax.post(`DeviceGroup/RemoveList/${this.deviceGroupsDelete}`)
               console.log("用户组,设备组删除成功")
-              this.$emit("refresh")
+	      //window.location.reload()
+              //this.$emit("refresh")
               }
               else
               console.log("用户组删除失败")
@@ -134,14 +136,15 @@
         })
         }
       else{
-        this.$ajax.delete(`Organization/Remove/${data.OrganizationID}`)
+        this.$ajax.delete(`Organization/Remove/${data.organizationid}`)
           .then((res)=>{
             if(res.data.code == 1){
               console.log("组织机构删除成功")
               if(this.targetUserGroupId!=""){
               this.$ajax.delete(`Role/Remove/${this.targetUserGroupId}`)
               console.log("用户组删除成功")
-              this.$emit("refresh")
+              //this.$emit("refresh")
+	      //window.location.reload()
               }
               else
               console.log("用户组删除失败")
@@ -152,8 +155,8 @@
       renameDeviceGroupList (event , data ,node) {
       console.log("焦点转移绑定成功")
       let text = event.target.textContent
-      let children = node.parent.data.Children
-      children[children.length-1].OrgName = text
+      let children = node.parent.data.children
+      children[children.length-1].orgname = text
       //if (text !== '新建设备分组') {
       this.$ajax.post('Organization/List',{pageIndex:1,pageSize:1000})
         .then((res)=>{
@@ -164,13 +167,13 @@
               let vertos = []
               let axios = []
               res.data.result.forEach((org)=>{
-                axios.push(this.$ajax.get(`Organization/Detail/${org.OrganizationID}`))
+                axios.push(this.$ajax.get(`Organization/Detail/${org.organizationid}`))
               })
               this.$ajax.all(axios)
               .then(res => {
               res.forEach((re)=>{
                 if(re!=null && re.data.result!=null)
-                vertos.push(Number(re.data.result.VertoID.slice(2)))
+                vertos.push(Number(re.data.result.vertoid.slice(2)))
               })
               let id = String(Math.max(...vertos)+1).length > 1?String(Math.max(...vertos)+1):"0"+String(Math.max(...vertos)+1)
 	      console.log(vertos,id)
@@ -181,29 +184,30 @@
               let meetingNum = "94" + id
 
               this.$ajax.post('Organization/Create',{
-                orgCode:"00000"+ String(Number(total)+1),
-                OrgName:text,
-                parentID:data.OrganizationID,
-                VertoID:vertoNum,
-                VoiceCallID:voiceNum,
-                MeetingID: meetingNum,
-                BroadID:broadNum,
-                AlarmID:alarmNum
+                orgcode:"00000"+ String(Number(total)+1),
+                orgname:text,
+                parentid:data.organizationid,
+                vertoid:vertoNum,
+                voicecallid:voiceNum,
+                meetingid: meetingNum,
+                broadid:broadNum,
+                alarmid:alarmNum
                 })
               .then((res)=>{
                 console.log(res)
                 if(res.data.code == 1){
-                  let organizationID = res.data.result.organizationID
-                  data.OrganizationID = organizationID
+                  let organizationID = res.data.result.organizationid
+                  data.organizationid = organizationID
                   let request = {
-                    roleName: text,
-                    childData: false
+                    rolename: text,
+                    childdata: false 
                   }
                   this.$ajax.post('Role/Create', request)
                   .then(res => {
                     console.log(res)
                     if (res.data.code === 1) {
                       let result = res.data.result
+		      console.log(result)
                       this.$emit("refresh")
                       }
                   })

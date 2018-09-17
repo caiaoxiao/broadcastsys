@@ -65,8 +65,8 @@
     data() {
       return {
         btnData,
-	      selected:[],
-	      status:"进入",
+	selected:[],
+	status:"进入",
         conf:[],
         confname:{},
         userDeflect:"",
@@ -90,7 +90,7 @@
         this.voice = this.get_user_info.freeswitchData.VoiceCallID
         this.alarm = this.get_user_info.freeswitchData.AlarmID
         this.broad = this.get_user_info.freeswitchData.BroadID
-	this.org = this.get_user_info.user.OrgName
+	this.org = this.get_user_info.user.orgname
         if(this.$router.history.current.fullPath=="/voiceCall"){
           this.conf = this.$store.getters.confLeft
           this.confname = {name:'confleft',num: this.voice,show:"通话"}

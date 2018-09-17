@@ -208,8 +208,10 @@ export default {
             })
       if(item){
       item.selected = true
-      this.groupShow = item.deviceGroupId
+      this.groupShow = item.devicegroupid
      }
+      else
+      this.groupShow = ""
     },
     itemClick (e, row) {
       let target = e.currentTarget

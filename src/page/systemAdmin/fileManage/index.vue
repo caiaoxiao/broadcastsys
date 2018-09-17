@@ -11,21 +11,21 @@
             <div class="songSetting">
               <span class="toggle"><i class="fa fa-angle-right" aria-hidden="true"></i></span>
               <p :contenteditable="songList.contenteditable"  @blur="renameSongList(songList, $event)">
-                {{songList.FolderName}}
+                {{songList.folderName}}
               </p>
-              <span class="musicNum" @click="qsss(songList, index)">[{{ songList.Files ? songList.Files.length :0}}]</span>
+              <span class="musicNum" @click="qsss(songList, index)">[{{ songList.files ? songList.files.length :0}}]</span>
               <span class="nameSetting" @click.stop="(()=>{ songList.contenteditable = true })"><button type="button" class="btn btn-sm btn-info" style="overflow:hidden;height: 25px;">重命名</button></span>
-              <span  class="nameSetting" @click.stop="deleteSongList(songList.FolderID)"><button type="button" class="btn btn-sm btn-info" style="overflow:hidden;height: 25px;">删除歌单</button></span>
+              <span  class="nameSetting" @click.stop="deleteSongList(songList.folderid)"><button type="button" class="btn btn-sm btn-info" style="overflow:hidden;height: 25px;">删除歌单</button></span>
             </div>
           </div>
           <div v-if="songList.unfold">
-            <ul class="musicList" v-for="fileItem in songList.Files" >
+            <ul class="musicList" v-for="fileItem in songList.files" >
               <li>
-                <p>{{ fileItem.FileName }}</p>
+                <p>{{ fileItem.filename }}</p>
                 <ul class="musicListTools">
                   <li @click="removeFile(songList, fileItem)"><button type="button" class="btn btn-sm btn-info">移除</button></li>
                 </ul>
-                <span class="totalTime Grid-cell">{{fileItem.FileTime}}</span>
+                <span class="totalTime Grid-cell">{{fileItem.filetime}}</span>
               </li>
             </ul>
 
@@ -60,7 +60,7 @@
             <input type="button"
                    @click.stop="addBlur()"  value="添加到">
             <div v-if="songListShow" v-for="songList in playList" @mouseout="addBlur()">
-              <span style="height:20px;width:20px;"  @click.self="addFileToPlaylist('', songList)">{{songList.FolderName}}</span>
+              <span style="height:20px;width:20px;"  @click.self="addFileToPlaylist('', songList)">{{songList.foldername}}</span>
             </div>
 
           </li>
@@ -81,15 +81,15 @@
       <ul class="musicList" id="height09">
         <li class="Grid" :class="{selected: file.selected}"
             v-for="(file, index) in defaultList"  @click="fileClick(file,index)">
-          <p class="Grid-cell" style="overflow:hidden;height: 35px;">{{ file.FileName }}</p>
+          <p class="Grid-cell" style="overflow:hidden;height: 35px;">{{ file.filename }}</p>
           <ul class="musicListTools Grid-cell">
-            <li v-if="file.MediaType == 3"  @click.stop="priview(file)">
+            <li v-if="file.mediatype == 3"  @click.stop="priview(file)">
               <button type="button" class="btn btn-sm btn-info" style="overflow:hidden;height: 30px;">预览</button>
             </li>
-            <li @click="prePlay(file)" v-if="file.MediaType == 1">
+            <li @click="prePlay(file)" v-if="file.mediatype == 1">
               <button type="button" class="btn btn-sm btn-info">试听</button>
             </li>
-            <li @click="stopMusic(file)" v-if="file.MediaType == 1">
+            <li @click="stopMusic(file)" v-if="file.mediatype == 1">
               <button type="button" class="btn btn-sm btn-info">停止</button>
             </li>
             <li @click.stop="download(file)"><button type="button" class="btn btn-sm btn-info">下载</button></li> 
@@ -99,14 +99,14 @@
                  @click.stop="addBlur(file)">添加到
               </button>
              <div>
-              <div :class="songlist(songList.FolderID)" v-if="file.songListShow" v-for="songList in playList">
-                <span class="songlist(songList.FolderID)" value=songList.FolderName @click.self="addFileToPlaylist(file, songList)">{{songList.FolderName}}</span>
+              <div :class="songlist(songList.folderid)" v-if="file.songListShow" v-for="songList in playList">
+                <span class="songlist(songList.folderid)" value=songList.FolderName @click.self="addFileToPlaylist(file, songList)">{{songList.foldername}}</span>
               </div>
              </div>
             </li>
           </ul>
           <span class="totalTime Grid-cell">
-            <span  v-if="file.MediaType == 1"> {{ file.FileTime}}</span>
+            <span  v-if="file.mediatype == 1"> {{ file.filetime}}</span>
 
           </span>
         </li>
@@ -244,7 +244,7 @@
       prePlay(file) {
         var audio = document.getElementById("music");
         console.log(audio);
-        audio.src = file.MediaPath;
+        audio.src = file.mediapath;
         audio.play();
         console.log(audio);
       },
@@ -255,7 +255,7 @@
         audio.pause();
       },
       audition(file) {
-        console.log(this.defaultList[0].MediaPath);
+        console.log(this.defaultList[0].mediaPath);
         let playlist = this.$store.state.player.playlist
         if(file != '') {
           playlist.push(file)
@@ -290,7 +290,7 @@
             }
           })
         this.playList.push({
-          FolderName: '新建歌单',
+          foldername: '新建歌单',
           contenteditable: true,
           musicList: []
         })
@@ -301,7 +301,7 @@
         // 添加文件至歌单
         if(file == '') {
           if(this.filePaths.length != 0) {
-            this.$ajax.post(`FolderMedia/CreateList/${songList.FolderID}`, this.filePaths)
+            this.$ajax.post(`FolderMedia/CreateList/${songList.folderid}`, this.filePaths)
               .then(res => {
                 if(res.data.code == 1) {
 
@@ -314,8 +314,8 @@
 
         }else {
           let request = {
-            FolderID: songList.FolderID,
-            MediaID: file.MediaID
+            FolderID: songList.folderid,
+            MediaID: file.mediaid
           }
 
           this.$ajax.post('FolderMedia/Create',request)
@@ -339,7 +339,7 @@
           FolderName: event.target.textContent,
           UserID: '133585596bb04c9cbe311d0859dd7196',
           FolderType: 1,
-          FolderID: item.FolderID
+          FolderID: item.folderid
         }
         this.$ajax.put('Folder/Edit',request)
           .then(res => {
@@ -410,8 +410,8 @@
         else if(this.submitType == 2){
           //移除歌单中文件
           let request = [{
-            FolderID: this.deleteId[0].FolderID,
-            MediaID: this.deleteId[1].MediaID
+            FolderID: this.deleteId[0].folderid,
+            MediaID: this.deleteId[1].mediaid
           }]
           this.$ajax.post('FolderMedia/RemoveList', request)
             .then(res => {
@@ -489,15 +489,15 @@
 
       download(file) {
         // 下载文件
-        console.log(file.FileTime);
+        console.log(file.filetime);
         if(file =='') {
           if(this.filePaths.length !=0) {
             this.filePaths.forEach(function(f,i) {
-              window.open(`https://scc.ieyeplus.com:8443/IpBc/File/Download/${f.MediaID}`)
+              window.open(`https://scc.ieyeplus.com:8443/IpBc/File/Download/${f.mediaid}`)
             })
           }
         }else {
-          window.open(`https://scc.ieyeplus.com:8443/IpBc/File/Download/${file.MediaID}`)
+          window.open(`https://scc.ieyeplus.com:8443/IpBc/File/Download/${file.mediaid}`)
         }
       },
       addText() {
@@ -523,13 +523,13 @@
       },
       priview(file) {
         // 预览文本
-        this.$ajax.get(`File/PreviewText/${file.MediaID}`)
+        this.$ajax.get(`File/PreviewText/${file.mediaid}`)
           .then(res => {
             if(res.data.code == 1) {
 
               this.$store.dispatch('setDialogShow', true)
               this.submitType = 6
-              this.dialogText = res.data.result.Content
+              this.dialogText = res.data.result.content
             }
           })
       }

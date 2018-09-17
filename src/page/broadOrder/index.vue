@@ -24,11 +24,11 @@
               </thead>
               <tbody v-if="showPlanData.length != 0">
               <tr @click="selectClick(index, plan)" v-for="(plan, index) in showPlanData">
-                <td>{{ plan.PlanName }}</td>
-                <!-- <td>{{ plan.PlanPreModel == 1 ? '定时预约' : ''}}</td> -->
-                <td>{{ plan.PlanPreTime }}</td>
-                <!-- <td>{{ plan.PlanModel == 1 ? '循环播放' : '按次播放' }}</td>
-                <td>{{ plan.PlanTime }}</td> -->
+                <td>{{ plan.planname }}</td>
+                <!-- <td>{{ plan.planpremodel == 1 ? '定时预约' : ''}}</td> -->
+                <td>{{ plan.planpretime }}</td>
+                <!-- <td>{{ plan.planmodel == 1 ? '循环播放' : '按次播放' }}</td>
+                <td>{{ plan.plantime }}</td> -->
                 <td>{{broad}}</td>
                 <!-- <td>
                   <span @click.stop="nowPlay">立即播放</span>
@@ -115,12 +115,12 @@
               let i = 0;
               let j = 0;
               let sum = 1;
-              for( i = 1; i<res.data.result.length && res.data.result[i].PlanName == res.data.result[i-1].PlanName; i++) {
+              for( i = 1; i<res.data.result.length && res.data.result[i].planname == res.data.result[i-1].planname; i++) {
                 sum++;
               }
               for( i = 0, j = 0; i<res.data.result.length; i=i+sum,j++) {
                 this.showPlanData[j] = res.data.result[i]
-                this.showPlanData[j].PlanPreTime = this.xPlanData[i].time
+                this.showPlanData[j].planpretime = this.xPlanData[i].time
                 if(i+sum == res.data.result.length) {
                   this.showPlanData.splice(j+1,res.data.result.length-j-1)
                 }
@@ -135,7 +135,7 @@
         let target = $(".table>tbody>tr").eq(index)
         if(target.hasClass('selected')) {
           this.selectPlan.forEach(function(s, i) {
-            if(s.PlanID == plan.PlanID) {
+            if(s.planid == plan.planid) {
               this.selectPlan.splice(i, 1)
             }
           }.bind(this))
@@ -155,7 +155,7 @@
         }
       },
       deleteItem() {
-        console.log(this.showPlanData[0].PlanName);
+        console.log(this.showPlanData[0].planname);
         if(this.selectPlan.length != 0) {
           this.$store.dispatch('setDialogShow', true)
         }
@@ -168,9 +168,9 @@
         let idx = []
         let xxx = this.xPlanData
         this.selectPlan.forEach(function(s, i) {
-          ids.push(s.PlanID)
+          ids.push(s.planid)
           xxx.forEach(function(m, n) {
-            if(s.PlanPreTime == m.time) idx.push(m.id)
+            if(s.planrpretime == m.time) idx.push(m.id)
           })
         })
         let _this = this

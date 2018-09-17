@@ -27,14 +27,14 @@
                   <div class="songSheetName" :class="songlist.selected ? 'songSheetNameSelect' : ''">
                     <div class="songSetting">
                       <span class="toggle"><i class="fa fa-angle-right" aria-hidden="true"></i></span>
-                      <p contenteditable="false">{{songlist.FolderName}}</p>
-                      <span class="musicNum">[{{ songlist.Files ? songlist.Files.length :0}}]</span>
+                      <p contenteditable="false">{{songlist.foldername}}</p>
+                      <span class="musicNum">[{{ songlist.files ? songlist.files.length :0}}]</span>
                     </div>
                     <span class="songSheetTool" @click.stop="selectSonglist(songlist)">选择</span>
                   </div>
                   <ul class="musicList" v-if="songlist.unfold">
-                    <li v-for="fileItem in songlist.Files">
-                      <p>{{fileItem.FileName}}</p>
+                    <li v-for="fileItem in songlist.files">
+                      <p>{{fileItem.filename}}</p>
                       <ul class="musicListTools">
                         <li><i class="fa fa-play-circle" aria-hidden="true"></i>试听</li>
 
@@ -67,7 +67,7 @@
               <div class="singleFlies"
                    :class="device.selected ? 'selected' : ''"
                    v-for="device in deviceList"
-                   @click="selectItem(device)">{{device.userID}}</div>
+                   @click="selectItem(device)">{{device.userid}}</div>
             </div>
             <div class="selectAll" @click="selectAll(1)">全选</div>
           </div>
@@ -277,7 +277,7 @@
             registrations.forEach(function(r) {
               let user = {}
               user.deviceState = "registered"
-              user.userID = r.reg_user
+              user.userid = r.reg_user
               user.callDirection = null
               user.selected = false
               deviceList.push(user)
@@ -300,7 +300,7 @@
         if (e.eventChannel == 'FSevent.custom::sofia::register') {
           let isContinue = true
           deviceList.forEach(function(d, i) {
-            if(d.userID == e.data.username) {
+            if(d.userid== e.data.username) {
               isContinue=false
               return;
             }
@@ -309,7 +309,7 @@
           if(isContinue) {
             let user = {}
             user.deviceState = "registered"
-            user.userID = e.data['to-user']
+            user.userid = e.data['to-user']
             user.callDirection = null
             user.selected = false
             deviceList.push(user)
@@ -318,7 +318,7 @@
 
         }else if( e.eventChannel =='FSevent.custom::sofia::unregister') {
           deviceList.forEach(function(d, i) {
-            if (d.userID == e.data.username) {
+            if (d.userid == e.data.username) {
               deviceList.splice(i,1)
             }
           })
@@ -475,8 +475,8 @@
                   .then((res) => {
                     if(res.data.code == 1) {
                       console.log("success"); 
-                      console.log(res.data.result.planID);
-                      this.$ajax.post(''+res.data.result.planID) 
+                      console.log(res.data.result.planid);
+                      this.$ajax.post(''+res.data.result.planid) 
                       this.$emit('close',1)
                     }else {
                       console.log(res)

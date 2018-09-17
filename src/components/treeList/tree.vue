@@ -6,7 +6,7 @@
       highlight-current 
       :props="defaultProps"
       :default-expanded-keys="defaultExpanded"
-      node-key="OrganizationID"
+      node-key="organizationid"
       @node-click="handleNodeClick"
       :expand-on-click-node="false"
       :render-content="renderContent"
@@ -25,8 +25,8 @@
         data: [],
         defaultExpanded: [],
         defaultProps: {
-          children: 'Children',
-          label: 'OrgName'
+          children: 'children',
+          label: 'orgname'
         },
 
       };
@@ -48,17 +48,15 @@
         'setInitData'
       ]),
       refresh () {
-        this.$ajax.get('https://scc.ieyeplus.com:8443/IpBc/' + 'Organization/Data/' + this.get_user_info.user.organizationID)
+        this.$ajax.get('https://scc.ieyeplus.com:8443/IpBc/' + 'Organization/Data/' + this.get_user_info.user.organizationid)
           .then((res) => {
             let data = res.data.result
-            console.log(data)
             this.data = data
             // 初始化树对象
-            this.$emit('setInitData', data[0])
             this.TreeChange({data:data[0],node:{}})
             //  循环出默认展开项的ID
             for(let i in data) {
-              this.defaultExpanded.push(data[i]['OrganizationID'])
+              this.defaultExpanded.push(data[i]['organizationid'])
             }
             this.$nextTick(()=> {
               this.$refs.tree.$children[0].$el.className = this.$refs.tree.$children[0].$el.className + ' ' + 'is-current'
@@ -66,6 +64,7 @@
           });
       },
       handleNodeClick(data, node, event) {
+	console.log(node.label,data.orgname)
         if(event) {                           // 判断点击的是否为默认选中的树节点，如果不是，取消默认选中
           if(node.id != this.$refs.tree.$children[0].node.id) {
             this.$refs.tree.$children[0].$el.className = 'el-tree-node'

@@ -185,7 +185,7 @@
             })
       if(item){
       item.selected = true
-      this.groupShow = item.deviceGroupId
+      this.groupShow = item.devicegroupid
      }
      else
       this.groupShow = ""

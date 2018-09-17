@@ -12,8 +12,8 @@
     <div class="musicList" id="height02">
       <div id="SelectedMembers" class="aa">
         <div class="singleFlies" :class="{selected: device.selected}" v-for="device in deviceList" :key="device.deviceId" @click="selectDeviceEvent(device)">
-          {{device.deviceCode}}
-          <span>{{ device.deviceName }}</span>
+          {{device.devicecode}}
+          <span>{{ device.devicename }}</span>
         </div>
       </div>
     </div>
@@ -51,7 +51,7 @@ export default {
   },
   watch:{
     'targetMenu': function(){
-      this.$ajax.get('Feature/getFeatureByOrg/' + this.targetMenu.OrganizationID)
+      this.$ajax.get('Feature/getFeatureByOrg/' + this.targetMenu.organizationid)
         .then((res) => {
           if (res.data.code === 1) {
             let result = res.data.result
@@ -72,7 +72,7 @@ export default {
         if(this.selectDevice.length == 0) {
           this.selectDevice.push(device)
         }else {
-          let isRepeat = this.selectDevice.find(item => item.deviceId == device.deviceId)
+          let isRepeat = this.selectDevice.find(item => item.deviceid == device.deviceid)
           if(!isRepeat) {
             this.selectDevice.push(device)
           }
@@ -81,7 +81,7 @@ export default {
       }
       else{
       this.selectDevice.forEach((de,index)=>{
-       if(device.deviceId == de.deviceId) 
+       if(device.deviceid == de.deviceid) 
 	this.selectDevice.splice(index,1)	
        })
       }

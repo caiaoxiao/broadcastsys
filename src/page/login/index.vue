@@ -92,15 +92,15 @@
             if (res.data.code == 1) {
               
               let treedata = res.data.result
-              this.$ajax.get(`Organization/Detail/${res.data.result.organizationID}`)
+              this.$ajax.get(`Organization/Detail/${res.data.result.organizationid}`)
               .then((res) => {
               if (res.data.code == 1) {
               let freeswtichdata = {
-                VertoID:res.data.result.VertoID,
-                VoiceCallID:res.data.result.VoiceCallID,
-                MeetingID:res.data.result.MeetingID,
-                BroadID:res.data.result.BroadID,
-                AlarmID:res.data.result.AlarmID
+                VertoID:res.data.result.vertoid,
+                VoiceCallID:res.data.result.voicecallid,
+                MeetingID:res.data.result.meetingid,
+                BroadID:res.data.result.broadid,
+                AlarmID:res.data.result.alarmid
                 }
               this.set_user_info({
                 user: treedata,

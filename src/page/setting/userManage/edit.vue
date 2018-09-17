@@ -8,7 +8,7 @@
             <div class="form-group">
               <label class="col-sm-4 control-label">设备号</label>
               <div class="col-sm-8">
-                <input type="text" class="form-control" v-model="formData.deviceCode">
+                <input type="text" class="form-control" v-model="formData.devicecode">
               </div>
             </div>
           </div>
@@ -24,7 +24,7 @@
             <div class="form-group">
               <label class="col-sm-4 control-label">设备名称</label>
               <div class="col-sm-8">
-                <input type="text" placeholder="" class="form-control" v-model="formData.deviceName">
+                <input type="text" placeholder="" class="form-control" v-model="formData.devicename">
               </div>
             </div>
           </div>
@@ -73,12 +73,12 @@ export default {
   data () {
     return {
       formData: {
-        deviceCode: '',
-        deviceName: '',
+        devicecode: '',
+        devicename: '',
 	      password:'',
         type: 0,
-        deviceVedios: [{ vedioUrl: '' }, { vedioUrl: '' }, { vedioUrl: '' }, { vedioUrl: '' }],
-        feature:{ organizationID :  this.transferdata.targetMenuId ,aliasName:""}
+        devicevedios: [{ vediourl: '' }, { vediourl: '' }, { vediourl: '' }, { vediourl: '' }],
+        feature:{ organizationid :  this.transferdata.targetMenuId ,aliasname:""}
 
       },
       rules: {},
@@ -91,11 +91,11 @@ export default {
       let documentHeight = document.documentElement.clientHeight
       $('.popUp').css('top', documentHeight * 0.3 + 'px')
       if (this.modolType === -2) {
-        this.$ajax.get(`Device/Detail/${this.transferdata.deviceId}`)
+        this.$ajax.get(`Device/Detail/${this.transferdata.deviceid}`)
           .then(res => {
             if (res.data.code === 1) {
               this.formData = res.data.result
-              this.formData.feature.organizationID = this.transferdata.targetMenuId
+              this.formData.feature.organizationid = this.transferdata.targetMenuId
               /*this.$ajax.get(`Feature/Detail/${this.transferdata.deviceId}`)
               .then(res => {
                   if (res.data.code === 1) {
@@ -117,15 +117,15 @@ export default {
     userEdit () {
        if (this.modolType!=-2) {
        let axios = []
-       let flag = this.formData.deviceName == this.formData.deviceCode?true:false
+       let flag = this.formData.devicename == this.formData.devicecode?true:false
        let range = this.range==''?1:parseInt(this.range)
        for(let i = 0;i < range;i++){
         let temp = new Object()
-        temp.deviceCode = String(parseInt(this.formData.deviceCode)+i)
-        temp.deviceName =  flag == true ? temp.deviceCode : this.formData.deviceName+"-"+String(i+1)
+        temp.devicecode = String(parseInt(this.formData.devicecode)+i)
+        temp.devicename =  flag == true ? temp.devicecode : this.formData.devicename+"-"+String(i+1)
 	      temp.password = this.formData.password
         temp.type = this.formData.type
-        temp.deviceVedios = this.formData.deviceVedios
+        temp.devicevedios = this.formData.devicevedios
         temp.feature = this.formData.feature
         axios.push(this.$ajax.post('Device/Create',temp))
        }
@@ -134,13 +134,13 @@ export default {
          if(re.data.code == 0)
 	   setTimeout(()=>{this.$message.success("某个设备已存在,请勿重复添加")},500)
 	 else
-	  setTimeout(()=>{this.$message.success(re.data.result.deviceCode+"添加成功")},500)
+	  setTimeout(()=>{this.$message.success(re.data.result.devicecode+"添加成功")},500)
 	})
          this.$store.dispatch('update', 1)
        })
     }
     else{
-        let request = Object.assign(this.formData,{deviceId:this.transferdata.deviceId})
+        let request = Object.assign(this.formData,{deviceid:this.transferdata.deviceId})
         this.$ajax.put(`Device/Edit`,request)
           .then(res => {
             if (res.data.code === 1) {

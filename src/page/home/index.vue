@@ -35,8 +35,8 @@
     },
     created() {
       this.$nextTick(()=> {
-	        getHeights()
-	        this.username = this.get_user_info.user.userName
+	  getHeights()
+	  this.username = this.get_user_info.user.username
           this.verto = this.get_user_info.freeswitchData.VertoID
           this.meeting = this.get_user_info.freeswitchData.MeetingID
           this.voice = this.get_user_info.freeswitchData.VoiceCallID
@@ -473,14 +473,14 @@
                         let groupList = res.data.result
                         this.targetUserGroupId = ""
                         groupList.forEach(element => {
-                          if(element.roleName == this.TreeData.OrgName){
-                            this.targetUserGroupId = element.roleID
+                          if(element.rolename == this.TreeData.orgname){
+                            this.targetUserGroupId = element.roleid
                           }
                         })
                       }
                       let  organizationID_requests = []
-                      organizationID_requests.push(this.$ajax.get(`Feature/getFeatureByOrg/${this.TreeData.OrganizationID}?flag=true`))
-                      organizationID_requests.push(this.$ajax.get(`Feature/getFeatureByOrg/${this.TreeData.OrganizationID}?flag=false`))
+                      organizationID_requests.push(this.$ajax.get(`Feature/getFeatureByOrg/${this.TreeData.organizationid}?flag=true`))
+                      organizationID_requests.push(this.$ajax.get(`Feature/getFeatureByOrg/${this.TreeData.organizationid}?flag=false`))
                       this.$ajax.all(organizationID_requests)
                         .then((res) => {
                             let all_devices = [] 
@@ -490,16 +490,16 @@
                               all_devices = all_devices.concat(res[1].data.result)
 			                      all_devices.forEach((r,i)=>{
 					
-                                if(r!=null && this.usermap.hasOwnProperty(r.deviceCode)){
+                                if(r!=null && this.usermap.hasOwnProperty(r.devicecode)){
                                 }
                                 else if(r!=null){
-                                  this.usermap[r.deviceCode] = {}
-                                  this.usermap[r.deviceCode].list = []
-                                  this.usermap[r.deviceCode].type =r.type
-                                  this.usermap[r.deviceCode].name = r.deviceName
+                                  this.usermap[r.devicecode] = {}
+                                  this.usermap[r.devicecode].list = []
+                                  this.usermap[r.devicecode].type =r.type
+                                  this.usermap[r.devicecode].name = r.devicename
                                 }
                             })
-			                    if(this.targetUserGroupId!="" || this.TreeData.ParentID=="0")
+			    if(this.targetUserGroupId!="" || this.TreeData.parentid=="0")
                             this.$ajax.get(`Role/getDeviceGroup/${this.targetUserGroupId}`)
                               .then((res) => {
                             if (res.data.code === 1) {
@@ -509,32 +509,33 @@
                               this.$store.dispatch('setUserGroup',this.group_list)
                               let axios = []
                               this.group_list.forEach((item,index) => {
-                              axios.push(this.$ajax.get(`DeviceGroup/Detail/${item.deviceGroupId}`))
+                              axios.push(this.$ajax.get(`DeviceGroup/Detail/${item.devicegroupid}`))
                               })
                               this.$ajax.all(axios)
                               .then(res => {
                                     for (let i = 0 ; i<res.length ; i++){
+                                    console.log(res[i].data.result) 
                                     let group  = res[i]?res[i].data.result.deviceGroups:[]
                                     group.forEach((r,i)=>{
-                                      if(this.usermap.hasOwnProperty(r.deviceCode)){
-                                        this.usermap[r.deviceCode].list.push(r.deviceGroupId)
-                                        this.usermap[r.deviceCode].type =r.type
-                                        this.usermap[r.deviceCode].name = r.deviceName
+                                      if(this.usermap.hasOwnProperty(r.devicecode)){
+                                        this.usermap[r.devicecode].list.push(r.devicegroupid)
+                                        this.usermap[r.devicecode].type =r.type
+                                        this.usermap[r.devicecode].name = r.devicename
                                       }
                                       else{
-                                        this.usermap[r.deviceCode] = {}
-                                        this.usermap[r.deviceCode].list = [r.deviceGroupId]
-                                        this.usermap[r.deviceCode].type =r.type
-                                        this.usermap[r.deviceCode].name = r.deviceName
+                                        this.usermap[r.devicecode] = {}
+                                        this.usermap[r.devicecode].list = [r.devicegroupdd]
+                                        this.usermap[r.devicecode].type =r.type
+                                        this.usermap[r.devicecode].name = r.devicename
                                       }
                                     })
                                   }
                                 for(let index in deviceList){
-                                if(this.usermap.hasOwnProperty(deviceList[index].userID)){
+                                if(this.usermap.hasOwnProperty(deviceList[index].userid)){
                                   deviceList[index].groupid =  this.usermap[deviceList[index].userID].list
                                   deviceList[index].type =  this.usermap[deviceList[index].userID].type
                                   deviceList[index].name = this.usermap[deviceList[index].userID].name
-                                  delete this.usermap[deviceList[index].userID] }
+                                  delete this.usermap[deviceList[index].userid] }
                               }
                               for(let item in this.usermap){
                                 let user = {}
@@ -572,6 +573,7 @@
                                       }
                                     }
                                   })
+				console.log(deviceList)
                                 //这时deviceList已经更新
                                 this.vertoHandle.sendMethod("jsapi",{command:"fsapi", data:{cmd:"show", arg:"channels as xml"}},
                                   (data) => {

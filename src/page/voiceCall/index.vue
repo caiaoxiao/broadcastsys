@@ -214,6 +214,7 @@ export default {
       this.groupShow = ""
     },
     itemClick (e, row) {
+      console.log(row)
       let target = e.currentTarget
       let _this = this
 
@@ -299,8 +300,14 @@ export default {
 
      // 实现管理员对指定通话的强拆
        strongDelete() {
-         this.fsAPI("uuid_kill",this.selectNowCall[0].channelUUID,function(res) {console.log("qiang delete")}.bind(this));
-         this.selectNowCall = [];
+	 if(this.selectNowCall.length>0){
+         this.fsAPI("uuid_kill",this.selectNowCall[0].channelUUID,function(res) {console.log("qiang delete")}.bind(this))
+         this.selectNowCall = []
+	}
+	 if(this.selectRingCall.length>0){
+         this.fsAPI("uuid_kill",this.selectRingCall[0].channelUUID,function(res) {console.log("qiang delete")}.bind(this))
+         this.selectRingCall = []
+	}
       },
 
     // 实现管理员对指定通话的强插

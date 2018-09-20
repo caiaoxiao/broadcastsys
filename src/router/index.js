@@ -32,12 +32,17 @@ const routes = [
                 path: '/video',
                 name: '视频',
                 component: _import('video/index'),
-            },*/
+            },
             {
                 path: '/meeting',
                 name: '会议',
                 component: _import('meeting/index'),
-            },
+            },*/
+	    {
+	        path: '/radio',
+	        name: '对讲',
+	        component: _import('radio/index'),
+		                },
             {
                 path: '/broadOrder',
                 name: '广播预约',

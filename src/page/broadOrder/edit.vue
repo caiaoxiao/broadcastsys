@@ -432,10 +432,12 @@
         this.dialogShow = false
       },
       submitPlan() {
+        console.log("The time1 is:",this.formData.PlanPreTime)
  	console.log("broad is:" ,this.broad)
         this.xData.period = String(this.cycleIndex * 86400);
         let path = '';
         this.xData.time = this.formData.PlanPreTime.toString()
+        console.log("The time2 is:",this.xData.time)
         this.xData.meeting = this.broad
         if(this.xData.cmdtype == 1) {
            this.selectSongList.forEach(function(c,i) {

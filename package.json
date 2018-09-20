@@ -20,6 +20,8 @@
     "element-ui": "legacy",
     "jquery-json": "^2.6.0",
     "js-cookie": "^2.2.0",
+    "modesl": "^1.2.0",
+    "moment": "^2.22.2",
     "node-sass": "^4.8.3",
     "nprogress": "^0.2.0",
     "verto": "0.0.2",

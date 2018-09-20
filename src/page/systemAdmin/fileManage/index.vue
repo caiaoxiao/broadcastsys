@@ -10,11 +10,11 @@
           <div class="songSheetName">
             <div class="songSetting">
               <span class="toggle"><i class="fa fa-angle-right" aria-hidden="true"></i></span>
-              <p :contenteditable="songList.contenteditable"  @blur="renameSongList(songList, $event)">
+              <p :id="'contented'+songList.FolderName" :contenteditable="songList.contenteditable"  @blur="renameSongList(songList, $event)">
                 {{songList.folderName}}
               </p>
               <span class="musicNum" @click="qsss(songList, index)">[{{ songList.files ? songList.files.length :0}}]</span>
-              <span class="nameSetting" @click.stop="(()=>{ songList.contenteditable = true })"><button type="button" class="btn btn-sm btn-info" style="overflow:hidden;height: 25px;">重命名</button></span>
+              <span class="nameSetting" @click.stop="getFocus(songList)"><button type="button" class="btn btn-sm btn-info" style="overflow:hidden;height: 25px;">重命名</button></span>
               <span  class="nameSetting" @click.stop="deleteSongList(songList.folderid)"><button type="button" class="btn btn-sm btn-info" style="overflow:hidden;height: 25px;">删除歌单</button></span>
             </div>
           </div>
@@ -184,6 +184,15 @@
       }),
     },
     methods: {
+      getContent(item) {
+        document.getElementById('contented'+item.FolderName).focus()
+      },
+      getFocus(item) {
+        console.log("Begin1:",item.contenteditable)
+        item.contenteditable=true
+        console.log("Finish1:",item.contenteditable)
+        setTimeout("this.getContent(this.item)",3000)
+      },
       addBlur(file) {
         console.log(this.playList);
         if(file) {
@@ -279,6 +288,7 @@
       addSongList() {
         // 添加歌单
         let request = {
+	  FolderID: '',
           FolderName: '新建歌单',
           UserID: '133585596bb04c9cbe311d0859dd7196',
           FolderType: 1
@@ -287,14 +297,22 @@
           .then(res => {
             let result = res.data.result
             if(res.data.code == 1) {
-              result.FolderID
+	      request.FolderID=result.folderID
+              this.playList.push({
+		FolderName: '新建歌单',
+		FolderID: result.folderID,
+		contenteditable: false,
+		musicList: []
+	      }) 
             }
           })
+	/* console.log("request.FolderID is:",request.FolderID)
         this.playList.push({
           foldername: '新建歌单',
-          contenteditable: true,
+	  FolderID: request.FolderID,
+          contenteditable: false,
           musicList: []
-        })
+        }) */
       },
 
       // 添加指定歌曲到指定歌单
@@ -335,6 +353,7 @@
 
       renameSongList(item, event) {
         // 歌单重命名
+	console.log("The item.FolderID is:",item.FolderID)
         item.contenteditable = true
         let request = {
           FolderName: event.target.textContent,
@@ -342,6 +361,7 @@
           FolderType: 1,
           FolderID: item.folderid
         }
+	console.log("The request is:",request)
         this.$ajax.put('Folder/Edit',request)
           .then(res => {
             if(res.data.code == 1) {
@@ -349,6 +369,7 @@
               this.refresh()
             }
           })
+        item.contenteditable=false
       },
 
       removeFile(songList,file) {

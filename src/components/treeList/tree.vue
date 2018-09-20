@@ -54,6 +54,7 @@
             console.log(data)
             this.data = data
             // 初始化树对象
+            this.$emit('setInitData', data[0])
             this.TreeChange({data:data[0],node:{}})
             //  循环出默认展开项的ID
             for(let i in data) {

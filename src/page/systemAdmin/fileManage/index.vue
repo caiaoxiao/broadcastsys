@@ -199,6 +199,7 @@
           .then(res => {
             if(res.data.code == 1) {
               let result = res.data.result
+	      console.log(result)
               result.forEach(function(r,i){
                 r.contenteditable = false
                 r.unfold = false
@@ -226,7 +227,7 @@
               }
             })
         }else {
-          this.$ajax.post('File/List', '')
+          this.$ajax.post('File/List', {pageIndex:1,pageSize:1000})
             .then(res => {
               if(res.data.code == 1) {
                 console.log("文件列表查询成功")

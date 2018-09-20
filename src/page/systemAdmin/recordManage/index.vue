@@ -15,12 +15,12 @@
           </div>
           <div class="form-group">
             <label>主叫号码</label>
-            <input type="text" v-model.number="formData.callNumber" class="form-control" style="width:70px;">
+            <input type="text" v-model.number="formData.callnumber" class="form-control" style="width:70px;">
 
           </div>
           <div class="form-group">
             <label>被叫号码</label>
-            <input type="text" v-model.number="formData.calledNumber" class="form-control" style="width:70px;">
+            <input type="text" v-model.number="formData.callednumber" class="form-control" style="width:70px;">
           </div>
           <div class="form-group" @click="typeSwitch">
             <label>文件类型</label>
@@ -45,9 +45,9 @@
         </thead>
         <tbody>
           <tr @click="selectClick(item, index)" v-for="(item, index) in dataAll">
-            <td>{{item.startStamp}}</td>
-            <td>{{item.callerNumber}}</td>
-            <td>{{item.calleeNumber}}</td>
+            <td>{{item.startstamp}}</td>
+            <td>{{item.callernumber}}</td>
+            <td>{{item.calleenumber}}</td>
             <td>{{item.duration}}</td>
             <td>应答</td>
             <!--    <td>

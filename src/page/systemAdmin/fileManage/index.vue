@@ -10,11 +10,11 @@
           <div class="songSheetName">
             <div class="songSetting">
               <span class="toggle"><i class="fa fa-angle-right" aria-hidden="true"></i></span>
-              <p :contenteditable="songList.contenteditable"  @blur="renameSongList(songList, $event)">
+              <p :id="'contented'+songList.FolderName" :contenteditable="songList.contenteditable"  @blur="renameSongList(songList, $event)">
                 {{songList.FolderName}}
               </p>
               <span class="musicNum" @click="qsss(songList, index)">[{{ songList.Files ? songList.Files.length :0}}]</span>
-              <span class="nameSetting" @click.stop="(()=>{ songList.contenteditable = true })"><button type="button" class="btn btn-sm btn-info" style="overflow:hidden;height: 25px;">重命名</button></span>
+              <span class="nameSetting" @click.stop="getFocus(songList)"><button type="button" class="btn btn-sm btn-info" style="overflow:hidden;height: 25px;">重命名</button></span>
               <span  class="nameSetting" @click.stop="deleteSongList(songList.FolderID)"><button type="button" class="btn btn-sm btn-info" style="overflow:hidden;height: 25px;">删除歌单</button></span>
             </div>
           </div>
@@ -184,6 +184,15 @@
       }),
     },
     methods: {
+      getContent(item) {
+        document.getElementById('contented'+item.FolderName).focus()
+      },
+      getFocus(item) {
+        console.log("Begin1:",item.contenteditable)
+        item.contenteditable=true
+        console.log("Finish1:",item.contenteditable)
+        setTimeout("this.getContent(this.item)",3000)
+      },
       addBlur(file) {
         console.log(this.playList);
         if(file) {
@@ -359,6 +368,7 @@
               this.refresh()
             }
           })
+        item.contenteditable=false
       },
 
       removeFile(songList,file) {

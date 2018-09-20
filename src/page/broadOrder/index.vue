@@ -118,14 +118,30 @@
               let i = 0;
               let j = 0;
               let sum = 1;
-              for( i = 1; i<res.data.result.length && res.data.result[i].PlanName == res.data.result[i-1].PlanName; i++) {
-                sum++;
+              let sum_show = 1;
+              console.log("The length is:",res.data.result.length)
+              for( i = 1; i<res.data.result.length && res.data.result[i].PlanName != res.data.result[i-1].PlanName; i++) {
+                sum_show++;
               }
-              for( i = 0, j = 0; i<res.data.result.length; i=i+sum,j++) {
-                this.showPlanData[j] = res.data.result[i]
+              console.log("The sum_show is:",sum_show)
+              let sum_array = []
+              sum_array.length = sum_show
+              for( i = 0; i < sum_show; i++) {
+                sum_array[i] = 1
+              }
+              this.showPlanData.length = sum_show
+              console.log("The sum_array's length is:",sum_array.length)
+              for( i = 1, j = 0; i<res.data.result.length; i++) {
+                if(res.data.result[i].PlanName == res.data.result[i-1].PlanName){
+                  sum_array[j]++
+                }else {
+                  j++
+                }
+              }
+              console.log("The sum_array is:",sum_array)
+              for( i = 0, j = 0; i<sum_array.length; i++, j=j+sum_array[i-1]) {
+                this.showPlanData[i] = res.data.result[j]
                 console.log("The time is:",this.showPlanData[j].PlanName)
-                // var d = new Date(this.xPlanData[i].time)
-                // this.showPlanData[j].PlanPreTime = d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds()
                 var moment = require('moment')
                 this.showPlanData[j].PlanPreTime = moment(this.xPlanData[i].time).format("YYYY-MM-DD HH:mm:ss") 
                 console.log("The perfect TIME:",this.showPlanData[j].PlanPreTime)

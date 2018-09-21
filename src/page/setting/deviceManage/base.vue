@@ -6,7 +6,7 @@
         <div class="row">
             <div class="form-group">
               <label>视频联动存储密匙</label>
-                <input id = "input_key" type="text" class="form-control" v-model="formData.uniqueId">
+                <input id = "input_key" type="text" class="form-control" v-model="formData.uniqueid">
             </div>
         </div>
 	</el-form >
@@ -25,7 +25,7 @@ export default {
   data () {
       return {
       formData: {
-	uniqueId:"",
+	uniqueid:"",
       },
       rules: {},
       self: this
@@ -40,13 +40,13 @@ export default {
           .then(res => {
 	  console.log(res)
             if (res.data.code === 1 && res.data.result.length>0) {
-              this.formData.uniqueId = res.data.result[0].uniqueId
-	      this.formData.basicId  = res.data.result[0].basicId
+              this.formData.uniqueId = res.data.result[0].uniqueid
+	      this.formData.basicId  = res.data.result[0].basicid
             }
 	    else if(res.data.code === 1){
 	    this.$ajax.post('Basic/Create',{uniqueId:"请输入视频联动存储密匙"})
           	.then(res => {
-          	this.formData.basicId = res.data.result.basicId})
+          	this.formData.basicId = res.data.result.basicid})
 		}
           })
       }

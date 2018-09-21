@@ -28,15 +28,15 @@
           </tr>
         </thead>
         <tbody>
-          <tr  v-for="item in dataAll" :key="item.deviceId">
-            <td>{{item.deviceCode}}</td>
-            <td>{{item.deviceName}}</td>
+          <tr  v-for="item in dataAll" :key="item.deviceid">
+            <td>{{item.devicecode}}</td>
+            <td>{{item.devicename}}</td>
             <td>
               {{ item.type == 0 ? '单话机' : '视频话机' }}
             </td>
-            <td> {{item.organizationId}} </td>
+            <td> {{item.organizationid}} </td>
             <td>
-              <button type="submit" class="btn btn-sm btn-default" @click="deleteItem(item.deviceId)">删除</button>
+              <button type="submit" class="btn btn-sm btn-default" @click="deleteItem(item.deviceid)">删除</button>
             </td>
           </tr>
         </tbody>
@@ -54,7 +54,7 @@
 import { mapGetters } from 'vuex'
 import modal from './edit.vue'
 import basechange from './base.vue'
-import {getHeights} from 'utils/page/setting'
+import {getHeights} from 'utils/page/device'
 export default {
   data () {
     return {
@@ -63,7 +63,7 @@ export default {
       modolType: null,
       self: this,
       transferData: {
-        deviceId: ''
+        deviceid: ''
       }
     }
   },
@@ -75,8 +75,8 @@ export default {
   },
   created () {
     this.$nextTick(()=> {
-    getHeights()
     this.refresh()
+    getHeights()
     })
   },
   watch: {
@@ -93,19 +93,19 @@ export default {
     refresh () {
       
       let  organizationID_requests = []
-      organizationID_requests.push(this.$ajax.get(`Feature/getFeatureByOrg/${this.$store.state.user_info.user.organizationID}?flag=false`))
-      organizationID_requests.push(this.$ajax.get(`Feature/getFeatureByOrg/${this.$store.state.user_info.user.organizationID}?flag=true`))
+      organizationID_requests.push(this.$ajax.get(`Feature/getFeatureByOrg/${this.$store.state.user_info.user.organizationid}?flag=false`))
+      organizationID_requests.push(this.$ajax.get(`Feature/getFeatureByOrg/${this.$store.state.user_info.user.organizationid}?flag=true`))
       this.$ajax.all(organizationID_requests)
             .then((res) => {
             let all_devices = [] 
-            if (res[0].data.code == 1)
+            if (res[0].data.code == 1 && res[0].data.result!=null)
               res[0].data.result.forEach((re)=>{
-                if(re.deviceCode == this.fuzzyquery || re.deviceName == this.fuzzyquery || re.orgName == this.fuzzyquery  || this.fuzzyquery == "")
+                if(re.devicecode == this.fuzzyquery || re.devicename == this.fuzzyquery || re.orgname == this.fuzzyquery  || this.fuzzyquery == "")
                 all_devices.push(re)
               })
-            if (res[1].data.code == 1)
+            if (res[1].data.code == 1 && res[1].data.result!=null)
               res[1].data.result.forEach((re)=>{
-                if(re.deviceCode == this.fuzzyquery || re.deviceName == this.fuzzyquery || re.orgName == this.fuzzyquery  || this.fuzzyquery == "")
+                if(re.devicecode == this.fuzzyquery || re.devicename == this.fuzzyquery || re.orgname == this.fuzzyquery  || this.fuzzyquery == "")
                 all_devices.push(re)
               })
             this.dataAll = all_devices
@@ -113,15 +113,16 @@ export default {
             let axios = []
             all_devices.forEach((device)=>{
 	            if(device!=null)
-              axios.push(this.$ajax.get(`Feature/Detail/${device.deviceId}`))
+              axios.push(this.$ajax.get(`Feature/Detail/${device.deviceid}`))
             })
             this.$ajax.all(axios)
                   .then((res) => {
                       for (let i = 0 ; i< res.length ; i++){
 			                    if(res[i].data.result!=null)
-                          all_devices[i].OrganizationID = res[i].data.result.organizationId
+                          all_devices[i].organizationid = res[i].data.result.organizationid
                       }
                     this.dataAll = all_devices
+	            getHeights()
                })
           */
           })
@@ -131,7 +132,7 @@ export default {
         this.modolType = 0
       } else if(id !=-1){
         this.modolType = 1
-        this.transferData.deviceId = id
+        this.transferData.deviceid = id
       }else{
 	this.modolType = 2 
 	}

@@ -28,12 +28,12 @@
                     <div class="songSetting">
                       <span class="toggle"><i class="fa fa-angle-right" aria-hidden="true"></i></span>
                       <p contenteditable="false">{{songlist.foldername}}</p>
-                      <span class="musicNum">[{{ songlist.files ? songlist.files.length :0}}]</span>
+                      <span class="musicNum">[{{ songlist.Files ? songlist.Files.length :0}}]</span>
                     </div>
                     <span class="songSheetTool" @click.stop="selectSonglist(songlist)">选择</span>
                   </div>
                   <ul class="musicList" v-if="songlist.unfold">
-                    <li v-for="fileItem in songlist.files">
+                    <li v-for="fileItem in songlist.Files">
                       <p>{{fileItem.filename}}</p>
                       <ul class="musicListTools">
                         <li><i class="fa fa-play-circle" aria-hidden="true"></i>试听</li>
@@ -105,7 +105,7 @@
           <div class="menuType"><i class="fa fa-th-large" aria-hidden="true"></i>播放设备列表</div>
           <div class="selectedList" id="height07">
             <div class="singleFlies selectDelate" v-for="device in selectDevice" @click="deleteDevice(device)">
-              {{device.userID}}</div>
+              {{device.userid}}</div>
           </div>
           <div class="selectAll" @click="deleteAll()">全部删除</div>
         </div>
@@ -410,7 +410,7 @@
       },
       deleteDevice(device) {
         this.selectDevice.forEach(function(s,i) {
-          if(device.userID == s.userID) {
+          if(device.userid == s.userid) {
 
             this.selectDevice.splice(i,1)
           }
@@ -452,7 +452,7 @@
               this.selectDevice.forEach((element,i) => {
                 if(i!=0)
                 device_ids+="-"
-                device_ids+=element.userID
+                device_ids+=element.userid
               })
               this.$ajax.get('https://scc.ieyeplus.com:8082/api/scheds/'+res.data.result.id+'%'+device_ids+'%'+this.cycleTime)
             }else {
@@ -468,7 +468,7 @@
             this.dialogShow = true
           }else {
               this.selectDevice.forEach(function(s,i) {
-                s.deviceId = s.userID;
+                s.deviceid = s.userid;
               }.bind(this))
               this.formData.FeatureBases = this.selectDevice
               console.log("777777");

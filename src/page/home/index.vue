@@ -628,6 +628,7 @@
                                             arr = this.$store.getters.confMeeting
                                             break
                                             }
+					  console.log(data)
                                           let conferences = data.message.split('\n')
                                           conferences.forEach( (element,index) => {
                                           if( element!= ""){

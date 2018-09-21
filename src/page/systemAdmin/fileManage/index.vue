@@ -11,15 +11,15 @@
             <div class="songSetting">
               <span class="toggle"><i class="fa fa-angle-right" aria-hidden="true"></i></span>
               <p :id="'contented'+songList.FolderName" :contenteditable="songList.contenteditable"  @blur="renameSongList(songList, $event)">
-                {{songList.folderName}}
+                {{songList.foldername}}
               </p>
-              <span class="musicNum" @click="qsss(songList, index)">[{{ songList.files ? songList.files.length :0}}]</span>
+              <span class="musicNum" @click="qsss(songList, index)">[{{ songList.Files ? songList.Files.length :0}}]</span>
               <span class="nameSetting" @click.stop="getFocus(songList)"><button type="button" class="btn btn-sm btn-info" style="overflow:hidden;height: 25px;">重命名</button></span>
               <span  class="nameSetting" @click.stop="deleteSongList(songList.folderid)"><button type="button" class="btn btn-sm btn-info" style="overflow:hidden;height: 25px;">删除歌单</button></span>
             </div>
           </div>
           <div v-if="songList.unfold">
-            <ul class="musicList" v-for="fileItem in songList.files" >
+            <ul class="musicList" v-for="fileItem in songList.Files" >
               <li>
                 <p>{{ fileItem.filename }}</p>
                 <ul class="musicListTools">

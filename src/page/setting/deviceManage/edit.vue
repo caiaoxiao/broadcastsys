@@ -73,12 +73,12 @@ export default {
   data () {
     return {
       formData: {
-        deviceCode: '',
-        deviceName: '',
-	      password:'',
+        devicecode: '',
+        devicename: '',
+	password:'',
         type: 0,
-        deviceVedios: [{ vedioUrl: '' }, { vedioUrl: '' }, { vedioUrl: '' }, { vedioUrl: '' }],
-        feature:{ organizationID :  this.transferdata.targetMenuId }
+        devicevedios: [{ vedioUrl: '' }, { vedioUrl: '' }, { vedioUrl: '' }, { vedioUrl: '' }],
+        feature:{ organizationid :  this.transferdata.targetMenuId }
 
       },
       rules: {},
@@ -91,15 +91,15 @@ export default {
       let documentHeight = document.documentElement.clientHeight
       $('.popUp').css('top', documentHeight * 0.3 + 'px')
       if (this.modolType === -2) {
-        this.$ajax.get(`Device/Detail/${this.transferdata.deviceId}`)
+        this.$ajax.get(`Device/Detail/${this.transferdata.deviceid}`)
           .then(res => {
             if (res.data.code === 1) {
               this.formData = res.data.result
-              this.formData.feature.organizationID = this.transferdata.targetMenuId
-              /*this.$ajax.get(`Feature/Detail/${this.transferdata.deviceId}`)
+              this.formData.feature.organizationid = this.transferdata.targetMenuId
+              /*this.$ajax.get(`Feature/Detail/${this.transferdata.deviceid}`)
               .then(res => {
                   if (res.data.code === 1) {
-                    this.formData.feature.organizationID = res.data.result.organizationID
+                    this.formData.feature.organizationid = res.data.result.organizationid
                   }
               })*/
             }
@@ -119,11 +119,11 @@ export default {
        let axios = []
        for(let i = 0;i < parseInt(this.range);i++){
         temp = new Object()
-        temp.deviceCode = String(parseInt(this.formData.deviceCode)+i)
-        deviceName = this.formData.deviceName
-	      password = this.formData.password
+        temp.deviceCode = String(parseInt(this.formData.devicecode)+i)
+        deviceName = this.formData.devicename
+	password = this.formData.password
         type = this.formData.type
-        deviceVedios = this.formData.deviceVedios
+        deviceVedios = this.formData.devicevedios
         feature = this.formData.feature
         axios.push(this.$ajax.post('Device/Create',temp))
        }
@@ -132,7 +132,7 @@ export default {
        })
     }
     else{
-        let request = Object.assign(this.formData,{deviceId:this.transferdata.deviceId})
+        let request = Object.assign(this.formData,{deviceId:this.transferdata.deviceid})
         this.$ajax.put(`Device/Edit`,request)
           .then(res => {
             if (res.data.code === 1) {

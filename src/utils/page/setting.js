@@ -13,6 +13,6 @@ export function getHeights() {
 	  
 	  if(contentHeight > maxHeight)
 	{
-		  $(".content").css('height',contentHeight+popUp.offsetHeight)
+		  $(".content").css('height',contentHeight)
 	}
 }

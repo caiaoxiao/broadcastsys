@@ -49,12 +49,12 @@
   }
 </script>
 <style scoped>
-.content{overflow-y:auto;}
 ::-webkit-scrollbar{
   width: 5px;
   background: #4E545A
 
 }
+.content{overflow-y:auto;}
 ::-webkit-scrollbar-button{  }
 ::-webkit-scrollbar-track{ }
 ::-webkit-scrollbar-track-piece {}

@@ -20,6 +20,7 @@
 
 <script type="text/javascript">
 import { mapActions } from 'vuex'
+import {getHeights} from 'utils/page/device'
 export default {
   props: ['modolType'],
   data () {
@@ -35,6 +36,7 @@ export default {
     this.$nextTick(() => {
       let documentHeight = document.documentElement.clientHeight
       $('.popUp').css('top', documentHeight * 0.3 + 'px')
+      //getHeights()
       if (this.modolType === 2) {
         this.$ajax.post('Basic/List')
           .then(res => {

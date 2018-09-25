@@ -5,14 +5,16 @@ export function getHeights() {
           var contentHeight = $(".table").outerHeight()
           var popUp = $(".popUp")
           var popUpHeight = 0
-          if (popUp!=undefined){
-          popUpHeight = popUp.offsetTop + popUp.offsetHeight
+          if (popUp.length>0){
+	  console.log(popUp,maxHeight,contentHeight,popUpHeight)
+          popUpHeight = popUp[0].offsetTop + popUp[0].offsetHeight
           contentHeight = Math.max( contentHeight,popUpHeight)
+	  console.log(popUp,maxHeight,contentHeight,popUpHeight)
           }
-	  console.log(maxHeight,contentHeight,popUpHeight)
 
-          if(contentHeight > maxHeight)
+          if( contentHeight > maxHeight)
         {
+		  console.log(popUp,maxHeight,contentHeight,popUpHeight)
                   $(".content").css('height',contentHeight)
         }
 }

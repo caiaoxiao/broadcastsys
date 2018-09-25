@@ -84,14 +84,14 @@
           <div class="songSheetName" :class="songlist.selected ? 'songSheetNameSelect' : ''" @click="addMusic(songlist)">
             <div class="songSetting">
               <span class="toggle"><i class="fa fa-angle-right" aria-hidden="true"></i></span>
-              <p>{{songlist.FolderName}}</p>
+              <p>{{songlist.foldername}}</p>
               <span class="musicNum">[{{ songlist.Files ? songlist.Files.length :0}}]</span>
             </div>
           </div>
           <ul class="musicList" v-if="songlist.unfold">
             <li v-for="fileItem in songlist.Files">
-              <p>{{fileItem.FileName}}</p>
-              <span class="totalTime" v-if="fileItem.MediaType == 1">{{fileItem.FileTime}}</span>
+              <p>{{fileItem.filename}}</p>
+              <span class="totalTime" v-if="fileItem.mediatype == 1">{{fileItem.filetime}}</span>
             </li>
           </ul>
         </div>
@@ -359,7 +359,7 @@
 
       playMusic() {
         this.$store.dispatch('setWhetherPlayAnotherSong','yes')
-        let music = this.selectPlayList[0].MediaPath;
+        let music = this.selectPlayList[0].mediapath;
 
         
           if(this.anotherSong[0] == null){
@@ -367,8 +367,9 @@
             let _this = this;
       
             usera.Files.forEach(function(usern){
-              var x = usern.MediaPath.indexOf("IpBcFiles");
-              var y = usern.MediaPath.substring(x);
+              var x = usern.mediapath.indexOf("IpBcFiles") ;
+              var y = usern.mediapath.substring(x);
+	      console.log(usern.mediapath)
               var z = "/var/lib/tomcat8/webapps/"+y;
               _this.fsAPI("conference"," " + _this.name + " " + "play" + " " + z,function(res){console.log("bofang")});
             });
@@ -378,8 +379,8 @@
             let _this = this;
             _this.fsAPI("conference"," " + _this.name + " " + "stop",function(res){console.log("qie ge")});
             usera.Files.forEach(function(usern){
-              var x = usern.MediaPath.indexOf("IpBcFiles");
-              var y = usern.MediaPath.substring(x);
+              var x = usern.mediapath.indexOf("IpBcFiles");
+              var y = usern.mediapath.substring(x);
               var z = "/var/lib/tomcat8/webapps/" + y;
               _this.fsAPI("conference"," " + _this.name + " " + "play" + " " + z,function(res){console.log("another song")});
             });

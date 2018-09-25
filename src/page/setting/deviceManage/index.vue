@@ -1,5 +1,5 @@
 <template>
-  <div class="content padding">
+  <div class="content">
     <div class="tableTool">
       <div class="operate">
         <form class="form-inline">
@@ -42,11 +42,11 @@
         </tbody>
       </table>
     </div>
-    <div v-if="modolType != null && modolType !=2">
-      <modal :modolType='modolType' :transferData='transferData' @close="close" @getHeight="getHeight"></modal>
-    </div>
     <div v-if="modolType ==2">
       <basechange :modolType='modolType'  @close="close"></basechange>
+    </div>
+    <div v-if="modolType != null && modolType !=2">
+      <modal :modolType='modolType' :transferData='transferData' @close="close" @getHeight="getHeight"></modal>
     </div>
   </div>
 </template>
@@ -54,7 +54,7 @@
 import { mapGetters } from 'vuex'
 import modal from './edit.vue'
 import basechange from './base.vue'
-import {getHeights} from 'utils/page/device'
+import {getHeights} from 'utils/page/setting'
 export default {
   data () {
     return {
@@ -122,7 +122,6 @@ export default {
                           all_devices[i].organizationid = res[i].data.result.organizationid
                       }
                     this.dataAll = all_devices
-	            getHeights()
                })
           */
           })
@@ -156,4 +155,5 @@ export default {
   }
 }
 </script>
-
+<style scoped>
+</style>

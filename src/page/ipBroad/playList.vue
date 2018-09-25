@@ -12,19 +12,19 @@
             <div class="songSheetName songSheetNameSelect" @click="addMusic(songlist)">
               <div class="songSetting">
                 <span class="toggle"><i class="fa fa-angle-right" aria-hidden="true"></i></span>
-                <p >{{songlist.FolderName}}</p>
+                <p >{{songlist.foldername}}</p>
                 <span class="musicNum">[{{ songlist.Files ? songlist.Files.length :0}}]</span>
               </div>
               <span class="songSheetTool">选择</span>
             </div>
             <ul class="musicList" v-if="songlist.unfold">
               <li v-for="fileItem in songlist.Files">
-                <p>{{ fileItem.FileName }}</p>
+                <p>{{ fileItem.filename }}</p>
                 <ul class="musicListTools">
                   <li><i class="fa fa-play-circle" aria-hidden="true"></i>试听</li>
 
                 </ul>
-                <span class="totalTime" v-if="fileItem.MediaType == 1"> {{ fileItem.FileTime}}</span>
+                <span class="totalTime" v-if="fileItem.mediatype == 1"> {{ fileItem.filetime}}</span>
               </li>
 
             </ul>

@@ -6,12 +6,16 @@ export function getHeights() {
 	  var contentHeight = $(".content").outerHeight()
 	  var popUp = $(".popUp")
 	  var popUpHeight = 0
-	  if (popUp!=undefined){
-	  popUpHeight = popUp.offsetTop + popUp.offsetHeight
+	  if (popUp.length>0){
+	  popUpHeight = popUp[0].offsetTop + popUp[0].offsetHeight
           contentHeight = Math.max( contentHeight,popUpHeight)
 	  }
 	  
-	  if(contentHeight > maxHeight)
+	if(popUpHeight > contentHeight)
+        {
+                  $(".content").css('height',popUpHeight)
+        }
+	  else if(contentHeight > maxHeight)
 	{
 		  $(".content").css('height',contentHeight)
 	}

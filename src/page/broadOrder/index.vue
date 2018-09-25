@@ -98,17 +98,7 @@
     },
     methods: {
       refresh() {
-        this.$ajax.get('QzTask/getAll')
-          .then(res => {
-            if(res.data.code == 1) {
-              console.log("success");
-              this.xPlanData = res.data.result
-	      console.log("The xPlanData is:",this.xPlanData)
-            }else {
-              console.log("failed");
-            }
-          })
-        this.$ajax.post('Plan/List')
+        this.$ajax.post('Plan/List',{pageIndex:1,pageSize:1000})
           .then(res => {
             if(res.data.code == 1) {
               console.log("success");
@@ -120,7 +110,7 @@
               let sum = 1;
               let sum_show = 1;
               console.log("The length is:",res.data.result.length)
-              for( i = 1; i<res.data.result.length && res.data.result[i].planname != res.data.result[i-1].planname; i++) {
+              for( i = 1; i<res.data.result.length && res.data.result[i].planname != res.data.result[i-1].planname;  i++) {
                 sum_show++;
               }
               console.log("The sum_show is:",sum_show)
@@ -143,7 +133,7 @@
                 this.showPlanData[i] = res.data.result[j]
                 console.log("The time is:",this.showPlanData[j].planname)
                 var moment = require('moment')
-                this.showPlanData[j].planpretime = moment(this.xPlanData[i].time).format("YYYY-MM-DD HH:mm:ss") 
+                //this.showPlanData[j].planpretime = moment(this.xPlanData[i].time).format("YYYY-MM-DD HH:mm:ss") 
                 console.log("The perfect TIME:",this.showPlanData[j].planpretime)
                 if(i+sum == res.data.result.length) {
                   this.showPlanData.splice(j+1,res.data.result.length-j-1)

@@ -434,17 +434,18 @@
       submitPlan() {
         console.log("The time1 is:",this.formData.PlanPreTime)
  	console.log("broad is:" ,this.broad)
-        this.xData.period = String(this.cycleIndex * 86400);
+        //this.xData.period = String(this.cycleIndex * 86400);
         let path = '';
-        this.xData.time = this.formData.PlanPreTime.toString()
+        //this.xData.time = this.formData.PlanPreTime.toString()
         console.log("The time2 is:",this.xData.time)
-        this.xData.meeting = this.broad
+        //this.xData.meeting = this.broad
         if(this.xData.cmdtype == 1) {
            this.selectSongList.forEach(function(c,i) {
              path = path + ' ' + c.MediaPath
            }.bind(this))
            this.xData.path = path
         }
+	/*
         this.$ajax.post('QzTask/add',this.xData)
           .then((res) => {
             if(res.data.code == 1) {
@@ -458,6 +459,7 @@
             }else {
             }
           })
+	*/
         // 提交预案
         if(this.formData.PlanName == ''){
           this.dialogText = '预案名称不能为空'
@@ -478,7 +480,14 @@
                     if(res.data.code == 1) {
                       console.log("success"); 
                       console.log(res.data.result.planid);
-                      this.$ajax.post(''+res.data.result.planid) 
+		      let device_ids = ""
+              this.selectDevice.forEach((element,i) => {
+                if(i!=0)
+                device_ids+="-"
+                device_ids+=element.userid
+              })
+		      this.$ajax.get('https://scc.ieyeplus.com:8082/api/scheds/'+res.data.result.planid+'%'+device_ids+'%'+this.cycleTime)
+                      //this.$ajax.post(''+res.data.result.planid) 
                       this.$emit('close',1)
                     }else {
                       console.log(res)

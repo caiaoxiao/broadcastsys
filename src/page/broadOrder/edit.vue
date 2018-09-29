@@ -455,7 +455,7 @@
                 device_ids+="-"
                 device_ids+=element.userid
               })
-              this.$ajax.get('https://scc.ieyeplus.com:8082/api/scheds/'+res.data.result.id+'%'+device_ids+'%'+this.cycleTime)
+              this.$ajax.get('https://scc.ieyeplus.com:8082/api/scheds/'+res.data.result.id+'%'+this.broad+'%'+this.cycleTime)
             }else {
             }
           })

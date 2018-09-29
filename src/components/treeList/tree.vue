@@ -25,7 +25,7 @@
         data: [],
         defaultExpanded: [],
         defaultProps: {
-          children: 'children',
+          children: 'Children',
           label: 'orgname'
         },
 

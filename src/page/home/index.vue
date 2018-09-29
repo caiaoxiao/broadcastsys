@@ -516,7 +516,7 @@
                                   this.usermap[r.devicecode].name = r.devicename
                                 }
                             })
-			    if(this.targetUserGroupId!="" || this.TreeData.parentid=="0")
+			                  if(this.targetUserGroupId!="" || this.TreeData.parentid=="0")
                             this.$ajax.get(`Role/getDeviceGroup/${this.targetUserGroupId}`)
                               .then((res) => {
                             if (res.data.code === 1) {
@@ -590,7 +590,6 @@
                                       }
                                     }
                                   })
-				console.log(deviceList)
                                 //这时deviceList已经更新
                                 this.vertoHandle.sendMethod("jsapi",{command:"fsapi", data:{cmd:"show", arg:"channels as xml"}},
                                   (data) => {
@@ -691,6 +690,148 @@
                                 })
 
                                }
+                  else {
+                        for(let index in deviceList){
+                                if(this.usermap.hasOwnProperty(deviceList[index].userid)){
+                                  deviceList[index].groupid =  this.usermap[deviceList[index].userID].list
+                                  deviceList[index].type =  this.usermap[deviceList[index].userID].type
+                                  deviceList[index].name = this.usermap[deviceList[index].userID].name
+                                  delete this.usermap[deviceList[index].userid] }
+                              }
+                              for(let item in this.usermap){
+                                let user = {}
+                                  user.deviceState = "unregistered"
+                                  user.calling = ""
+                                  user.userID = item
+                                  user.callDirection = null
+                                  user.channelUUID = null
+                                  user.networkIP = null
+                                  user.networkPort = null
+                                  user.operationState = 0
+                                  user.oppoChannelUUID = null
+                                  user.groupid = this.usermap[item].list
+                                  user.type = this.usermap[item].type
+                                  user.name = this.usermap[item].name
+                                  user.timer = {s:0,m:0,h:0,id:[],clock:false}
+                                  deviceList.push(user)
+                                }
+                                      registrations.forEach( (r) =>{
+                                        for (let i =0;i < deviceList.length;i++){
+                                        if (deviceList[i].userID == r.reg_user){
+                                        if(r.reg_user != xuiUsername){ //(!deviceList.some((item)=>{return item.userID == r.reg_user})) 
+                                          deviceList[i].deviceState = "registered"
+                                          deviceList[i].userID = r.reg_user
+                                          deviceList[i].callDirection = null
+                                          deviceList[i].channelUUID = null
+                                          deviceList[i].networkIP = r.network_ip
+                                          deviceList[i].networkPort = r.network_port
+                                          deviceList[i].operationState = 0
+                                          deviceList[i].oppoChannelUUID = null
+                                          deviceList[i].timer = {s:0,m:0,h:0,id:[],clock:false}
+                                          deviceList[i].calling = null 
+                                          //deviceList[i].name = null 
+                                        }
+                                      }
+                                    }
+                                  })
+                                //这时deviceList已经更新
+                                this.vertoHandle.sendMethod("jsapi",{command:"fsapi", data:{cmd:"show", arg:"channels as xml"}},
+                                  (data) => {
+                                    const parser = new DOMParser()
+                                    const doc = parser.parseFromString(data.message, "text/xml")
+                                    const msg = parseXML(doc)
+                                    if(msg != 0) {
+                                      let channel_data = msg.row
+                                      if(!(channel_data instanceof Array))
+                                      channel_data = [channel_data]
+                                      channel_data.forEach( (item,index) => {
+                                        let application_des = ""
+                                        let arr = []
+                                        if(item.application == "conference"){
+                                        if(item.application_data.slice(0,2)=="93"){
+                                          item.application_data = item.application_data.slice(0,item.application_data.indexOf('-'))+"-scc.ieyeplus.com"
+                                        }
+                                        this.vertoHandle.sendMethod("jsapi",{command:"fsapi", data:{cmd:"conference", arg:item.application_data  +  " " + "list as xml"}},
+                                        (data)=>{
+                                            switch(item.application_data){
+                                            case this.voice+"-scc.ieyeplus.com":
+                                            application_des = "setConfLeft"
+                                            arr = this.$store.getters.confLeft
+                                            break
+                                            case this.alarm+"-scc.ieyeplus.com":
+                                            application_des = "setConfAlarm"
+                                            arr = this.$store.getters.confAlarm
+                                            break
+                                            case this.broad+"-scc.ieyeplus.com":
+                                            application_des = "setConfIpBoard"
+                                            arr = this.$store.getters.confIpBoard
+                                            break
+                                            case this.meeting+"-scc.ieyeplus.com":
+                                            application_des = "setConfMeeting"
+                                            arr = this.$store.getters.confMeeting
+                                            break
+                                            }
+					  console.log(data)
+                                          let conferences = data.message.split('\n')
+                                          conferences.forEach( (element,index) => {
+                                          if( element!= ""){
+                                          let conference_data = element.split(";")
+                                          let sound = conference_data[5].split("|")
+                                          if(conference_data[4] == item.presence_id.slice(0,item.presence_id.indexOf('@'))){
+                                              if(arr.length == 0 ||  arr.every(function(item,index,array){return item.key!=conference_data[2]}))
+                                              arr.push({
+                                                conf_id : conference_data[0],
+                                                caller_id_number : conference_data[4],
+                                                muted : sound.findIndex((item)=>{return item =="speak"})==-1?true:false,
+                                                deaf :  sound.findIndex((item)=>{return item =="hear"})==-1?true:false,
+                                                talking : false,
+                                                channel_uuid : conference_data[2],
+                                                key : conference_data[2] 
+                                              })
+                                          }
+                                          }
+                                        })
+                                        this.$store.dispatch(application_des,arr)
+                                        })
+                                        }
+                                        let deviceList = this.$store.getters.deviceList
+                                        deviceList.forEach((device,index) => {
+                                          if(device.userID == item.presence_id.slice(0,item.presence_id.indexOf('@'))){
+                                            if(item.callstate == "RINGING"  || item.callstate == "EARLY" || item.callstate =="RING_WAIT")
+                                              device.deviceState = "ringing"
+                                            else if(item.callstate == "ACTIVE"){
+                                            device.deviceState = "active"
+                                            device.channelUUID = item.call_uuid
+                                            device.calling = item.sent_callee_num
+                                            if(device.timer.clock == false){
+                                              item.created = item.created.replace(/\-/g, "/")
+                                              let time = new Date(item.created)
+                                              let now = new Date()
+                                              device.timer.h = parseInt(parseInt(now - time)/1000/60/60)
+                                              device.timer.m = parseInt(parseInt(now - time - device.timer.h*1000*60*60)/1000/60)
+                                              device.timer.s = parseInt(parseInt(now - time - device.timer.h*1000*60*60-device.timer.m*1000*60)/1000)
+                                              var t = setInterval(()=>{
+                                                  device.timer.s+=1
+                                                  if(device.timer.s>59.5){
+                                                      device.timer.s=0
+                                                      device.timer.m+=1}
+                                                      if(device.timer.s>59.5 || device.timer.m>59){
+                                                          device.timer.m=0
+                                                          device.timer.h+=1}
+                                                          },1000)
+                                              device.timer.clock = true
+                                              device.timer.id.push(t) 
+                                              } //开启计时器
+                                            } //通话状态
+                                          } //遍历userid
+                                      }) //deviceList
+                                      this.$store.dispatch('setDeviceList',deviceList)
+                                      }) // 遍历启动的channel
+                                    
+                                    } //msg
+                                  }
+                                )
+                  }
                               })
                             })
                 if(this.targetUserGroupId == "")

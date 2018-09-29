@@ -142,8 +142,8 @@ import edit from  './edit.vue'
 import {getHeights} from 'utils/page/setting'
 import { GET_USER_INFO } from 'store/getters/type'
 const labels = {
-  defaultId: 'OrganizationID',
-  treeName: 'OrgName'
+  defaultId: 'organizationid',
+  treeName: 'orgname'
 }
 export default {
   computed: {

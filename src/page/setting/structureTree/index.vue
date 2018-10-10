@@ -48,7 +48,7 @@
         data: [],
         defaultExpanded: [],
         defaultProps: {
-          children: 'children',
+          children: 'Children',
           label: 'orgname'
         },
 
@@ -97,17 +97,17 @@
         this.TreeChange({data, node})
       },
       append(data,node) {
-            const newChild = { organizationid:data.organizationid,childnum: 0, orgname:"新建组织机构", children: [] };
+            const newChild = { organizationid:data.organizationid,childnum: 0, orgname:"新建组织机构", Children: [] };
             if (!data.children) {
-              this.$set(data, 'children', []);
+              this.$set(data, 'Children', []);
             }
-            data.children.push(newChild)
+            data.Children.push(newChild)
             this.TreeChange({data, node})
           
       },
       remove(node, data) {
         let parent = node.parent
-        parent.data.children.pop()
+        parent.data.Children.pop()
         let request = []
         this.users.forEach((element) => {
           request.push(element.userID)
@@ -155,7 +155,7 @@
       renameDeviceGroupList (event , data ,node) {
       console.log("焦点转移绑定成功")
       let text = event.target.textContent
-      let children = node.parent.data.children
+      let children = node.parent.data.Children
       children[children.length-1].orgname = text
       //if (text !== '新建设备分组') {
       this.$ajax.post('Organization/List',{pageIndex:1,pageSize:1000})

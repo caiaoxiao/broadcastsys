@@ -199,7 +199,6 @@
           FeatureBases: [],
           FeatureCode: [],
         },
-
         selectSongList: [],
         xData: {
           path: '',
@@ -369,7 +368,7 @@
            }.bind(this))
            
         }else {
-          this.selectSonglist.forEach(function(c,i) {
+          this.selectSongList.forEach(function(c,i) {
             if(songlist.FolderID == c.FolderID) {
               this.selectSongList.splice(i, 1)
             }
@@ -432,16 +431,36 @@
         this.dialogShow = false
       },
       submitPlan() {
+	Date.prototype.format = function(format)
+{
+ var o = {
+ "M+" : this.getMonth()+1, //month
+ "d+" : this.getDate(),    //day
+ "h+" : this.getHours(),   //hour
+ "m+" : this.getMinutes(), //minute
+ "s+" : this.getSeconds(), //second
+ "q+" : Math.floor((this.getMonth()+3)/3),  //quarter
+ "S" : this.getMilliseconds() //millisecond
+ }
+ if(/(y+)/.test(format)) format=format.replace(RegExp.$1,
+ (this.getFullYear()+"").substr(4 - RegExp.$1.length));
+ for(var k in o)if(new RegExp("("+ k +")").test(format))
+ format = format.replace(RegExp.$1,
+ RegExp.$1.length==1 ? o[k] :
+ ("00"+ o[k]).substr((""+ o[k]).length));
+ return format;
+}
         console.log("The time1 is:",this.formData.PlanPreTime)
  	console.log("broad is:" ,this.broad)
-        //this.xData.period = String(this.cycleIndex * 86400);
+        this.xData.period = String(this.cycleIndex * 86400);
         let path = '';
-        //this.xData.time = this.formData.PlanPreTime.toString()
+        this.xData.time = this.formData.PlanPreTime.format('yyyy-MM-dd hh:mm:ss')
         console.log("The time2 is:",this.xData.time)
-        //this.xData.meeting = this.broad
+        this.xData.meeting = this.broad
         if(this.xData.cmdtype == 1) {
            this.selectSongList.forEach(function(c,i) {
-             path = path + ' ' + c.MediaPath
+	     let mediapath = c.mediapath.split('/')
+             path = path + ' ' + mediapath[mediapath.length-1] 
            }.bind(this))
            this.xData.path = path
         }
@@ -455,7 +474,7 @@
                 device_ids+="-"
                 device_ids+=element.userid
               })
-              this.$ajax.get('https://scc.ieyeplus.com:8082/api/scheds/'+res.data.result.id+'%'+device_ids+'%'+this.cycleTime)
+              this.$ajax.get('https://scc.ieyeplus.com:8082/api/scheds/'+res.data.result.id+'%'+this.broad+'%'+this.cycleTime)
             }else {
             }
           })
@@ -475,7 +494,7 @@
               this.formData.FeatureBases = this.selectDevice
               console.log("777777");
               console.log(this.formData.Files[0]); 
-                this.$ajax.post('Plan/Create', this.formData)
+                this.$ajax.post('Plan/Create', Object.assign(this.formData,this.xData))
                   .then((res) => {
                     if(res.data.code == 1) {
                       console.log("success"); 

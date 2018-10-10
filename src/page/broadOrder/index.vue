@@ -100,7 +100,7 @@
       refresh() {
         this.$ajax.post('Plan/List',{pageIndex:1,pageSize:1000})
           .then(res => {
-            if(res.data.code == 1 && res.data.result.length > 0) {
+            if(res.data.code == 1 && res.data.result!=null) {
               console.log("success");
               this.showPlanData = res.data.result
               this.showPlanData = this.showPlanData.reverse()

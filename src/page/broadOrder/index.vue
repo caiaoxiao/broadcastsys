@@ -103,6 +103,7 @@
             if(res.data.code == 1 && res.data.result!=null) {
               console.log("success");
               this.showPlanData = res.data.result
+              console.log("The result is :",res.data.result[0].planname); 
               this.showPlanData = this.showPlanData.reverse()
               console.log("The showPlanData is:",this.showPlanData)
               let i = 0;
@@ -110,8 +111,11 @@
               let sum = 1;
               let sum_show = 1;
               console.log("The length is:",res.data.result.length)
-              for( i = 1; i<res.data.result.length && res.data.result[i].planname != res.data.result[i-1].planname;  i++) {
-                sum_show++;
+              for( i = 1; i<res.data.result.length;  i++) {
+               console.log("",this.showPlanData[i].planname);  
+               if (this.showPlanData[i].planname != this.showPlanData[i-1].planname) {
+                  sum_show++;
+                } 
               }
               console.log("The sum_show is:",sum_show)
               let sum_array = []
@@ -119,7 +123,7 @@
               for( i = 0; i < sum_show; i++) {
                 sum_array[i] = 1
               }
-              this.showPlanData.length = sum_show
+              // this.showPlanData.length = sum_show
               console.log("The sum_array's length is:",sum_array.length)
               for( i = 1, j = 0; i<res.data.result.length; i++) {
                 if(res.data.result[i].planname == res.data.result[i-1].planname){
@@ -129,16 +133,14 @@
                 }
               }
               console.log("The sum_array is:",sum_array)
+              console.log("THE SHOWPLANDATA IS:",this.showPlanData) 
               for( i = 0, j = 0; i<sum_array.length; i++, j=j+sum_array[i-1]) {
                 this.showPlanData[i] = res.data.result[j]
-                console.log("The time is:",this.showPlanData[j].planname)
-                var moment = require('moment')
-                //this.showPlanData[j].planpretime = moment(this.xPlanData[i].time).format("YYYY-MM-DD HH:mm:ss") 
-                console.log("The perfect TIME:",this.showPlanData[j].planpretime)
                 if(i+sum == res.data.result.length) {
                   this.showPlanData.splice(j+1,res.data.result.length-j-1)
                 }
               }
+              this.showPlanData.length = sum_show 
             }else {
               console.log("failed");
             }

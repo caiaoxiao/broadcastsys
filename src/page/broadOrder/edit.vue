@@ -506,6 +506,9 @@
                 device_ids+=element.userid
               })
 		      this.$ajax.get('https://scc.ieyeplus.com:8082/api/scheds/'+res.data.result.planid+'%'+device_ids+'%'+this.cycleTime)
+		    .then((res) => {
+				console.log(res)
+		    })
                       //this.$ajax.post(''+res.data.result.planid) 
                       this.$emit('close',1)
                     }else {

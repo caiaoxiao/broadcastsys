@@ -108,7 +108,7 @@ export default {
                 if(re.devicecode == this.fuzzyquery || re.devicename == this.fuzzyquery || re.orgname == this.fuzzyquery  || this.fuzzyquery == "")
                 all_devices.push(re)
               })
-	    all_devices.sort((x,y)=>{return x.devicecode > y.devicecode})
+	    all_devices.sort((x,y)=>{return x.devicecode - y.devicecode})
             this.dataAll = all_devices
             /*
             let axios = []

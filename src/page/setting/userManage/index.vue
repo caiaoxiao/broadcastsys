@@ -253,8 +253,7 @@ export default {
       this.$ajax.get(`Feature/getFeatureByOrg/${this.targetMenu.organizationid}`)
         .then((res) => {
           if (res.data.code === 1) {
-            this.allDevices = res.data.result
-	    this.allDevices.sort((x,y)=>{return x.devicecode > y.devicecode}) 
+            this.allDevices = res.data.result.sort((x,y)=>{return x.devicecode - y.devicecode})
           }
         })
       this.$ajax.post(`Role/List`)
@@ -282,7 +281,7 @@ export default {
                   .then((res) => {
                       for (let i = 0 ; i<length ; i++){
 			if(!this.deviceGroups.some((item)=>{return item.devicegroupid == res[i].data.result.devicegroupid})){
-          res[i].data.result.deviceGroups.sort((x,y)=>{return x.devicecode > y.devicecode})
+          res[i].data.result.deviceGroups.sort((x,y)=>{return x.devicecode - y.devicecode})
           this.deviceGroups.push(res[i].data.result)
           this.deviceGroupsDelete.push(res[i].data.result.devicegroupid)
 		        	}
@@ -372,6 +371,7 @@ export default {
       .then(res => {
           if (res.data.code === 1) {
             console.log('删除成功')
+	    this.deviceGroups = []
             this.refresh()
           }
       })

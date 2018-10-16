@@ -22,7 +22,7 @@
         vertoConf:{},
         group_list:[],
 	usermap:{},
-	      last_id:"",	
+	last_id:"",	
         targetUserGroupId:"",
         verto: "",
         meeting: "",
@@ -288,8 +288,8 @@
                       device.forEach(function(user) {
                             if(user.userID == args.data[1])  {
                                 user.deviceState = 'active'
-			                        	user.calling = liveArrayObj.name.slice(0,liveArrayObj.name.indexOf('-'))
-				                if(user.timer.clock == false){
+			        user.calling = liveArrayObj.name.slice(0,liveArrayObj.name.indexOf('-'))
+			       if(user.timer.clock == false){
                                 var t = setInterval(()=>{
                                  user.timer.s+=1
                                 if(user.timer.s>59.5){
@@ -337,21 +337,8 @@
 
                       // User left conference.
                       case "del":
-                        let device_del = _this.$store.getters.deviceList
-                        device_del.forEach(function(user) {
-                              if(user.channelUUID == args.key) {
-                                  user.deviceState = 'register'
-				  user.calling = null 
-                                  user.timer.s=0
-                                  user.timer.m=0
-                                  user.timer.h=0
-				  user.timer.clock = false
-                                  user.timer.id.forEach((id)=>{clearInterval(id)})
-                              }
-                        })
-                        _this.$store.dispatch('setDeviceList',device_del)
                         console.log('conference user deleted')
-			                  arr.forEach(function(a,i){
+			arr.forEach(function(a,i){
                           if (a.key == args.key)
                             arr.splice(i,1)
                         })
@@ -925,6 +912,7 @@
         let callDirection = e.data["Call-Direction"];            //入栈还是出栈
         let callerNumber = e.data["Caller-Caller-ID-Number"];    //主叫号码
         let calleeNumber = e.data["Caller-Callee-ID-Number"];  //被叫号码
+	let destinationNumber = e.data["Caller-Destination-Number"]
         let channelUUID = e.data["Unique-ID"];                   //id
         let channelCallState = e.data["Channel-Call-State"];  
         let currentLoginUser = this.currentLoginUser;
@@ -1017,14 +1005,14 @@
                 user.channelUUID = channelUUID;
                 user.deviceState = channelCallState;
                 user.callDirection = callDirection;
-                user.calling = channelCallState=="active"?calleeNumber:null 
+                user.calling = (channelCallState=="active" || channelCallState=="ringing")?(calleeNumber?calleeNumber:destinationNumber):null 
                 usersChanged = true;
               }
 	      else if(user.userID  == calleeNumber) {
                 user.channelUUID = channelUUID;
                 user.deviceState = channelCallState;
                 user.callDirection = callDirection;
-                user.calling = channelCallState=="active"?callerNumber:null 
+		user.calling = (channelCallState=="active" || channelCallState=="ringing")?(callerNumber?callerNumber:destinationNumber):null
                 usersChanged = true;
               }
             })
@@ -1055,7 +1043,15 @@
                 user.deviceState = channelCallState;
                 user.callDirection = callDirection;
                 user.oppoChannelUUID = opChannelUUID;
-                user.calling = channelCallState=="active"?callerNumber:null
+		user.calling = (channelCallState=="active" || channelCallState=="ringing")?(callerNumber?callerNumber:destinationNumber):null
+                usersChanged = true;
+              }
+	      else if (user.userID  == callerNumber) {
+                user.channelUUID = channelUUID;
+                user.deviceState = channelCallState;
+                user.callDirection = callDirection;
+		user.oppoChannelUUID = opChannelUUID;
+		user.calling = (channelCallState=="active" || channelCallState=="ringing")?(calleeNumber?calleeNumber:destinationNumber):null
                 usersChanged = true;
               }
             })

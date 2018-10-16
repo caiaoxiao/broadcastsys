@@ -12,13 +12,14 @@
               <div class="singleM" v-for="item in deviceList">
 		<div class="moduleStyle" :class="returnClass(item.deviceState)" @click.stop="itemClick($event, item)">
                 <div class="moduleNum"><i class="fa fa-video-camera" aria-hidden="true"></i>{{item.userID + " " + (item.name==null?"":item.name)}}</div>
-                <div class="moduleKind">视频终端</div>
+		<div class="moduleKind">{{(item.type=='1'?'视频':'话机') + '终端' +'  '}}
+                        <i class="fa fa-user" v-if = "item.deviceState=='active' || item.deviceState=='ringing'"></i>
+                        {{(item.calling==null?"":item.calling)}}
+                </div>
                 <div class="moduleState">{{ returnState(item.deviceState)  + "   " + ((item.timer.s>0 || item.timer.m>0 || item.timer.h>0)?
                         ((item.timer.h/10<1?"0"+item.timer.h+":":item.timer.h+":")+
                         (item.timer.m/10<1?"0"+item.timer.m+":":item.timer.m+":")+
                         (item.timer.s/10<1?"0"+Math.floor(item.timer.s):Math.floor(item.timer.s))):"")}}
-                        <i class="fa fa-user" v-if = "item.deviceState=='active'"></i>
-                        {{ (item.calling==null?"":item.calling) }}
               </div>
               </div>
               </div>
@@ -38,13 +39,14 @@
 		  <div class="singleM" v-show="returnGroup(item)" v-for="item in deviceList">
 			<div class="moduleStyle" :class="returnClass(item.deviceState)" @click.stop="itemClick($event, item)">
                 <div class="moduleNum"><i class="fa fa-video-camera" aria-hidden="true"></i>{{item.userID + " " + (item.name==null?"":item.name)}}</div>
-                <div class="moduleKind">视频终端</div>
+		<div class="moduleKind">{{(item.type=='1'?'视频':'话机') + '终端' +'  '}}
+                        <i class="fa fa-user" v-if = "item.deviceState=='active' || item.deviceState=='ringing'"></i>
+                        {{(item.calling==null?"":item.calling)}}
+                </div>
                 <div class="moduleState">{{ returnState(item.deviceState)  + "   " + ((item.timer.s>0 || item.timer.m>0 || item.timer.h>0)?
                         ((item.timer.h/10<1?"0"+item.timer.h+":":item.timer.h+":")+
                         (item.timer.m/10<1?"0"+item.timer.m+":":item.timer.m+":")+
                         (item.timer.s/10<1?"0"+Math.floor(item.timer.s):Math.floor(item.timer.s))):"")}}
-                        <i class="fa fa-user" v-if = "item.deviceState=='active'"></i>
-                        {{ (item.calling==null?"":item.calling) }}
               </div>
               </div>
                   </div>

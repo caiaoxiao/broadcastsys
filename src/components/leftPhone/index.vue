@@ -322,7 +322,7 @@
                 }
 		else if(this.selectPhone.length > 0 ){
                  this.selectPhone.forEach((a,i)=>{
-                  this.fsAPI('conference',this.confname.num+"-scc.ieyeplus.com"+(this.confname.num==this.broad ? '+flags{mute}' :'') +" "+"bgdial"+" "+"user/"+  a.userID+" " + this.confname.num + "-"+this.org+this.confname.show+"呼叫"  )
+                  this.fsAPI('conference',this.confname.num+"-scc.ieyeplus.com"+(this.confname.num==this.broad ? '+flags{mute}' :'') +" "+"bgdial"+" "+"user/"+  a.userID+" " + this.confname.num )
                 })
                 }
 		this.$emit('reset')

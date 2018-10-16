@@ -10,11 +10,11 @@
           <div class="songSheetName">
             <div class="songSetting">
               <span class="toggle"><i class="fa fa-angle-right" aria-hidden="true"></i></span>
-              <p :id="'contented'+songList.FolderName" :contenteditable="songList.contenteditable"  @blur="renameSongList(songList, $event)">
+              <p :id=index :contenteditable="songList.contenteditable"  @blur="renameSongList(songList, $event)">
                 {{songList.foldername}}
               </p>
               <span class="musicNum" @click="qsss(songList, index)">[{{ songList.Files ? songList.Files.length :0}}]</span>
-              <span class="nameSetting" @click.stop="getFocus(songList)"><button type="button" class="btn btn-sm btn-info" style="overflow:hidden;height: 25px;">重命名</button></span>
+              <span class="nameSetting" @click.stop="getFocus(songList,index)"><button type="button" class="btn btn-sm btn-info" style="overflow:hidden;height: 25px;">重命名</button></span>
               <span  class="nameSetting" @click.stop="deleteSongList(songList.folderid)"><button type="button" class="btn btn-sm btn-info" style="overflow:hidden;height: 25px;">删除歌单</button></span>
             </div>
           </div>
@@ -167,7 +167,8 @@
         defaultList:[],           //默认文件列表
         filePaths: [],            //勾选的默认文件列表
         songListShow: false,      //批量添加到歌单 显示隐藏
-        queryFileName: ''
+        queryFileName: '',
+        whetherChange: false
       }
     },
     created() {
@@ -184,14 +185,14 @@
       }),
     },
     methods: {
-      getContent(item) {
-        document.getElementById('contented'+item.FolderName).focus()
-      },
-      getFocus(item) {
+      getFocus(item,index) {
         console.log("Begin1:",item.contenteditable)
         item.contenteditable=true
         console.log("Finish1:",item.contenteditable)
-        setTimeout("this.getContent(this.item)",3000)
+        if(item.contenteditable){
+          
+          document.getElementById(index).focus()
+        } 
       },
       addBlur(file) {
         console.log(this.playList);
@@ -208,7 +209,6 @@
           .then(res => {
             if(res.data.code == 1) {
               let result = res.data.result
-	      console.log(result)
               result.forEach(function(r,i){
                 r.contenteditable = false
                 r.unfold = false
@@ -288,32 +288,32 @@
       addSongList() {
         // 添加歌单
         let request = {
-	  FolderID: '',
-          FolderName: '新建歌单',
-          UserID: '133585596bb04c9cbe311d0859dd7196',
-          FolderType: 1
+	  folderid: '',
+          foldername: '新建歌单',
+          userid: '133585596bb04c9cbe311d0859dd7196',
+          foldertype: 1
         }
         this.$ajax.post('Folder/Create', request)
           .then(res => {
             let result = res.data.result
             if(res.data.code == 1) {
-	      request.FolderID=result.folderID
+	      request.folderid=result.folderid
               this.playList.push({
-		FolderName: '新建歌单',
-		FolderID: result.folderID,
+		foldername: '新建歌单',
+		folderid: result.folderid,
 		contenteditable: false,
 		musicList: []
 	      }) 
             }
           })
-	/* console.log("request.FolderID is:",request.FolderID)
-        this.playList.push({
+        console.log("request.FolderID is:",this.playList)
+        /* this.playList.push({
           foldername: '新建歌单',
-	  FolderID: request.FolderID,
+	  FolderID: request.folderid,
           contenteditable: false,
           musicList: []
-        }) */
-      },
+        })*/ 
+      },   
 
       // 添加指定歌曲到指定歌单
       addFileToPlaylist(file, songList) {
@@ -353,23 +353,36 @@
 
       renameSongList(item, event) {
         // 歌单重命名
-	console.log("The item.FolderID is:",item.FolderID)
+	console.log("The item.FolderID is:",item.folderid)
         item.contenteditable = true
         let request = {
-          FolderName: event.target.textContent,
-          UserID: '133585596bb04c9cbe311d0859dd7196',
-          FolderType: 1,
-          FolderID: item.folderid
+          foldername: event.target.textContent,
+          userid: '133585596bb04c9cbe311d0859dd7196',
+          foldertype: 1,
+          folderid: item.folderid
+        }
+        if(item.foldername != request.foldername){
+          this.whetherChange = true
+        } 
+        /* this.playList.forEach(function(r,i){
+          if(r.folderid == request.folderid){
+            r = request
+          }
+        }) */ 
+        if(this.whetherChange){
+         
+          this.playList = null
+          this.whetherChange = false 
         }
 	console.log("The request is:",request)
         this.$ajax.put('Folder/Edit',request)
           .then(res => {
             if(res.data.code == 1) {
               console.log("修改成功")
-              this.refresh()
+              this.refresh() 
             }
           })
-        item.contenteditable=false
+       
       },
 
       removeFile(songList,file) {
@@ -432,8 +445,8 @@
         else if(this.submitType == 2){
           //移除歌单中文件
           let request = [{
-            FolderID: this.deleteId[0].folderid,
-            MediaID: this.deleteId[1].mediaid
+            folderid: this.deleteId[0].folderid,
+            mediaid: this.deleteId[1].mediaid
           }]
           this.$ajax.post('FolderMedia/RemoveList', request)
             .then(res => {
@@ -457,9 +470,9 @@
         }else if(this.submitType == 4) {
           // 添加文本
           let request = {
-            UserID: '133585596bb04c9cbe311d0859dd7196',
-            TextSubject: this.TextSubject,
-            Content: this.Content
+            userid: '133585596bb04c9cbe311d0859dd7196',
+            textsubject: this.TextSubject,
+            content: this.Content
           }
           this.$ajax.post('File/UploadText', request)
             .then(res => {

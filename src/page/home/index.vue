@@ -832,6 +832,7 @@
           }.bind(this))
 
         // 订阅注册事件
+	 this.vertoHandle.subscribe("FSevent.add_schedule",{handler:function(v,e){console.log(v,e)}.bind(this)});
         this.vertoHandle.subscribe("FSevent.custom::sofia::expire",{handler: this.handleExpire.bind(this)});
         this.vertoHandle.subscribe("FSevent.custom::sofia::register", {handler: this.handleFSEventRegister.bind(this)});
         // 订阅取消注册事件

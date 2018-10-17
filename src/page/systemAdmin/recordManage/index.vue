@@ -1,8 +1,8 @@
 <template>
   <div ><!--tab02录音管理-->
     <div class="tableTool">
-      <button type="submit" class="btn btn-sm btn-info" id="play"><i class="fa fa-play" aria-hidden="true"></i>播放</button>
-      <button type="submit" class="btn btn-sm btn-info"><i class="fa fa-cloud-download" aria-hidden="true"></i>下载</button>
+      <button type="submit" @click="prePlay()" class="btn btn-sm btn-info" id="play"><i class="fa fa-play" aria-hidden="true"></i>播放</button>
+      <button type="submit" @click="downLoad()" class="btn btn-sm btn-info"><i class="fa fa-cloud-download" aria-hidden="true"></i>下载</button>
       <div class="operate">
         <form class="form-inline">
           <div class="form-group">
@@ -77,7 +77,8 @@
           startStamp: null,
           endStamp: null,
         },
-        dataAll: []
+        dataAll: [], 
+        downloadfile: null 
       }
     },
     created() {
@@ -113,12 +114,13 @@
       },
       selectClick(item, index) {
         let target = $(".table>tbody>tr").eq(index)
+        this.downloadfile = item 
+        console.log("The recording is:",this.downloadfile)
         var s7 = '';
         if(target.hasClass('selected')) {
           this.mediaPath = ''
         }else {
-          console.log("here")
-          var arr1 = item.startStamp.split("-");
+          var arr1 = item.startstamp.split("-");
           var s1 = arr1[0] + arr1[1] + arr1[2];
           var arr2 = s1.split(":");
           var s2 = arr2[0] + arr2[1] + arr2[2];
@@ -132,22 +134,18 @@
         this.mediaPath = s7;
         this.$store.dispatch('setMediaPath',s7);
       },
-      prePlay(item) {
-        var arr1 = item.startStamp.split("-");
-        var s1 = arr1[0]+arr1[1]+arr1[2];
-        var arr2 = s1.split(":");
-        var s2 = arr2[0]+arr2[1]+arr2[2];
-        var s3 = s2.replace(' ','');
-        var s4 = s3.substr(0,12);
-        var s5 = item.uuid.substr(1);
-        var s6 = s4 + s5;
+      prePlay() {
         var audio = document.getElementById("music");
-        audio.src = 'https://scc.ieyeplus.com:8443/IpBcFiles/recording/'+s6+'.mp3';
+        audio.src = this.mediaPath;
         audio.play();
         console.log(audio);
       },
-      stopRecord(item) {
+      downLoad() {
         console.log("888888");
+        if(this.downloadfile == null) {
+        }else {
+          window.open(`https://scc.ieyeplus.com:8443/IpBc/File/Download/${this.downloadfile.callid}`) 
+        } 
       },
       typeSwitch(e) {
         this.fileType = e.target.innerText

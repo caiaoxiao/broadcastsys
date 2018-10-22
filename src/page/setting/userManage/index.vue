@@ -38,7 +38,7 @@
               <td>广播号码</td>
               <td>会议呼叫号码</td>
               <td>值班电话号码  
-                <button type="button" class="btn btn-sm btn-info watcher"  @click = "enable_watcher==true?editWatcher():setWatcherState(true)" > {{enable_watcher==true?"修改值班电话":"启用值班模式"}}</button>
+             <button type="button" class="btn btn-sm btn-info watcher"  @click = "enable_watcher==true?editWatcher():setWatcherState(true)" > {{enable_watcher==true?"修改值班电话":"启用值班模式"}}</button>
                 <button type="button" v-if = "enable_watcher"  class="btn btn-sm btn-info watcher"  @click = "setWatcherState(false)" > {{"关闭值班模式"}}</button>  
               </td>
             </tr>
@@ -50,7 +50,7 @@
               <td>{{voice}}</td>
               <td>{{broad}}</td>
               <td>{{meeting}}</td>
-              <td  :contenteditable = "contenteditable"  @keydown.13 = "editWatcherFinished($event)" >{{enable_watcher==true?watcher:""}}</td>
+              <td  :contenteditable = "contenteditable" @blur="()=>{this.editwatcher = false ;this.contenteditable = false}" @keydown.13 = "editWatcherFinished($event)" v-focus = "editwatcher" >{{enable_watcher==true?watcher:""}}</td>
             </tr>
           </tbody>
         </table>
@@ -151,6 +151,15 @@ const labels = {
   treeName: 'orgname'
 }
 export default {
+  directives: {
+    focus: {
+        update: function (el, {value}) {
+            if (value) {
+                el.focus();
+            }
+        }
+    }
+  },
   computed: {
     ...mapGetters({
       get_user_info: GET_USER_INFO,
@@ -185,6 +194,7 @@ export default {
    			 baseURL: 'https://scc.ieyeplus.com:8001/'
       }),
       contenteditable:false,
+      editwatcher:false,
     }
   },
   watch: {
@@ -233,7 +243,7 @@ export default {
   },
   methods: {  //  组织机构树默认选中
     editWatcherFinished(event){
-
+       this.editwatcher = false
        event.target.contentEditable = "false"
        let text = event.target.textContent
        this.watcher = text
@@ -249,6 +259,7 @@ export default {
     },
     editWatcher(){
       this.contenteditable = true
+      this.editwatcher = true
     },
     setWatcherState(state){
       this.instance({

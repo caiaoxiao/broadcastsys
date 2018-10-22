@@ -141,7 +141,7 @@
         console.log(audio);
       },
       downLoad() {
-        console.log("888888");
+        console.log("888888",this.downloadfile);
         if(this.downloadfile == null) {
         }else {
           window.open(`https://scc.ieyeplus.com:8443/IpBc/File/Download/${this.downloadfile.callid}`) 

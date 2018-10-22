@@ -30,12 +30,18 @@
         broad: "",
         alarm: "",
 	username:"",
+	orgid:"",
+        instance : this.$ajax.create({
+ 	 baseURL: 'https://scc.ieyeplus.com:8001/'
+        }),	
 
       }
     },
     created() {
       this.$nextTick(()=> {
 	  getHeights()
+	  console.log(this.get_user_info)
+	  this.orgid = this.get_user_info.user.organizationid  
 	  this.username = this.get_user_info.user.username
           this.verto = this.get_user_info.freeswitchData.VertoID
           this.meeting = this.get_user_info.freeswitchData.MeetingID
@@ -324,8 +330,17 @@
           _this.$ajax.post('Basic/List')
           .then(res=>{
 					if (res.data.code === 1 && res.data.result.length>0){ 
-								let url = "http://scc.ieyeplus.com:8080/"+res.data.result[0].uniqueId+"/"+deviceCode 
-								window.open(url,'newwindow','height=1920,width=1080,top=0,left=0,toolbar=no,menubar=no,scrollbars=no,location=no, status=no')
+								let basic_id = res.data.result[0].uniqueId
+							        _this.instance({
+        								method: 'get',
+        								url: '/organization/'+ _this.orgid,
+    								}).then((res)=>{
+        								if(deviceCode!=res.data.watcherid)
+									{
+								let url = "http://scc.ieyeplus.com:8080/"+ basic_id +"/"+deviceCode
+                                                                window.open(url,'newwindow','height=1920,width=1080,top=0,left=0,toolbar=no,menubar=no,scrollbars=no,location=no, status=no')
+									}
+        							}) 				
 						}
 					})//device获取videourl
 		}//liveArrayObj.name =='9110-scc.ieyeplus.com'i && args.data[1]!='9000'

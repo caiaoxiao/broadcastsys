@@ -10,9 +10,7 @@
           <div class="songSheetName">
             <div class="songSetting">
               <span class="toggle"><i class="fa fa-angle-right" aria-hidden="true"></i></span>
-              <p :id=index :contenteditable="songList.contenteditable"  @blur="renameSongList(songList, $event)">
-                {{songList.foldername}}
-              </p>
+              <p :id=index v-focus="ifFocus" :contenteditable="songList.contenteditable"  @blur="renameSongList(songList, $event)">{{songList.foldername}}</p>
               <span class="musicNum" @click="qsss(songList, index)">[{{ songList.Files ? songList.Files.length :0}}]</span>
               <span class="nameSetting" @click.stop="getFocus(songList,index)"><button type="button" class="btn btn-sm btn-info" style="overflow:hidden;height: 25px;">重命名</button></span>
               <span  class="nameSetting" @click.stop="deleteSongList(songList.folderid)"><button type="button" class="btn btn-sm btn-info" style="overflow:hidden;height: 25px;">删除歌单</button></span>
@@ -60,7 +58,7 @@
             <input type="button"
                    @click.stop="addBlur()"  value="添加到">
             <div v-if="songListShow" v-for="songList in playList" @mouseout="addBlur()">
-              <span style="height:20px;width:20px;"  @click.self="addFileToPlaylist('', songList)">{{songList.foldername}}</span>
+              <span style="height:100px;width:100px;"  @click.self="addFileToPlaylist('', songList)">{{songList.foldername}}</span>
             </div>
 
           </li>
@@ -99,7 +97,7 @@
                  @click.stop="addBlur(file)">添加到
               </button>
              <div>
-              <div :class="songlist(songList.folderid)" v-if="file.songListShow" v-for="songList in playList">
+              <div :class="songlist(songList.folderid)" v-if="file.songListShow" v-for="songList in playList" style="height: 200px;width: 200px">
                 <span class="songlist(songList.folderid)" value=songList.FolderName @click.self="addFileToPlaylist(file, songList)">{{songList.foldername}}</span>
               </div>
              </div>
@@ -168,7 +166,9 @@
         filePaths: [],            //勾选的默认文件列表
         songListShow: false,      //批量添加到歌单 显示隐藏
         queryFileName: '',
-        whetherChange: false
+        whetherChange: false,  
+        renameChange: false,
+        ifFocus: false 
       }
     },
     created() {
@@ -183,16 +183,24 @@
       ...mapGetters({
         dialogStatu: 'dialogStatu',
       }),
-    },
+    }, 
+    directives: {
+      focus: {
+        update: function(el) {
+          el.focus()
+        }
+      }
+    },    
     methods: {
       getFocus(item,index) {
         console.log("Begin1:",item.contenteditable)
         item.contenteditable=true
         console.log("Finish1:",item.contenteditable)
-        if(item.contenteditable){
-          
-          document.getElementById(index).focus()
-        } 
+        /* if(item.contenteditable){
+          document.getElementById(index).focus() 
+        } */
+        this.renameChange = true
+        this.ifFocus = true 
       },
       addBlur(file) {
         console.log(this.playList);
@@ -208,21 +216,22 @@
         this.$ajax.get('Folder/getTreeFiles', {params: {UserID: '133585596bb04c9cbe311d0859dd7196'}})
           .then(res => {
             if(res.data.code == 1) {
-              let result = res.data.result
+              console.log("The res.data.result is:",res.data.result); 
+              let result = res.data.result 
               result.forEach(function(r,i){
-                r.contenteditable = false
+                r.contenteditable = false 
                 r.unfold = false
               })
+              console.log("The result is:",result); 
               this.playList = result
+              console.log("The playList is:",this.playList); 
             }
           })
-
         this.queryDefaultList()
-
       },
       queryDefaultList() {
         // 2、查询右侧所有文件
-        if(this.queryFileName != '') {
+         if(this.queryFileName != '') {
           this.$ajax.post('File/List', {FileName: this.queryFileName})
             .then(res => {
               if(res.data.code == 1) {
@@ -235,32 +244,31 @@
                 this.defaultList = result
               }
             })
-        }else {
+        } else {
           this.$ajax.post('File/List', {pageIndex:1,pageSize:1000})
             .then(res => {
               if(res.data.code == 1) {
                 console.log("文件列表查询成功")
                 let result =  res.data.result
-                result.forEach(function(r,i){
-                  r.songListShow = false
-                  r.selected = false
-                })
+                if(result != null) {
+                  result.forEach(function(r,i){
+                    r.songListShow = false
+                    r.selected = false
+                  })
+                } 
                 this.defaultList = result
               }
             })
-        }
+        }    
 
       },
       prePlay(file) {
         var audio = document.getElementById("music");
-        console.log(audio);
         audio.src = file.mediapath;
         audio.play();
-        console.log(audio);
       },
       stopMusic(file) {
         var audio = document.getElementById("music");
-        console.log(audio);
         audio.currentTime = 0;
         audio.pause();
       },
@@ -306,13 +314,6 @@
 	      }) 
             }
           })
-        console.log("request.FolderID is:",this.playList)
-        /* this.playList.push({
-          foldername: '新建歌单',
-	  FolderID: request.folderid,
-          contenteditable: false,
-          musicList: []
-        })*/ 
       },   
 
       // 添加指定歌曲到指定歌单
@@ -353,36 +354,37 @@
 
       renameSongList(item, event) {
         // 歌单重命名
-	console.log("The item.FolderID is:",item.folderid)
-        item.contenteditable = true
-        let request = {
-          foldername: event.target.textContent,
-          userid: '133585596bb04c9cbe311d0859dd7196',
-          foldertype: 1,
-          folderid: item.folderid
-        }
-        if(item.foldername != request.foldername){
-          this.whetherChange = true
-        } 
-        /* this.playList.forEach(function(r,i){
-          if(r.folderid == request.folderid){
-            r = request
+        if(this.renameChange){ 
+          var s = event.target.textContent 
+          var s1 = s.replace(" ","")
+          var s2 = s1.replace(/[\'\"\\\/\b\f\n\r\t]/g, '');
+          var s3 = s2.replace(/[\@\#\$\%\^\&\*\(\)\{\}\:\"\L\<\>\?\[\]]/,'');
+          item.contenteditable = true
+          let request = {
+            foldername: s3, 
+            userid: '133585596bb04c9cbe311d0859dd7196',
+            foldertype: 1,
+            folderid: item.folderid
           }
-        }) */ 
-        if(this.whetherChange){
-         
-          this.playList = null
-          this.whetherChange = false 
-        }
-	console.log("The request is:",request)
-        this.$ajax.put('Folder/Edit',request)
-          .then(res => {
-            if(res.data.code == 1) {
-              console.log("修改成功")
-              this.refresh() 
-            }
-          })
-       
+          if(item.foldername != request.foldername){
+            this.whetherChange = true
+          } 
+          if(this.whetherChange){
+            this.playList = null
+            this.whetherChange = false 
+          }
+          this.$ajax.put('Folder/Edit',request)
+            .then(res => {
+              if(res.data.code == 1) {
+                console.log("修改成功")
+                this.refresh() 
+              }
+            })
+          this.renameChange = false 
+        }else{
+          this.playList = null 
+          this.refresh()
+        } 
       },
 
       removeFile(songList,file) {
@@ -401,9 +403,7 @@
       },
 
       uploadFile() {
-          console.log("888888");
           $('.uploadFiles').click()
-          console.log("999999");
       },
 
 
@@ -509,7 +509,7 @@
       deleteFile(file) {
         // 删除列表文件
         this.$store.dispatch('setDialogShow', true)
-        this.filePaths = [file.MediaPath]
+        this.filePaths = [file.mediapath]
         this.submitType = 3
         this.dialogText = "您确定要从默认列表中删除此文件吗?"
       },
@@ -524,7 +524,7 @@
 
       download(file) {
         // 下载文件
-        console.log(file.filetime);
+        console.log("The download file is:",file);
         if(file =='') {
           if(this.filePaths.length !=0) {
             this.filePaths.forEach(function(f,i) {

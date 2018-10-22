@@ -37,6 +37,10 @@
               <td>语音呼叫号码</td>
               <td>广播号码</td>
               <td>会议呼叫号码</td>
+              <td>值班电话号码  
+             <button type="button" class="btn btn-sm btn-info watcher"  @click = "enable_watcher==true?editWatcher():setWatcherState(true)" > {{enable_watcher==true?"修改值班电话":"启用值班模式"}}</button>
+                <button type="button" v-if = "enable_watcher"  class="btn btn-sm btn-info watcher"  @click = "setWatcherState(false)" > {{"关闭值班模式"}}</button>  
+              </td>
             </tr>
           </thead>
           <tbody>
@@ -46,6 +50,7 @@
               <td>{{voice}}</td>
               <td>{{broad}}</td>
               <td>{{meeting}}</td>
+              <td  :contenteditable = "contenteditable" @blur="()=>{this.editwatcher = false ;this.contenteditable = false}" @keydown.13 = "editWatcherFinished($event)" v-focus = "editwatcher" >{{enable_watcher==true?watcher:""}}</td>
             </tr>
           </tbody>
         </table>
@@ -146,6 +151,15 @@ const labels = {
   treeName: 'orgname'
 }
 export default {
+  directives: {
+    focus: {
+        update: function (el, {value}) {
+            if (value) {
+                el.focus();
+            }
+        }
+    }
+  },
   computed: {
     ...mapGetters({
       get_user_info: GET_USER_INFO,
@@ -174,6 +188,13 @@ export default {
       voice: "",
       broad: "",
       alarm: "",
+      watcher:"",
+      enable_watcher:"",
+      instance : this.$ajax.create({
+   			 baseURL: 'https://scc.ieyeplus.com:8001/'
+      }),
+      contenteditable:false,
+      editwatcher:false,
     }
   },
   watch: {
@@ -221,6 +242,36 @@ export default {
     this.OrgUrl = 'Organization/TreeRoot/' + this.$store.state.user_info.user.organizationid
   },
   methods: {  //  组织机构树默认选中
+    editWatcherFinished(event){
+       this.editwatcher = false
+       event.target.contentEditable = "false"
+       let text = event.target.textContent
+       this.watcher = text
+       this.instance({
+          method: 'post',
+          url: '/watcher/update/'+ this.transferdata.targetMenuId,
+          data:{
+            watcher:text
+          }
+  			}).then((res)=>{
+		      console.log("watcher更新成功")
+		    })
+    },
+    editWatcher(){
+      this.contenteditable = true
+      this.editwatcher = true
+    },
+    setWatcherState(state){
+      this.instance({
+    			method: 'post',
+          url: '/watcher/'+ this.transferdata.targetMenuId,
+          data:{
+            enable_watcher: state
+          }
+  			}).then((res)=>{
+          this.enable_watcher = state
+		    })
+    },
     initDatas (data) {
       if (!this.targetMenu.hasOwnProperty('organizationid') && data) {
         this.targetMenu = data
@@ -248,12 +299,21 @@ export default {
     		this.voice = res.data.result.voicecallid
     		this.alarm = res.data.result.alarmid
     		this.broad = res.data.result.broadid
+		
+		this.instance({
+    			method: 'get',
+    		        url: '/organization/'+ this.transferdata.targetMenuId,
+  			}).then((res)=>{
+    			this.watcher = res.data.watcher
+		        this.enable_watcher = res.data.enable_watcher
+		})
           }
       })
       this.$ajax.get(`Feature/getFeatureByOrg/${this.targetMenu.organizationid}`)
         .then((res) => {
           if (res.data.code === 1) {
-            this.allDevices = res.data.result.sort((x,y)=>{return x.devicecode - y.devicecode})
+            this.allDevices = res.data.result
+	    this.allDevices.sort((x,y)=>{return x.devicecode > y.devicecode}) 
           }
         })
       this.$ajax.post(`Role/List`)
@@ -281,7 +341,7 @@ export default {
                   .then((res) => {
                       for (let i = 0 ; i<length ; i++){
 			if(!this.deviceGroups.some((item)=>{return item.devicegroupid == res[i].data.result.devicegroupid})){
-          res[i].data.result.deviceGroups.sort((x,y)=>{return x.devicecode - y.devicecode})
+          res[i].data.result.deviceGroups.sort((x,y)=>{return x.devicecode > y.devicecode})
           this.deviceGroups.push(res[i].data.result)
           this.deviceGroupsDelete.push(res[i].data.result.devicegroupid)
 		        	}
@@ -371,7 +431,6 @@ export default {
       .then(res => {
           if (res.data.code === 1) {
             console.log('删除成功')
-	    this.deviceGroups = []
             this.refresh()
           }
       })
@@ -396,6 +455,9 @@ export default {
 
 </script>
 <style  scoped>
+.watcher{
+margin-left:5px;
+}
 </style>
 
 

@@ -98,9 +98,9 @@
       },
       append(data,node) {
             const newChild = { organizationid:data.organizationid,childnum: 0, orgname:"新建组织机构", Children: [] };
-            if (!data.children) {
+            if (!data.Children) {
               this.$set(data, 'Children', []);
-            }
+            }	
             data.Children.push(newChild)
             this.TreeChange({data, node})
           

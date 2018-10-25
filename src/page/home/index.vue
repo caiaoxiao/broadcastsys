@@ -330,14 +330,14 @@
           _this.$ajax.post('Basic/List')
           .then(res=>{
 					if (res.data.code === 1 && res.data.result.length>0){ 
-								let basic_id = res.data.result[0].uniqueId
+								let basic_id = res.data.result[0].uniqueid
 							        _this.instance({
         								method: 'get',
         								url: '/organization/'+ _this.orgid,
     								}).then((res)=>{
         								if(deviceCode!=res.data.watcherid)
 									{
-								let url = "http://scc.ieyeplus.com:8080/"+ basic_id +"/"+deviceCode
+								let url = "http://scc.ieyeplus.com:8432/"+ basic_id  
                                                                 window.open(url,'newwindow','height=1920,width=1080,top=0,left=0,toolbar=no,menubar=no,scrollbars=no,location=no, status=no')
 									}
         							}) 				

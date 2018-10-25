@@ -41,9 +41,10 @@ export default {
         this.$ajax.post('Basic/List')
           .then(res => {
 	  console.log(res)
+	    console.log(res.data.code,res.data.result.length)
             if (res.data.code === 1 && res.data.result.length>0) {
-              this.formData.uniqueId = res.data.result[0].uniqueid
-	      this.formData.basicId  = res.data.result[0].basicid
+              this.formData.uniqueid = res.data.result[0].uniqueid
+	      this.formData.basicid  = res.data.result[0].basicid
             }
 	    else if(res.data.code === 1){
 	    this.$ajax.post('Basic/Create',{uniqueId:"请输入视频联动存储密匙"})

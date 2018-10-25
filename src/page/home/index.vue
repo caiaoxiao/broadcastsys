@@ -337,7 +337,7 @@
     								}).then((res)=>{
         								if(deviceCode!=res.data.watcherid)
 									{
-								let url = "http://scc.ieyeplus.com:8432/"+ basic_id  
+								let url = "https://scc.ieyeplus.com:8432/"+ basic_id  
                                                                 window.open(url,'newwindow','height=1920,width=1080,top=0,left=0,toolbar=no,menubar=no,scrollbars=no,location=no, status=no')
 									}
         							}) 				

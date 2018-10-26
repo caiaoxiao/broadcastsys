@@ -92,15 +92,22 @@
             </li>
             <li @click.stop="download(file)"><button type="button" class="btn btn-sm btn-info">下载</button></li> 
             <li @click.stop="deleteFile(file)"><button type="button" class="btn btn-sm btn-info">删除</button></li>
-            <li id="add">
-              <button type="button" class="btn btn-sm btn-info"
-                 @click.stop="addBlur(file)">添加到
-              </button>
+            <li>
+              <!-- <button type="button" class="btn btn-sm btn-info"
+                 @click.stop="addBlur(file)">添加-->  
+                 <el-dropdown style="top:0px;background-color:#333"> 
+                   <!-- <el-button type="primary">添加到<i class="el-icon-arrow-down el-icon--right"></i></el-button>  -->
+                   <button type="button" class="btn btn-sm btn-info">添加到<i class="el-icon-arrow-down el-icon--right"></i></button> 
+                   <el-dropdown-menu slot="dropdown">
+                     <el-dropdown-item v-for="songList in playList"><span style="color:#333" @click.self="addFileToPlaylist(file, songList)">{{songList.foldername}}</span></el-dropdown-item>
+                   </el-dropdown-menu>
+                 </el-dropdown> 
+             <!-- </button>
              <div>
               <div :class="songlist(songList.folderid)" v-if="file.songListShow" v-for="songList in playList" style="height: 200px;width: 200px">
                 <span class="songlist(songList.folderid)" value=songList.FolderName @click.self="addFileToPlaylist(file, songList)">{{songList.foldername}}</span>
               </div>
-             </div>
+             </div> -->
             </li>
           </ul>
           <span class="totalTime Grid-cell">

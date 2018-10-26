@@ -126,12 +126,18 @@
       <div class="settingMoudle">
         <div class="settingTitle">循环周期</div>
         <div class="settingCon">
-          <span class="times" @click="subtract">-</span>
+        <!--  <span class="times" @click="subtract">-</span>
           <input type="text" v-model="cycleIndex" class="cycleIndex"/>
           <span class="times" @click="add">+</span>
-          <span>天</span>
-        </div>
-
+          <span>天</span> -->
+                 <el-dropdown style="top:0px;background-color:#333">
+                   <button type="button" class="btn btn-sm btn-info">循环周期选择<i class="el-icon-arrow-down el-icon--right"></i></button>
+                   <el-dropdown-menu slot="dropdown">
+                     <el-dropdown-item><span style="color:#333">每周播放</span></el-dropdown-item>
+                     <el-dropdown-item><span style="color:#333">每天播放</span></el-dropdown-item> 
+                   </el-dropdown-menu>
+                 </el-dropdown> 
+        </div> 
       </div>
       <div class="settingMoudle">
         <div class="settingTitle">循环次数(-1为循环播放)</div>

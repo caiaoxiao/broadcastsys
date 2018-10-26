@@ -2,7 +2,7 @@
   <div ><!--tab02录音管理-->
     <div class="tableTool">
       <button type="submit" @click="prePlay()" class="btn btn-sm btn-info" id="play"><i class="fa fa-play" aria-hidden="true"></i>播放</button>
-      <button type="submit" @click="downLoad()" class="btn btn-sm btn-info"><i class="fa fa-cloud-download" aria-hidden="true"></i>下载</button>
+      <a download @click="downLoad()" class="btn btn-sm btn-info"><i class="fa fa-cloud-download" aria-hidden="true"></i>下载</a>
       <div class="operate">
         <form class="form-inline">
           <div class="form-group">
@@ -78,7 +78,11 @@
           endStamp: null,
         },
         dataAll: [], 
-        downloadfile: null 
+        downloadfile: null,
+        instance : this.$ajax.create({
+          baseURL: 'https://scc.ieyeplus.com:8001/'
+        }), 
+        mediaPath: '',
       }
     },
     created() {
@@ -144,7 +148,17 @@
         console.log("888888",this.downloadfile);
         if(this.downloadfile == null) {
         }else {
-          window.open(`https://scc.ieyeplus.com:8443/IpBc/File/Download/${this.downloadfile.callid}`) 
+	/*
+          this.instance({
+          method: 'post',
+          url: '/file/download/'+ this.downloadfile.callid,
+          data:{
+          }
+          }).then((res)=>{
+             console.log("下载成功")
+          }) 
+	*/
+	window.open(`https://scc.ieyeplus.com:8001/file/download/${this.downloadfile.callid + '.mp3'}`)
         } 
       },
       typeSwitch(e) {

@@ -6,6 +6,22 @@
         <div id="aa">
           <div class="tableTool">
             <button type="button" class="btn btn-success" @click="booking">发起预约</button>
+            <button type="button" class="btn btn-success" @click="orderDetail(detailData)">查看预约详情</button>
+            <el-dialog
+              title="提示"
+              :visible.sync="dialogVisible"
+              width="30%"
+              >
+              <el-form ref="form" :model="detailData" label-width="80px">
+                <el-form-item label="预案名称">
+                  <el-input v-model="detailData.planname"></el-input>
+                </el-form-item>
+              </el-form> 
+              <span slot="footer" class="dialog-footer">
+                <el-button @click="diaReturn"><span style="color: #333;">取 消</span></el-button>
+                <el-button type="primary" @click="diaConfirm">确 定</el-button>
+              </span>
+            </el-dialog>
             <div class="operate"
                  @click="deleteItem"><span class="delate"><i class="fa fa-times" aria-hidden="true"></i>删除</span></div>
           </div>
@@ -71,6 +87,8 @@
 	broad: '',
         xPlanData: [],
         showPlanData: [],
+        dialogVisible: false,
+        detailData: '',     
       }
     },
     created() {
@@ -103,7 +121,7 @@
             if(res.data.code == 1 && res.data.result!=null) {
               console.log("success");
               this.showPlanData = res.data.result
-              console.log("The result is :",res.data.result[0].planname); 
+              console.log("The result is :",res.data.result); 
               this.showPlanData = this.showPlanData.reverse()
               console.log("The showPlanData is:",this.showPlanData)
               let i = 0;
@@ -150,6 +168,7 @@
       selectClick(index, plan) {
         let target = $(".table>tbody>tr").eq(index)
         if(target.hasClass('selected')) {
+          this.detailData = '' 
           this.selectPlan.forEach(function(s, i) {
             if(s.planid == plan.planid) {
               this.selectPlan.splice(i, 1)
@@ -157,6 +176,7 @@
           }.bind(this))
         }else {
           this.selectPlan.push(plan)
+          this.detailData = plan 
         }
         this.selectPlan
         target.toggleClass("selected")
@@ -169,6 +189,16 @@
           this.refresh()
 
         }
+      },
+      orderDetail(item) {
+        console.log(item);
+        this.dialogVisible = true
+      },
+      diaConfirm() {
+        this.dialogVisible = false   
+      },
+      diaReturn() {
+        this.dialogVisible = false   
       },
       deleteItem() {
         console.log(this.showPlanData[0].planname);

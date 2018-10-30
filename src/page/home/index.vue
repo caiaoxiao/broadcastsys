@@ -331,15 +331,27 @@
           .then(res=>{
 					if (res.data.code === 1 && res.data.result.length>0){ 
 								let basic_id = res.data.result[0].uniqueid
+								let alarm_devices  = [] 
 							        _this.instance({
         								method: 'get',
         								url: '/organization/'+ _this.orgid,
     								}).then((res)=>{
         								if(deviceCode!=res.data.watcherid)
 									{
-								let url = "http://scc.ieyeplus.com:8432/"+ basic_id  
-                                                                window.open(url,'newwindow','height=1920,width=1080,top=0,left=0,toolbar=no,menubar=no,scrollbars=no,location=no, status=no')
+								        arr.forEach((de)=>{
+									if(de.caller_id_number!=_this.verto)
+									alarm_devices.push(de.caller_id_number)
+								})
 									}
+									else{
+								arr.forEach((de)=>{
+									if(de.caller_id_number!=deviceCode && de.caller_id_number!=_this.verto)
+                                                                        alarm_devices.push(de.caller_id_number)
+                                                                })
+								}
+								console.log(alarm_devices)
+								let url = "http://scc.ieyeplus.com:8432/"+ basic_id + alarm_devices.join('|')
+                                                                window.open(url,'newwindow','height=1920,width=1080,top=0,left=0,toolbar=no,menubar=no,scrollbars=no,location=no, status=no')
         							}) 				
 						}
 					})//device获取videourl
@@ -848,6 +860,9 @@
 
         // 订阅注册事件
 	 this.vertoHandle.subscribe("FSevent.add_schedule",{handler:function(v,e){console.log(v,e)}.bind(this)});
+	 this.vertoHandle.subscribe("FSevent.del_schedule",{handler:function(v,e){console.log(v,e)}.bind(this)});
+	 this.vertoHandle.subscribe("FSevent.exe_schedule",{handler:function(v,e){console.log(v,e)}.bind(this)});
+	 this.vertoHandle.subscribe("FSevent.re_schedule",{handler:function(v,e){console.log(v,e)}.bind(this)});
         this.vertoHandle.subscribe("FSevent.custom::sofia::expire",{handler: this.handleExpire.bind(this)});
         this.vertoHandle.subscribe("FSevent.custom::sofia::register", {handler: this.handleFSEventRegister.bind(this)});
         // 订阅取消注册事件

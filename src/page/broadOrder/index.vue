@@ -16,6 +16,18 @@
                 <el-form-item label="预案名称">
                   <el-input v-model="detailData.planname"></el-input>
                 </el-form-item>
+                <el-form-item label="播放文件类型">
+                  <el-input v-model="detailData.cmdtype"></el-input>
+                </el-form-item>
+                <el-form-item label="预案时间">
+                  <el-input v-model="detailData.planpretime"></el-input>
+                </el-form-item>
+                <el-form-item label="预案周期">
+                  <el-input v-model="detailData.period/86400"></el-input>
+                </el-form-item>
+                <el-form-item label="播放文件">
+                  <el-input v-model="detailData.planname"></el-input>
+                </el-form-item>
               </el-form> 
               <span slot="footer" class="dialog-footer">
                 <el-button @click="diaReturn"><span style="color: #333;">取 消</span></el-button>
@@ -42,7 +54,7 @@
               <tr @click="selectClick(index, plan)" v-for="(plan, index) in showPlanData">
                 <td>{{ plan.planname }}</td>
                 <!-- <td>{{ plan.planpremodel == 1 ? '定时预约' : ''}}</td> -->
-                <td>{{ plan.planpretime }}</td>
+                <td>{{ dateToStr(plan.planpretime) }}</td>
                 <!-- <td>{{ plan.planmodel == 1 ? '循环播放' : '按次播放' }}</td>
                 <td>{{ plan.plantime }}</td> -->
                 <td>{{broad}}</td>
@@ -89,6 +101,9 @@
         showPlanData: [],
         dialogVisible: false,
         detailData: '',     
+	instance : this.$ajax.create({
+            baseURL: 'https://scc.ieyeplus.com:8001/'
+      }),
       }
     },
     created() {
@@ -115,55 +130,81 @@
       confirmDialog
     },
     methods: {
+      dateToStr( datetime ) {
+	datetime = new Date(datetime)
+	var year = datetime.getFullYear(),
+	month = datetime.getMonth()+1,
+	date = datetime.getDate(),
+	hour = datetime.getHours(),
+	minutes = datetime.getMinutes(),
+	second = datetime.getSeconds();
+	if ( month < 10 ) {
+		month = "0" + month;
+	}
+	if ( date < 10 ) {
+		date = "0" + date;
+	}
+        if ( hour < 10 ) {
+		hour = "0" + hour;
+	}
+	if ( minutes < 10 ) {
+		minutes = "0" + minutes;
+	}
+	if ( second < 10 ) {
+		second = "0" + second;
+	}
+	return (year+"-"+month+"-"+date+" "+hour+":"+minutes+":"+second);
+      },
       refresh() {
-        this.$ajax.post('Plan/List',{pageIndex:1,pageSize:1000})
+       this.instance({
+	  method: 'post',
+          url : '/Plan/List',
+	  data:{pageIndex:0,pageSize:1000}}) 
           .then(res => {
-            if(res.data.code == 1 && res.data.result!=null) {
-              console.log("success");
-              this.showPlanData = res.data.result
-              console.log("The result is :",res.data.result); 
-              this.showPlanData = this.showPlanData.reverse()
-              console.log("The showPlanData is:",this.showPlanData)
-              let i = 0;
-              let j = 0;
-              let sum = 1;
-              let sum_show = 1;
-              console.log("The length is:",res.data.result.length)
-              for( i = 1; i<res.data.result.length;  i++) {
-               console.log("",this.showPlanData[i].planname);  
-               if (this.showPlanData[i].planname != this.showPlanData[i-1].planname) {
-                  sum_show++;
-                } 
-              }
-              console.log("The sum_show is:",sum_show)
-              let sum_array = []
-              sum_array.length = sum_show
-              for( i = 0; i < sum_show; i++) {
-                sum_array[i] = 1
-              }
-              // this.showPlanData.length = sum_show
-              console.log("The sum_array's length is:",sum_array.length)
-              for( i = 1, j = 0; i<res.data.result.length; i++) {
-                if(res.data.result[i].planname == res.data.result[i-1].planname){
-                  sum_array[j]++
-                }else {
-                  j++
+            if(res.data.code == 1 ) {
+              if(res.data.result!=null && res.data.result.length>0) {
+                console.log("success");
+                this.showPlanData = res.data.result
+                console.log("The result is :",res.data.result); 
+                this.showPlanData = this.showPlanData.reverse()
+		this.showPlanData.sort((a,b)=>{return Date(b.planpretime) - Date(a.planpretime)})
+                console.log("The showPlanData is:",this.showPlanData)
+                let i = 0;
+                let j = 0;
+                let sum = 1;
+                let sum_show = 1;
+                for( i = 1; i<res.data.result.length;  i++) {
+                  console.log("",this.showPlanData[i].planname);  
+                  if (this.showPlanData[i].planname != this.showPlanData[i-1].planname) {
+                    sum_show++;
+                  } 
                 }
-              }
-              console.log("The sum_array is:",sum_array)
-              console.log("THE SHOWPLANDATA IS:",this.showPlanData) 
-              for( i = 0, j = 0; i<sum_array.length; i++, j=j+sum_array[i-1]) {
-                this.showPlanData[i] = res.data.result[j]
-                if(i+sum == res.data.result.length) {
-                  this.showPlanData.splice(j+1,res.data.result.length-j-1)
+                let sum_array = []
+                sum_array.length = sum_show
+                for( i = 0; i < sum_show; i++) {
+                  sum_array[i] = 1
                 }
-              }
-              this.showPlanData.length = sum_show 
+                for( i = 1, j = 0; i<res.data.result.length; i++) {
+                  if(res.data.result[i].planname == res.data.result[i-1].planname){
+                    sum_array[j]++
+                  }else {
+                    j++
+                  }
+                }
+                for( i = 0, j = 0; i<sum_array.length; i++, j=j+sum_array[i-1]) {
+                  this.showPlanData[i] = res.data.result[j]
+                  if(i+sum == res.data.result.length) {
+                    this.showPlanData.splice(j+1,res.data.result.length-j-1)
+                  }
+                }
+                this.showPlanData.length = sum_show
+              }else {
+                this.showPlanData = [] 
+              } 
             }else {
               console.log("failed");
             }
           })
-         
       },
       selectClick(index, plan) {
         let target = $(".table>tbody>tr").eq(index)
@@ -211,17 +252,13 @@
       },
       confirm(){
         let ids = []
-        let idx = []
-        let xxx = this.xPlanData
         this.selectPlan.forEach(function(s, i) {
           ids.push(s.planid)
-          xxx.forEach(function(m, n) {
-            if(s.planrpretime == m.time) idx.push(m.id)
-          })
         })
         let _this = this
-        idx.forEach(function(s, i) {
-          console.log("qwer")
+        ids.forEach(function(s, i) {
+          console.log("delete_freeswitch_scheds")
+          console.log(s)
           _this.$ajax.get("https://scc.ieyeplus.com:8082/api/deletescheds/"+s)
             .then(res => { 
             })

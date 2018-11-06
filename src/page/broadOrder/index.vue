@@ -149,7 +149,7 @@
         formLabelWidth: '120px',
         dList: [],
         pList: [],
-        deviceList: [],
+        // deviceList: [],
         showPeriod: '',
         selectDevice: [], 
         unselectDevice: [],   
@@ -197,6 +197,7 @@
         currentLoginUser: 'currentLoginUser',
         dialogShow: 'dialogShow',
 	get_user_info: GET_USER_INFO,
+        // deviceList:'deviceList',
       }),
     },
     components: {
@@ -291,7 +292,7 @@
               this.playList = result
             }
           })  
-       this.vertoHandle.sendMethod("jsapi",{command:"fsapi", data:{cmd:"show", arg:"registrations as xml"}},
+       /* this.vertoHandle.sendMethod("jsapi",{command:"fsapi", data:{cmd:"show", arg:"registrations as xml"}},
           function(data) {
             const parser = new DOMParser();
             const doc = parser.parseFromString(data.message, "text/xml");
@@ -328,7 +329,7 @@
         // 订阅注册事件
         this.vertoHandle.subscribe("FSevent.custom::sofia::register", {handler: this.handleFSEventRegister.bind(this)});
         // 订阅取消注册事件
-        this.vertoHandle.subscribe("FSevent.custom::sofia::unregister", {handler: this.handleFSEventRegister.bind(this)});  
+        this.vertoHandle.subscribe("FSevent.custom::sofia::unregister", {handler: this.handleFSEventRegister.bind(this)}); */ 
       },
       handleFSEventRegister(v, e) {
         let _this = this;
@@ -390,6 +391,46 @@
         }
       },
       orderDetail(item) {
+        console.log("The vertoHandle is:",this.vertoHandle)        
+        this.vertoHandle.sendMethod("jsapi",{command:"fsapi", data:{cmd:"show", arg:"registrations as xml"}},
+          function(data) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(data.message, "text/xml");
+            const msg = parseXML(doc);
+
+            let registrations = [];
+            let deviceList = []
+            if(msg) {
+              if (isArray(msg.row)) {
+                registrations = msg.row;
+              } else if (isObject(msg.row)) {
+                registrations.push(msg.row);
+              } else if (isArray(msg)) {
+                registrations = msg;
+              } else if (isObject(msg)) {
+                registrations.push(msg);
+              }
+            }
+
+            registrations.forEach(function(r) {
+              let user = {}
+              user.deviceState = "registered"
+              user.userid = r.reg_user
+              user.callDirection = null
+              user.selected = false
+              deviceList.push(user)
+            })
+            if (deviceList.length) this.deviceList = deviceList
+
+          }.bind(this),function(data) {
+            console.log("error:"+data)
+          }.bind(this))
+
+        // 订阅注册事件
+        this.vertoHandle.subscribe("FSevent.custom::sofia::register", {handler: this.handleFSEventRegister.bind(this)});
+        // 订阅取消注册事件
+        this.vertoHandle.subscribe("FSevent.custom::sofia::unregister", {handler: this.handleFSEventRegister.bind(this)});
+
         this.instance({
           method: 'get',
           url : '/Plan/Folders/'+item.planid,

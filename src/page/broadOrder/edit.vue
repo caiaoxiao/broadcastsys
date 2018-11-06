@@ -126,12 +126,18 @@
       <div class="settingMoudle">
         <div class="settingTitle">循环周期</div>
         <div class="settingCon">
-          <span class="times" @click="subtract">-</span>
+        <span class="times" @click="subtract">-</span>
           <input type="text" v-model="cycleIndex" class="cycleIndex"/>
           <span class="times" @click="add">+</span>
           <span>天</span>
-        </div>
-
+         <!--        <el-dropdown style="top:0px;background-color:#333">
+                   <button type="button" class="btn btn-sm btn-info">循环周期选择<i class="el-icon-arrow-down el-icon--right"></i></button>
+                   <el-dropdown-menu slot="dropdown">
+                     <el-dropdown-item><span style="color:#333">每周播放</span></el-dropdown-item>
+                     <el-dropdown-item><span style="color:#333">每天播放</span></el-dropdown-item> 
+                   </el-dropdown-menu>
+                 </el-dropdown> --> 
+        </div> 
       </div>
       <div class="settingMoudle">
         <div class="settingTitle">循环次数(-1为循环播放)</div>
@@ -191,10 +197,10 @@
           CreateUserID: '133585596bb04c9cbe311d0859dd7196',
           PlanName: '',
           PlanPreModel: 1,
-          PlanModel: 2,
+          planmodel: 0,
           PlanPreTime: new Date(),
           PlanActualTxt: '',
-          Files: [],         // 已勾选的歌单
+          folders: [],         // 已勾选的歌单
           deviceId: '1005',
           FeatureBases: [],
           FeatureCode: [],
@@ -214,7 +220,7 @@
         broad: '',
         dialogShow: false,
         dialogText: null,
-      }
+	}
     },
     created() {
       this.$nextTick(function() {
@@ -358,24 +364,17 @@
         }
       },
       selectSonglist(songlist){
-
+        console.log("The vertoHandle is:",this.vertoHandle) 
 
         if(!songlist.selected) {
-            
-           songlist.Files.forEach(function(c,i) {
-            this.formData.Files.push(c);
-            this.selectSongList.push(c);
-           }.bind(this))
+           this.formData.folders.push(songlist)   
+           this.selectSongList.push(songlist);
            
         }else {
           this.selectSongList.forEach(function(c,i) {
             if(songlist.FolderID == c.FolderID) {
               this.selectSongList.splice(i, 1)
-            }
-          }.bind(this))
-          this.formData.Files.forEach(function(c,i) {
-            if(songlist.FolderID == c.FolderID) {
-              this.formData.Files.splice(i, 1)
+              this.formData.folders.splice(i, 1)
             }
           }.bind(this))
         }
@@ -431,6 +430,7 @@
         this.dialogShow = false
       },
       submitPlan() {
+        console.log(this.selectSongList)  
 	Date.prototype.format = function(format)
 {
  var o = {
@@ -459,9 +459,11 @@
         this.xData.meeting = this.broad
         if(this.xData.cmdtype == 1) {
            this.selectSongList.forEach(function(c,i) {
-	     let mediapath = c.mediapath.split('/')
-             path = path + ' ' + mediapath[mediapath.length-1] 
-           }.bind(this))
+              c.Files.forEach(function(s,j) {
+	       let mediapath = s.mediapath.split('/')
+               path = path + ' ' + mediapath[mediapath.length-1]
+             }.bind(this))   
+           }.bind(this))  
            this.xData.path = path
         }
 	/*
@@ -492,8 +494,7 @@
                 s.deviceid = s.userid;
               }.bind(this))
               this.formData.FeatureBases = this.selectDevice
-              console.log("777777");
-              console.log(this.formData.Files[0]); 
+              this.formData.planmodel=this.cycleTime
                 this.$ajax.post('Plan/Create', Object.assign(this.formData,this.xData))
                   .then((res) => {
                     if(res.data.code == 1) {
@@ -505,16 +506,14 @@
                 device_ids+="-"
                 device_ids+=element.userid
               })
-		      this.$ajax.get('https://scc.ieyeplus.com:8082/api/scheds/'+res.data.result.planid+'%'+device_ids+'%'+this.cycleTime)
+		let planid = res.data.result.planid
+		this.$ajax.get('https://scc.ieyeplus.com:8082/api/scheds/'+ planid+'%'+device_ids+'%'+this.cycleTime)
                       //this.$ajax.post(''+res.data.result.planid) 
                       this.$emit('close',1)
                     }else {
                       console.log(res)
                     }
                   })
-         
-
-            
           }
         }
       },

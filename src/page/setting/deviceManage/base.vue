@@ -41,6 +41,7 @@ export default {
         this.$ajax.post('Basic/List')
           .then(res => {
 	  console.log(res)
+	    console.log(res.data.code,res.data.result.length)
             if (res.data.code === 1 && res.data.result.length>0) {
               this.formData.uniqueid = res.data.result[0].uniqueid
 	      this.formData.basicid  = res.data.result[0].basicid

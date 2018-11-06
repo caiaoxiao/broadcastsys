@@ -18,7 +18,8 @@ const routes = [
         path: '/',
         redirect: '/voiceCall',
         component: _import('home/index'),
-        children: [{
+        children: [
+            {
                 path: '/voiceCall',
                 name: '语音通话',
                 component: _import('voiceCall/index'),
@@ -43,6 +44,11 @@ const routes = [
 	        name: '对讲',
 	        component: _import('radio/index'),
 		                },
+	    {
+                path: '/alarm',
+                name: '视频联动',
+                component: _import('alarm/index'),
+                                },
             {
                 path: '/broadOrder',
                 name: '广播预约',

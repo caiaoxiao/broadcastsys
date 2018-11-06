@@ -36,10 +36,14 @@
               <td>告警号码</td>
               <td>语音呼叫号码</td>
               <td>广播号码</td>
-              <td>会议呼叫号码</td>
+              <td>会议呼叫号码
+	     </td>
               <td>值班电话号码  
              <button type="button" class="btn btn-sm btn-info watcher"  @click = "enable_watcher==true?editWatcher():setWatcherState(true)" > {{enable_watcher==true?"修改值班电话":"启用值班模式"}}</button>
                 <button type="button" v-if = "enable_watcher"  class="btn btn-sm btn-info watcher"  @click = "setWatcherState(false)" > {{"关闭值班模式"}}</button>  
+              </td>
+	      <td>视频告警联动模式
+	      <button type="button" class="btn btn-sm btn-info alarm_control"  @click = "changeAlarmControl()" > 修改</button>
               </td>
             </tr>
           </thead>
@@ -51,6 +55,7 @@
               <td>{{broad}}</td>
               <td>{{meeting}}</td>
               <td  :contenteditable = "contenteditable" @blur="()=>{this.editwatcher = false ;this.contenteditable = false}" @keydown.13 = "editWatcherFinished($event)" v-focus = "editwatcher" >{{enable_watcher==true?watcher:""}}</td>
+	      <td> {{alarm_control=="popup"?"弹窗模式":"路由模式"}} </td>
             </tr>
           </tbody>
         </table>
@@ -193,6 +198,7 @@ export default {
       instance : this.$ajax.create({
    			 baseURL: 'https://scc.ieyeplus.com:8001/'
       }),
+      alarm_control:"",
       contenteditable:false,
       editwatcher:false,
     }
@@ -242,6 +248,22 @@ export default {
     this.OrgUrl = 'Organization/TreeRoot/' + this.$store.state.user_info.user.organizationid
   },
   methods: {  //  组织机构树默认选中
+    changeAlarmControl(){
+	if(this.alarm_control=="popup")
+	this.alarm_control = "router"
+ 	else
+	this.alarm_control = "popup"	
+	this.instance({
+          method: 'post',
+          url: '/alarm_control/update/'+ this.transferdata.targetMenuId,
+          data:{
+            alarm_control:this.alarm_control 
+          }           
+          }).then((res)=>{
+          console.log("alarm_control更新成功")
+          })
+
+    },
     editWatcherFinished(event){
        this.editwatcher = false
        event.target.contentEditable = "false"
@@ -299,7 +321,6 @@ export default {
     		this.voice = res.data.result.voicecallid
     		this.alarm = res.data.result.alarmid
     		this.broad = res.data.result.broadid
-		
 		this.instance({
     			method: 'get',
     		        url: '/organization/'+ this.transferdata.targetMenuId,
@@ -307,6 +328,15 @@ export default {
     			this.watcher = res.data.watcher
 		        this.enable_watcher = res.data.enable_watcher
 		})
+		this.instance({
+                        method: 'get',
+                        url: '/alarm_control/'+ this.transferdata.targetMenuId,
+                        }).then((res)=>{
+			if(res.data.alarm_control=="popup")
+                        this.alarm_control = "popup" 
+			else
+			this.alarm_control = "router"
+                })
           }
       })
       this.$ajax.get(`Feature/getFeatureByOrg/${this.targetMenu.organizationid}`)

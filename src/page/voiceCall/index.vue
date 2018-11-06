@@ -96,8 +96,6 @@
       </div>
     </div>
     <right-phone></right-phone>
-    <device-list></device-list>
-    <switchs></switchs>
   </div>
 </template>
 

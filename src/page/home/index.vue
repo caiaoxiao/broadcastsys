@@ -40,7 +40,6 @@
     created() {
       this.$nextTick(()=> {
 	  getHeights()
-	  console.log(this.get_user_info)
 	  this.orgid = this.get_user_info.user.organizationid  
 	  this.username = this.get_user_info.user.username
           this.verto = this.get_user_info.freeswitchData.VertoID
@@ -294,7 +293,7 @@
                       device.forEach(function(user) {
                             if(user.userID == args.data[1])  {
                                 user.deviceState = 'active'
-			        user.calling = liveArrayObj.name.slice(0,liveArrayObj.name.indexOf('-'))
+			          	user.calling = liveArrayObj.name.slice(0,liveArrayObj.name.indexOf('-'))
 			       if(user.timer.clock == false){
                                 var t = setInterval(()=>{
                                  user.timer.s+=1
@@ -331,15 +330,37 @@
           .then(res=>{
 					if (res.data.code === 1 && res.data.result.length>0){ 
 								let basic_id = res.data.result[0].uniqueid
+								let alarm_devices  = [] 
 							        _this.instance({
         								method: 'get',
         								url: '/organization/'+ _this.orgid,
     								}).then((res)=>{
         								if(deviceCode!=res.data.watcherid)
 									{
-								let url = "https://scc.ieyeplus.com:8432/"+ basic_id  
-                                                                window.open(url,'newwindow','height=1920,width=1080,top=0,left=0,toolbar=no,menubar=no,scrollbars=no,location=no, status=no')
+								        arr.forEach((de)=>{
+									if(de.caller_id_number!=_this.verto)
+									alarm_devices.push(de.caller_id_number)
+								})
 									}
+									else{
+								arr.forEach((de)=>{
+									if(de.caller_id_number!=deviceCode && de.caller_id_number!=_this.verto)
+                                                                        alarm_devices.push(de.caller_id_number)
+                                                                })
+								}
+								_this.instance({
+                                                                        method: 'get',
+                                                                        url: '/alarm_control/'+ _this.orgid,
+                                                                }).then((res)=>{
+								let url = "https://scc.ieyeplus.com:8432/"+ basic_id + alarm_devices.join('|')
+								if(res.data.alarm_control == 'popup'){
+                                                                window.open(url,'newwindow','height=1920,width=1080,top=0,left=0,toolbar=no,menubar=no,scrollbars=no,location=no, status=no')
+								}
+								else{
+								console.log('router')
+								_this.$store.dispatch('setAlarmAddress',url)	
+								}
+									})
         							}) 				
 						}
 					})//device获取videourl
@@ -363,7 +384,6 @@
                       // Existing user's state changed (mute/unmute, talking, floor, etc)
                       case "modify":
                         console.log('conference user changed')
-			//console.log(args)
 			var data = JSON.parse(args.data[4])
                         if(arr.length == 0 ||  arr.every(function(item,index,array){return item.key!=args.key}))
                         {
@@ -533,7 +553,6 @@
                               this.$ajax.all(axios)
                               .then(res => {
                                     for (let i = 0 ; i<res.length ; i++){
-                                    console.log(res[i].data.result) 
                                     let group  = res[i]?res[i].data.result.deviceGroups:[]
                                     group.forEach((r,i)=>{
                                       if(this.usermap.hasOwnProperty(r.devicecode)){
@@ -629,7 +648,6 @@
                                             arr = this.$store.getters.confMeeting
                                             break
                                             }
-					  console.log(data)
                                           let conferences = data.message.split('\n')
                                           conferences.forEach( (element,index) => {
                                           if( element!= ""){
@@ -773,7 +791,6 @@
                                             arr = this.$store.getters.confMeeting
                                             break
                                             }
-					  console.log(data)
                                           let conferences = data.message.split('\n')
                                           conferences.forEach( (element,index) => {
                                           if( element!= ""){

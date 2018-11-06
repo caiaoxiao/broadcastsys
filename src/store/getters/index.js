@@ -101,4 +101,7 @@ export default {
   userGroup: state=> {
     return  state.userGroup
   },
+  alarmAddress: state=> {
+    return  state.alarmAddress
+  },
 }

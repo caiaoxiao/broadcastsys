@@ -40,7 +40,6 @@
     created() {
       this.$nextTick(()=> {
 	  getHeights()
-	  console.log(this.get_user_info)
 	  this.orgid = this.get_user_info.user.organizationid  
 	  this.username = this.get_user_info.user.username
           this.verto = this.get_user_info.freeswitchData.VertoID
@@ -349,9 +348,19 @@
                                                                         alarm_devices.push(de.caller_id_number)
                                                                 })
 								}
-								console.log(alarm_devices)
-								let url = "http://scc.ieyeplus.com:8432/"+ basic_id + alarm_devices.join('|')
+								_this.instance({
+                                                                        method: 'get',
+                                                                        url: '/alarm_control/'+ _this.orgid,
+                                                                }).then((res)=>{
+								let url = "https://scc.ieyeplus.com:8432/"+ basic_id + alarm_devices.join('|')
+								if(res.data.alarm_control == 'popup'){
                                                                 window.open(url,'newwindow','height=1920,width=1080,top=0,left=0,toolbar=no,menubar=no,scrollbars=no,location=no, status=no')
+								}
+								else{
+								console.log('router')
+								_this.$store.dispatch('setAlarmAddress',url)	
+								}
+									})
         							}) 				
 						}
 					})//device获取videourl
@@ -375,7 +384,6 @@
                       // Existing user's state changed (mute/unmute, talking, floor, etc)
                       case "modify":
                         console.log('conference user changed')
-			//console.log(args)
 			var data = JSON.parse(args.data[4])
                         if(arr.length == 0 ||  arr.every(function(item,index,array){return item.key!=args.key}))
                         {
@@ -545,7 +553,6 @@
                               this.$ajax.all(axios)
                               .then(res => {
                                     for (let i = 0 ; i<res.length ; i++){
-                                    console.log(res[i].data.result) 
                                     let group  = res[i]?res[i].data.result.deviceGroups:[]
                                     group.forEach((r,i)=>{
                                       if(this.usermap.hasOwnProperty(r.devicecode)){
@@ -641,7 +648,6 @@
                                             arr = this.$store.getters.confMeeting
                                             break
                                             }
-					  console.log(data)
                                           let conferences = data.message.split('\n')
                                           conferences.forEach( (element,index) => {
                                           if( element!= ""){
@@ -785,7 +791,6 @@
                                             arr = this.$store.getters.confMeeting
                                             break
                                             }
-					  console.log(data)
                                           let conferences = data.message.split('\n')
                                           conferences.forEach( (element,index) => {
                                           if( element!= ""){
@@ -859,10 +864,6 @@
           }.bind(this))
 
         // 订阅注册事件
-	 this.vertoHandle.subscribe("FSevent.add_schedule",{handler:function(v,e){console.log(v,e)}.bind(this)});
-	 this.vertoHandle.subscribe("FSevent.del_schedule",{handler:function(v,e){console.log(v,e)}.bind(this)});
-	 this.vertoHandle.subscribe("FSevent.exe_schedule",{handler:function(v,e){console.log(v,e)}.bind(this)});
-	 this.vertoHandle.subscribe("FSevent.re_schedule",{handler:function(v,e){console.log(v,e)}.bind(this)});
         this.vertoHandle.subscribe("FSevent.custom::sofia::expire",{handler: this.handleExpire.bind(this)});
         this.vertoHandle.subscribe("FSevent.custom::sofia::register", {handler: this.handleFSEventRegister.bind(this)});
         // 订阅取消注册事件
@@ -940,7 +941,6 @@
         }, success_cb, failed_cb);
       },
       handleFSEventChannel(v, e) {
-	console.log(e)
         let callDirection = e.data["Call-Direction"];            //入栈还是出栈
         let callerNumber = e.data["Caller-Caller-ID-Number"];    //主叫号码
         let calleeNumber = e.data["Caller-Callee-ID-Number"];  //被叫号码

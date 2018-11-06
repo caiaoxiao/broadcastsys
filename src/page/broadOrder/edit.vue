@@ -197,10 +197,10 @@
           CreateUserID: '133585596bb04c9cbe311d0859dd7196',
           PlanName: '',
           PlanPreModel: 1,
-          PlanModel: 2,
+          planmodel: 0,
           PlanPreTime: new Date(),
           PlanActualTxt: '',
-          Files: [],         // 已勾选的歌单
+          folders: [],         // 已勾选的歌单
           deviceId: '1005',
           FeatureBases: [],
           FeatureCode: [],
@@ -364,24 +364,17 @@
         }
       },
       selectSonglist(songlist){
-
+        console.log("The vertoHandle is:",this.vertoHandle) 
 
         if(!songlist.selected) {
-            
-           songlist.Files.forEach(function(c,i) {
-            this.formData.Files.push(c);
-            this.selectSongList.push(c);
-           }.bind(this))
+           this.formData.folders.push(songlist)   
+           this.selectSongList.push(songlist);
            
         }else {
           this.selectSongList.forEach(function(c,i) {
             if(songlist.FolderID == c.FolderID) {
               this.selectSongList.splice(i, 1)
-            }
-          }.bind(this))
-          this.formData.Files.forEach(function(c,i) {
-            if(songlist.FolderID == c.FolderID) {
-              this.formData.Files.splice(i, 1)
+              this.formData.folders.splice(i, 1)
             }
           }.bind(this))
         }
@@ -437,6 +430,7 @@
         this.dialogShow = false
       },
       submitPlan() {
+        console.log(this.selectSongList)  
 	Date.prototype.format = function(format)
 {
  var o = {
@@ -465,9 +459,11 @@
         this.xData.meeting = this.broad
         if(this.xData.cmdtype == 1) {
            this.selectSongList.forEach(function(c,i) {
-	     let mediapath = c.mediapath.split('/')
-             path = path + ' ' + mediapath[mediapath.length-1] 
-           }.bind(this))
+              c.Files.forEach(function(s,j) {
+	       let mediapath = s.mediapath.split('/')
+               path = path + ' ' + mediapath[mediapath.length-1]
+             }.bind(this))   
+           }.bind(this))  
            this.xData.path = path
         }
 	/*
@@ -498,8 +494,7 @@
                 s.deviceid = s.userid;
               }.bind(this))
               this.formData.FeatureBases = this.selectDevice
-              console.log("777777");
-              console.log(this.formData.Files[0]); 
+              this.formData.planmodel=this.cycleTime
                 this.$ajax.post('Plan/Create', Object.assign(this.formData,this.xData))
                   .then((res) => {
                     if(res.data.code == 1) {

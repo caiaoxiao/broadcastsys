@@ -53,5 +53,6 @@ export default {
   // 控制播放音乐或者录音的路径
   mediaPath: '111',
   // 是否订阅会议回调
-  use_livearray: false
+  use_livearray: false,
+  alarmAddress:"",
 }

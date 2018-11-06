@@ -102,4 +102,7 @@ export default {
   setUserGroup({ commit }, data) {
     commit('SET_USER_GROUP', data)
   },
+  setAlarmAddress({ commit }, data) {
+    commit('SET_ALARM_ADDRESS', data)
+  },
 }

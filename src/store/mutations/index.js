@@ -103,4 +103,7 @@ export default {
   SET_USER_GROUP: (state, data) => {
     state.userGroup = data
   },
+  SET_ALARM_ADDRESS: (state, data) => {
+    state.alarmAddress = data
+  },
 }

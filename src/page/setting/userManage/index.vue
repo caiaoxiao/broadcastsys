@@ -251,8 +251,10 @@ export default {
     changeAlarmControl(){
 	if(this.alarm_control=="popup")
 	this.alarm_control = "router"
- 	else
+ 	else{
 	this.alarm_control = "popup"	
+	this.$store.dispatch("setAlarmAddress","")
+	}
 	this.instance({
           method: 'post',
           url: '/alarm_control/update/'+ this.transferdata.targetMenuId,

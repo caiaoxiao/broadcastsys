@@ -330,6 +330,7 @@
           .then(res=>{
 					if (res.data.code === 1 && res.data.result.length>0){ 
 								let basic_id = res.data.result[0].uniqueid
+								if(basic_id=="") return 
 								let alarm_devices  = [] 
 							        _this.instance({
         								method: 'get',
@@ -357,8 +358,8 @@
                                                                 window.open(url,'newwindow','height=1920,width=1080,top=0,left=0,toolbar=no,menubar=no,scrollbars=no,location=no, status=no')
 								}
 								else{
-								console.log('router')
 								_this.$store.dispatch('setAlarmAddress',url)	
+								_this.$router.push('/alarm')
 								}
 									})
         							}) 				

@@ -494,6 +494,7 @@
                 s.deviceid = s.userid;
               }.bind(this))
               this.formData.FeatureBases = this.selectDevice
+              console.log("this.formData.FeatureBases is:",this.formData.FeatureBases)
               this.formData.planmodel=this.cycleTime
                 this.$ajax.post('Plan/Create', Object.assign(this.formData,this.xData))
                   .then((res) => {

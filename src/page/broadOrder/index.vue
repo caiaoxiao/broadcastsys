@@ -14,7 +14,7 @@
               >
               <el-form ref="form" :model="detailData" label-width="80px">
                 <el-form-item label="预案名称:" :label-width="formLabelWidth">
-                  <el-input v-model="detailData.planname" style="border: 1px solid #dcdfe6;padding: 0 15px;width: 200px"></el-input>
+                  <el-input v-model="detailData.planname" style="border: 1px solid #dcdfe6;padding: 0 15px;width: 200px;color: #fff !important;"></el-input>
                 </el-form-item>
                 <el-form-item label="文件类型:" :label-width="formLabelWidth">
                   <el-input v-model="detailData.cmdtype == 1 ? '音乐播放':'文本播放'" style="border: 1px solid #dcdfe6;padding: 0 15px;width: 200px"></el-input>
@@ -29,7 +29,7 @@
                   <el-input v-model="detailData.planmodel" style="border: 1px solid #dcdfe6;padding: 0 15px;width: 200px"></el-input>
                 </el-form-item>
                 <el-form-item label="播放文件:" :label-width="formLabelWidth">
-                  <el-select v-model="value" style="color: #333;">
+                  <el-select v-model="value" style="color: #333;border: 1px solid #dcdfe6;padding: 0 15px;width: 200px;">
                     <el-option
                       v-for="item in playList"
                       @click="changePList(item)"
@@ -54,16 +54,15 @@
               width="30%"
               >
               <div style="display:block; float:clear;height:200px">
-                <span style="color:#333">未选设备列表</span>
+                <span style="color:#333">未选设备列表（在线）</span>
                 <div class="selectedList">
                   <div class="singleFlies"
-                    :class="device.selected ? 'selected' : ''"
-                    v-for="device in deviceList"
+                    v-for="device in unselectDevice"
                     @click="selectItem(device)">{{device.userid}}</div>
                 </div>
               </div>
               <div style="display:block; float:clear;height:200px"> 
-                <span style="color:#333">已选设备列表</span>
+                <span style="color:#333">已选设备列表（在线）</span>
                 <div class="selectedList">
                   <div class="singleFlies selected"
                     v-for="device in selectDevice"
@@ -98,7 +97,7 @@
                 <td>{{ dateToStr(plan.planpretime) }}</td>
                 <!-- <td>{{ plan.planmodel == 1 ? '循环播放' : '按次播放' }}</td>
                 <td>{{ plan.plantime }}</td> -->
-                <td>{{broad}}</td>
+                <td>{{ plan.deviceids }}</td>
                 <!-- <td>
                   <span @click.stop="nowPlay">立即播放</span>
                 </td> -->
@@ -149,7 +148,7 @@
         formLabelWidth: '120px',
         dList: [],
         pList: [],
-        // deviceList: [],
+        deviceList: [],
         showPeriod: '',
         selectDevice: [], 
         unselectDevice: [],   
@@ -243,6 +242,8 @@
             if(res.data.code == 1 ) {
               if(res.data.result!=null && res.data.result.length>0) {
                 console.log("success");
+                console.log(res.data.result);
+                this.showPlanData = []
                 this.showPlanData = res.data.result
                 this.showPlanData = this.showPlanData.reverse()
 		this.showPlanData.sort((a,b)=>{return Date(b.planpretime) - Date(a.planpretime)})
@@ -292,44 +293,6 @@
               this.playList = result
             }
           })  
-       /* this.vertoHandle.sendMethod("jsapi",{command:"fsapi", data:{cmd:"show", arg:"registrations as xml"}},
-          function(data) {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(data.message, "text/xml");
-            const msg = parseXML(doc);
-
-            let registrations = [];
-            let deviceList = []
-            if(msg) {
-              if (isArray(msg.row)) {
-                registrations = msg.row;
-              } else if (isObject(msg.row)) {
-                registrations.push(msg.row);
-              } else if (isArray(msg)) {
-                registrations = msg;
-              } else if (isObject(msg)) {
-                registrations.push(msg);
-              }
-            }
-
-            registrations.forEach(function(r) {
-              let user = {}
-              user.deviceState = "registered"
-              user.userid = r.reg_user
-              user.callDirection = null
-              user.selected = false
-              deviceList.push(user)
-            })
-            if (deviceList.length) this.deviceList = deviceList
-
-          }.bind(this),function(data) {
-            console.log("error:"+data)
-          }.bind(this))
-
-        // 订阅注册事件
-        this.vertoHandle.subscribe("FSevent.custom::sofia::register", {handler: this.handleFSEventRegister.bind(this)});
-        // 订阅取消注册事件
-        this.vertoHandle.subscribe("FSevent.custom::sofia::unregister", {handler: this.handleFSEventRegister.bind(this)}); */ 
       },
       handleFSEventRegister(v, e) {
         let _this = this;
@@ -387,19 +350,18 @@
         $('#aa').toggle()
         if(type == 1) {
           this.refresh()
-
         }
       },
       orderDetail(item) {
-        console.log("The vertoHandle is:",this.vertoHandle)        
+      if(this.detailData!=''){
+        this.showPeriod = (item.period)/86400
         this.vertoHandle.sendMethod("jsapi",{command:"fsapi", data:{cmd:"show", arg:"registrations as xml"}},
           function(data) {
             const parser = new DOMParser();
             const doc = parser.parseFromString(data.message, "text/xml");
             const msg = parseXML(doc);
-
+	    this.deviceList = []
             let registrations = [];
-            let deviceList = []
             if(msg) {
               if (isArray(msg.row)) {
                 registrations = msg.row;
@@ -411,17 +373,15 @@
                 registrations.push(msg);
               }
             }
-
-            registrations.forEach(function(r) {
+	    
+            registrations.forEach((s,i)=> {
               let user = {}
               user.deviceState = "registered"
-              user.userid = r.reg_user
+              user.userid = s.reg_user
               user.callDirection = null
               user.selected = false
-              deviceList.push(user)
+              this.deviceList.push(user)
             })
-            if (deviceList.length) this.deviceList = deviceList
-
           }.bind(this),function(data) {
             console.log("error:"+data)
           }.bind(this))
@@ -446,6 +406,7 @@
         .then((res) => {
           this.dList = res.data
           let _this = this 
+          this.selectDevice = []
           this.deviceList.forEach(function(s,i){
             _this.dList.forEach(function(c,j){
               if(s.userid == c){
@@ -453,27 +414,41 @@
               }
             }) 
           })
-          this.unselectDevice = this.deviceList
-          this.unselectDevice.forEach(function(s,i) {
-            _this.dList.forEach(function(c,j){
-              if(s.userid == c) {
-                _this.unselectDevice.splice(i,1)
+          this.unselectDevice = [] 
+	  this.deviceList.forEach((item)=>{
+	  this.unselectDevice.push(item)
+	  })
+	  for(let i = 0;i < this.unselectDevice.length;i++){
+	  for(let j = 0;j < this.dList.length;j++){
+              if(this.unselectDevice[i].userid == this.dList[j]) {
+                this.unselectDevice.splice(i,1)
+		i-=1
+		continue
               }
-            })
-          })
+            }
+          }
         })
         this.dialogVisible = true
+        } else{
+          this.$message('请选择想要查看的预约！');
+        }   
       },
       diaConfirm(detailData) {
-        this.selectDevice = []
         this.$ajax.get("https://scc.ieyeplus.com:8082/api/deletescheds/"+detailData.planid)   
-          .then(res => {
-          })
-        this.$ajax.post('Plan/RemoveList', detailData.planid)
-          .then(res => {
-          }) 
+          .then(re => {
+	})
+        this.$ajax.post('Plan/RemoveList', [detailData.planid])
+          .then(re => {
+            if(re.data.code == 1) {
+              console.log("delete_success")  
+            } else{
+              console.log("failed")
+            } 
         this.returnData=this.detailData
         this.returnData.FeatureBases=this.selectDevice   
+        this.returnData.FeatureBases.forEach(function(s,i) {
+          s.deviceid=s.userid
+        }) 
         let _this = this
         this.playList.forEach(function(s,i){
             if(s.folderid == _this.value){
@@ -486,7 +461,7 @@
         this.$ajax.post('Plan/Create', this.returnData)
           .then((res) => {
             if(res.data.code == 1) {
-              console.log("success");
+              console.log("create_success");
               let device_ids = ""
               this.selectDevice.forEach((element,i) => {
                 if(i!=0)
@@ -501,7 +476,11 @@
           })
         this.dialogVisible = false   
         this.showPlanData = ''
+        this.deviceList = []
+        this.selectDevice = []
+        this.unselectDevice = []
         this.refresh()
+	})
       },
       diaReturn() {
         this.dialogVisible = false  
@@ -569,5 +548,14 @@
 <style>
   #elsel span {
     color: #333 !important;
+  }
+  .el-dialog {
+    background-color: #4e545a !important;
   } 
+  .el-input input {
+    color: #fff !important;
+  }
+  label {
+    color: #fff !important;
+  }
 </style>

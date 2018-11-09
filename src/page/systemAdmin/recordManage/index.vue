@@ -8,26 +8,33 @@
           <div class="form-group">
             <label>呼叫时间</label>
             <el-date-picker
+              v-model="value"
+              type="datetimerange"
+              range-separator="至"
+              start-placeholder="开始日期"
+              end-placeholder="结束日期">
+            </el-date-picker> 
+            <!-- <el-date-picker
               v-model="formData.time"
-              type="datetime"
+              type="date"
               placeholder="选择日期时间">
-            </el-date-picker>
+            </el-date-picker> -->
           </div>
           <div class="form-group">
             <label>主叫号码</label>
-            <input type="text" v-model.number="formData.callnumber" class="form-control" style="width:70px;">
+            <input type="text" v-model.number="formData.callernumber" class="form-control" style="width:70px;">
 
           </div>
           <div class="form-group">
             <label>被叫号码</label>
-            <input type="text" v-model.number="formData.callednumber" class="form-control" style="width:70px;">
+            <input type="text" v-model.number="formData.calleenumber" class="form-control" style="width:70px;">
           </div>
           <div class="form-group" @click="typeSwitch">
             <label>文件类型</label>
             <span :class="fileType == '通话录音' ? 'selected' : ''">通话录音</span>
             <span :class="fileType == '会议录音' ? 'selected' : ''">会议录音</span>
           </div>
-          <button @click="refresh" class="btn btn-info"><i class="fa fa-search" aria-hidden="true"></i>查询</button>
+          <button @click="queryRecord()" class="btn btn-info"><i class="fa fa-search" aria-hidden="true"></i>查询</button>
         </form>
       </div>
     </div>
@@ -72,10 +79,12 @@
       return {
         fileType: '通话录音',           // 默认文件类型
         formData: {
-          calleeNumber: '',
-          callNumber: '',
-          startStamp: null,
-          endStamp: null,
+          calleenumber: '',
+          callernumber: '',
+          // startstamp: null,
+          // endstamp: null,
+          BeginTime: null,
+          EndTime: null, 
         },
         dataAll: [], 
         downloadfile: null,
@@ -83,6 +92,7 @@
           baseURL: 'https://scc.ieyeplus.com:8001/'
         }), 
         mediaPath: '',
+        value: '',
       }
     },
     created() {
@@ -113,13 +123,13 @@
             if(res.data.code == 1) {
               this.dataAll = res.data.result
               this.pageData.total = res.data.total
+              console.log("res.data.result is:",res.data.result)
             }
           }.bind(this))
       },
       selectClick(item, index) {
         let target = $(".table>tbody>tr").eq(index)
         this.downloadfile = item 
-        console.log("The recording is:",this.downloadfile)
         var s7 = '';
         if(target.hasClass('selected')) {
           this.mediaPath = ''
@@ -142,10 +152,8 @@
         var audio = document.getElementById("music");
         audio.src = this.mediaPath;
         audio.play();
-        console.log(audio);
       },
       downLoad() {
-        console.log("888888",this.downloadfile);
         if(this.downloadfile == null) {
         }else {
 	/*
@@ -161,6 +169,27 @@
 	window.open(`https://scc.ieyeplus.com:8001/file/download/${this.downloadfile.callid + '.mp3'}`)
         } 
       },
+      queryRecord() {
+        Date.prototype.format = function(format) {  
+          var o = {
+            "M+" : this.getMonth()+1, //month
+            "d+" : this.getDate(),    //day
+            "h+" : this.getHours(),   //hour
+            "m+" : this.getMinutes(), //minute
+            "s+" : this.getSeconds(), //second
+            "q+" : Math.floor((this.getMonth()+3)/3),  //quarter
+            "S" : this.getMilliseconds() //millisecond
+          }
+          if(/(y+)/.test(format)) format=format.replace(RegExp.$1, (this.getFullYear()+"").substr(4 - RegExp.$1.length));
+          for(var k in o) 
+            if(new RegExp("("+ k +")").test(format)) format = format.replace(RegExp.$1,RegExp.$1.length==1 ? o[k] : ("00"+ o[k]).substr((""+ o[k]).length));    
+          return format;
+        }
+        // if(this.formData.time != null && typeof(this.formData.time) != 'string') this.formData.time = this.formData.time.format('yyyy-MM-dd') 
+        this.formData.BeginTime = this.value[0].format('yyyy-MM-dd hh:mm:ss')   
+        this.formData.EndTime = this.value[1].format('yyyy-MM-dd hh:mm:ss') 
+        this.refresh()
+      },   
       typeSwitch(e) {
         this.fileType = e.target.innerText
       },

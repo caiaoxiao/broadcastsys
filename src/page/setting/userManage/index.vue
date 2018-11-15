@@ -368,7 +368,7 @@ export default {
         .then((res) => {
           if (res.data.code === 1) {
             this.allDevices = res.data.result
-	    this.allDevices.sort((x,y)=>{return x.devicecode > y.devicecode}) 
+	    this.allDevices.sort((x,y)=>{return x.devicecode -  y.devicecode}) 
           }
         })
       this.$ajax.post(`Role/List`)
@@ -398,7 +398,7 @@ export default {
 		      console.log(res)
                       for (let i = 0 ; i<length ; i++){
 			if(!this.deviceGroups.some((item)=>{return item.devicegroupid == res[i].data.result.devicegroupid})){
-          res[i].data.result.deviceGroups.sort((x,y)=>{return x.devicecode > y.devicecode})
+          res[i].data.result.deviceGroups.sort((x,y)=>{return x.devicecode - y.devicecode})
           this.deviceGroups.push(res[i].data.result)
           this.deviceGroupsDelete.push(res[i].data.result.devicegroupid)
 		        	}

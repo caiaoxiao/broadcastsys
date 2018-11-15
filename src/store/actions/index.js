@@ -87,6 +87,9 @@ export default {
   setWhetherPlayAnotherSong({ commit }, data) {
     commit('SET_WHETHER_PLAY_ANOTHER_SONG', data)
   },
+  setWhetherPlayAnotherRecord({ commit }, data) {
+    commit('SET_WHETHER_PLAY_ANOTHER_RECORD', data)
+  },
   setConfAlarm({ commit }, data) {
     commit('SET_CONF_ALARM', data)
   },

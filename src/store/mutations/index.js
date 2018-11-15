@@ -82,6 +82,9 @@ export default {
   SET_WHETHER_PLAY_ANOTHER_SONG: (state, data) => {
     state.whetherPlayAnotherSong = data
   },
+  SET_WHETHER_PLAY_ANOTHER_RECORD: (state, data) => {
+    state.whetherPlayAnotherRecord = data
+  },
   SET_CONF_LEFT: (state, data) => {
     state.confLeft = data
   },

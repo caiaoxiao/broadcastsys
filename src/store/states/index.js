@@ -44,6 +44,7 @@ export default {
   //  设置通话队列
   callQueue: [],
   whetherPlayAnotherSong: 'no',
+  whetherPlayAnotherRecord: 'no',
   confLeft: [],
   confAlarm:[],
   confMeeting:[],

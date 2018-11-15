@@ -118,7 +118,9 @@
         <h3 v-if = "deviceGroups.length>0">设备组</h3>
         <table class = "table" v-for = "group in deviceGroups" >
           <caption> <span> {{group.name}} </span> 
-          <button type="button" class="btn btn-sm btn-info" @click="deleteDeviceGroup(group.devicegroupid)">删除</button>
+          </caption>
+          <caption> <span> {{"设备组号：" + group.devicegroup_extn + "  设备组类型："+ type(group.devicegroup_type)}} </span> 
+          <button type="button" class="btn btn-sm btn-info" @click="deleteDeviceGroup(group.devicegroupid,group.devicegroup_extn)">删除</button>
           </caption>
           <thead>
             <tr>
@@ -248,6 +250,27 @@ export default {
     this.OrgUrl = 'Organization/TreeRoot/' + this.$store.state.user_info.user.organizationid
   },
   methods: {  //  组织机构树默认选中
+    type(str){
+	let devicegroup_type
+        switch(str){
+              case "broad":
+                devicegroup_type = "广播组"
+                break
+              case "inqueue":
+                devicegroup_type = "顺振队列组"
+                break
+	      case "allqueue":
+                devicegroup_type = "同振队列组"
+                break
+              case "radio":
+                devicegroup_type = "对讲组"
+                break
+              case "meeting":
+                devicegroup_type = "会议组"
+                break
+	}
+	return devicegroup_type
+      },
     changeAlarmControl(){
 	if(this.alarm_control=="popup")
 	this.alarm_control = "router"
@@ -359,7 +382,7 @@ export default {
               }
             })
             if(this.targetUserGroupId!="")
-          this.$ajax.get(`Role/getDeviceGroup/${this.targetUserGroupId}`)
+          this.instance({method:'get',url:`Role/getDeviceGroup/${this.targetUserGroupId}`})
           .then((res) => {
             if (res.data.code === 1) {
               let result = res.data.result
@@ -367,10 +390,12 @@ export default {
               this.deviceGroups = []
               let axios = []
               for (let i = 0 ; i < length ; i++){
-		   axios.push(this.$ajax.get(`DeviceGroup/Detail/${result[i].devicegroupid}`))
+		   axios.push(this.instance({method:'get',url
+:`DeviceGroup/Detail/${result[i].devicegroupid}`}))
 	            }
               this.$ajax.all(axios)
                   .then((res) => {
+		      console.log(res)
                       for (let i = 0 ; i<length ; i++){
 			if(!this.deviceGroups.some((item)=>{return item.devicegroupid == res[i].data.result.devicegroupid})){
           res[i].data.result.deviceGroups.sort((x,y)=>{return x.devicecode > y.devicecode})
@@ -417,6 +442,7 @@ export default {
         .then(res => {
           if (res.data.code === 1) {
             console.log('删除成功')
+	    this.deviceGroups = []
             this.refresh()
           }
         })
@@ -440,8 +466,11 @@ export default {
       $('.singleDevice').removeClass('moveLeftMiddle').addClass('moveRightMiddle')
       $('.allDevice').removeClass('moveLeftDev').addClass('moveRightDev')
     },
-    transferData (selectDevice,newDeviceGroupName) {
-      this.$ajax.post('DeviceGroup/Create',{name:newDeviceGroupName,deviceGroups:selectDevice})
+    transferData (selectDevice,newDeviceGroupName,newDeviceGroupType) {
+      this.instance({
+	method:'post',
+	url:'DeviceGroup/Create',
+	data:{name:newDeviceGroupName,devicegroup_type:newDeviceGroupType,deviceGroups:selectDevice}})
       .then(res => {
           if (res.data.code === 1) {
             let targetDeviceGroup =  res.data.result.devicegroupid
@@ -457,12 +486,17 @@ export default {
           }
         })
       
-    },//添加设备组
-    deleteDeviceGroup(deviceGroupId){
-      this.$ajax.post('DeviceGroup/RemoveList',[deviceGroupId])
+    },//删除设备组
+    deleteDeviceGroup(deviceGroupId,extn){
+      this.instance({
+	method:'post',
+	url:'DeviceGroup/RemoveList',
+        data:{ids:[deviceGroupId],roleid:this.targetUserGroupId,extn:extn}
+		})
       .then(res => {
-          if (res.data.code === 1) {
+          if (res.data.code === 1 ) {
             console.log('删除成功')
+            this.deviceGroups = []	
             this.refresh()
           }
       })

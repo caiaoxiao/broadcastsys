@@ -83,6 +83,9 @@ export default {
   whetherPlayAnotherSong: state => {
     return state.whetherPlayAnotherSong
   },
+  whetherPlayAnotherRecord: state => {
+    return state.whetherPlayAnotherRecord 
+  },
   confLeft: state=> {
     return  state.confLeft
   },

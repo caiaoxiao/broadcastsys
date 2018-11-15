@@ -9,6 +9,16 @@
       <span>请输入新设备组名称</span>
       <input  v-model="newDeviceGroupName" style="width: 50% ;margin:5px 0px" type="text" class="form-control form-lighter" placeholder="" />
     </form>
+
+    <el-radio-group  class="choose" v-model="newDeviceGroupType">
+    <span>请勾选新设备组类型</span>
+    <el-radio :label="'broad'">广播组</el-radio>
+    <el-radio :label="'inqueue'">顺振队列组</el-radio>
+    <el-radio :label="'allqueue'">同振队列组</el-radio>
+    <el-radio :label="'radio'">对讲组</el-radio>
+    <el-radio :label="'meeting'">会议组</el-radio>
+    </el-radio-group>
+
     <div class="musicList" id="height02">
       <div id="SelectedMembers" class="aa">
         <div class="singleFlies" :class="{selected: device.selected}" v-for="device in deviceList" :key="device.deviceId" @click="selectDeviceEvent(device)">
@@ -40,6 +50,10 @@ export default {
       selectDevice: [],
       fuzzyQuery:'',
       newDeviceGroupName:'',
+      newDeviceGroupType:'',
+      instance:this.$ajax.create({
+	baseurl:'https://scc.ieyeplus.com:8001'	
+      })
     }
   },
   created () {
@@ -90,12 +104,12 @@ export default {
     confirmAdd () {
       
       if (this.deviceList.length !== 0 && this.selectDevice.length !== 0) {
-        this.$emit('transferData', this.selectDevice,this.newDeviceGroupName)
+        this.$emit('transferData', this.selectDevice,this.newDeviceGroupName,this.newDeviceGroupType)
       }
     },
     confirmAddAll () {
       if (this.deviceList.length !== 0) {
-        this.$emit('transferData', this.deviceList,this.newDeviceGroupName)
+        this.$emit('transferData', this.deviceList,this.newDeviceGroupName,this.newDeviceGroupType)
       }
     },
     close () {
@@ -106,5 +120,8 @@ export default {
 </script>
 <style scoped>
 .menuType button{
-float:right;}
+  float:right;}
+.choose{
+  padding:5px 10px;
+}
 </style>

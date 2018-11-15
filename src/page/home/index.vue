@@ -290,6 +290,7 @@
 		      		}
 			}
 		      if(args.data[1]!=_this.verto){
+			/*
                       device.forEach(function(user) {
                             if(user.userID == args.data[1])  {
                                 user.deviceState = 'active'
@@ -304,11 +305,12 @@
                                   user.timer.m=0
                                   user.timer.h+=1}
                                   },1000)
-				                        user.timer.clock = true
+			        user.timer.clock = true
                                 user.timer.id.push(t) 
 				}
                             }
                         })
+			*/
                         _this.$store.dispatch('setDeviceList',device)}
 			console.log('conference user added')
 	                var  data = JSON.parse(args.data[4])
@@ -540,7 +542,7 @@
                                 }
                             })
 			                  if(this.targetUserGroupId!="" || this.TreeData.parentid=="0")
-                            this.$ajax.get(`Role/getDeviceGroup/${this.targetUserGroupId}`)
+                            this.instance({method:'get',url:`Role/getDeviceGroup/${this.targetUserGroupId}`})
                               .then((res) => {
                             if (res.data.code === 1) {
                               this.group_list = res.data.result
@@ -942,6 +944,7 @@
         }, success_cb, failed_cb);
       },
       handleFSEventChannel(v, e) {
+	console.log(e)
         let callDirection = e.data["Call-Direction"];            //入栈还是出栈
         let callerNumber = e.data["Caller-Caller-ID-Number"];    //主叫号码
         let calleeNumber = e.data["Caller-Callee-ID-Number"];  //被叫号码

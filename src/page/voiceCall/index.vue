@@ -34,7 +34,7 @@
                 <li
                 @click="refresh(item)"
                 :class="{on: item.selected}"
-                 v-for='item in userGroup'>{{ item.name }}</li>
+                 v-for='item in userGroup'>{{ item.name + " " + item.devicegroup_extn}}</li>
               </ul>
             </div>
             <div class="rightDetailList" data-name="con">
@@ -301,12 +301,16 @@ export default {
      // 实现管理员对指定通话的强拆
        strongDelete() {
 	 if(this.selectNowCall.length>0){
-         this.fsAPI("uuid_kill",this.selectNowCall[0].channelUUID,function(res) {console.log("qiang delete")}.bind(this))
+	this.selectNowCall.forEach((call)=>{
+         this.fsAPI("uuid_kill",call.channelUUID,function(res) {console.log("qiang delete")}.bind(this))
          this.selectNowCall = []
+	})
 	}
 	 if(this.selectRingCall.length>0){
-         this.fsAPI("uuid_kill",this.selectRingCall[0].channelUUID,function(res) {console.log("qiang delete")}.bind(this))
+	this.selectRingCall.forEach((call)=>{
+         this.fsAPI("uuid_kill",call.channelUUID,function(res) {console.log("qiang delete")}.bind(this))
          this.selectRingCall = []
+	})
 	}
       },
 

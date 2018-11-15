@@ -46,7 +46,18 @@ vue.prototype.returnState = function(deviceState) {
       return '在线'
   }
 }
-//
+// 控制录音播放状态  
+vue.prototype.recordPlay = function(recordState) {
+  switch (recordState) {
+    case '播放':
+      return 'fa fa-play';
+    case '暂停':
+      return 'fa fa-pause';
+    default:
+      return 'fa fa-play';
+  }
+}
+// 控制音乐播放状态
 vue.prototype.ifPlay = function(playState) {
   switch (playState) {
     case '继续播放':

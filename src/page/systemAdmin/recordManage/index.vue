@@ -1,7 +1,7 @@
 <template>
   <div ><!--tab02录音管理-->
     <div class="tableTool">
-      <button type="submit" @click="prePlay()" class="btn btn-sm btn-info" id="play"><i class="fa fa-play" aria-hidden="true"></i>播放</button>
+      <button type="submit" @click="prePlay" class="btn btn-sm btn-info" id="play"><i :class="recordPlay(recordState)" aria-hidden="true"></i>{{recordState}}</button>
       <a download @click="downLoad()" class="btn btn-sm btn-info"><i class="fa fa-cloud-download" aria-hidden="true"></i>下载</a>
       <div class="operate">
         <form class="form-inline">
@@ -77,6 +77,7 @@
   export default {
     data() {
       return {
+        recordState: '播放', 
         fileType: '通话录音',           // 默认文件类型
         formData: {
           calleenumber: '',
@@ -102,6 +103,7 @@
       ...mapGetters({
         pageData: 'pageData',
         mediaPath: 'mediaPath',
+        whetherPlayAnotherRecord: 'whetherPlayAnotherRecord',
       })
     },
     components: {
@@ -113,6 +115,11 @@
       },
       'pageData.pageIndex': function() {
         this.refresh()
+      },  
+      'mediaPath': function(newval, oldval) {
+        if(oldval != ''){
+          this.$store.dispatch('setWhetherPlayAnotherRecord','yes')
+        }
       }
     },
     methods: {
@@ -143,15 +150,44 @@
           var s5 = item.uuid.substr(1);
           var s6 = s4 + s5;
           s7 = 'https://scc.ieyeplus.com:8443/IpBcFiles/recording/'+s6+'.mp3';
+          for(var i=0; i<10; i++) {
+            if(i != index){
+              let aaa=$(".table>tbody>tr").eq(i)
+              if(aaa.hasClass('selected')){
+                aaa.toggleClass("selected")
+              }else {
+              }
+            }else{
+            }
+          }
         }
         target.toggleClass("selected")
         this.mediaPath = s7;
         this.$store.dispatch('setMediaPath',s7);
       },
       prePlay() {
-        var audio = document.getElementById("music");
-        audio.src = this.mediaPath;
-        audio.play();
+        if(this.whetherPlayAnotherRecord == 'no') {
+          console.log("The same record");
+          if(this.recordState == '暂停') {
+            this.recordState = '播放'
+            var audio = document.getElementById("music");
+            audio.src = this.mediaPath;
+            audio.play(); 
+          }else {
+            this.recordState = '暂停'
+            var audio = document.getElementById("music");
+            audio.src = this.mediaPath;
+            audio.pause();
+          }
+        }else {
+         console.log("Another song");
+         this.recordState = '暂停'
+         var audio = document.getElementById("music");
+         audio.src = this.mediaPath;
+         audio.play(); 
+         this.$store.dispatch('setWhetherPlayAnotherRecord','no')
+        }
+
       },
       downLoad() {
         if(this.downloadfile == null) {

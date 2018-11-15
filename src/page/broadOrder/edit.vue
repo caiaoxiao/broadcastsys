@@ -111,6 +111,35 @@
         </div>
       </div>
     </div>
+
+    <el-dialog
+        title="提示"
+        :visible.sync="dialogxVisible"
+        width="30%"
+        append-to-body>
+        <div>
+          <div class="settingCon">
+            <label style="display: block;">自选周期设置</label>
+            <span class="times" @click="subtract" style="background-color: black;">-</span>
+            <input type="text" v-model="cycleIndex" class="cycleIndex"/>
+            <span class="times" @click="add" style="background-color: black;">+</span>
+            <span>天</span> 
+          </div>
+          <div>
+            <br />
+          </div>
+          <div class="settingCon">
+            <label style="display: block;">常用周期选择</label>
+            <span class="moudle" :class="dayOrWeek==2 ? 'selected' : ''" @click="everyWeek" style="background-color:black;">每周播放</span>
+            <span class="moudle" :class="dayOrWeek==1 ? 'selected' : ''" @click="everyDay" style="background-color:black;">每日播放</span>
+          </div>
+        </div>
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="dialogxVisible = false"><span style="color: #333">取 消</span></el-button>
+          <el-button type="primary" @click="dialogxVisible = false">确 定</el-button>
+        </span>
+      </el-dialog>
+
     <div class="setting">
       <div class="settingMoudle">
         <div class="settingTitle">选择时间</div>
@@ -126,18 +155,12 @@
       <div class="settingMoudle">
         <div class="settingTitle">循环周期</div>
         <div class="settingCon">
-        <span class="times" @click="subtract">-</span>
+          <!-- <span class="times" @click="subtract">-</span>
           <input type="text" v-model="cycleIndex" class="cycleIndex"/>
           <span class="times" @click="add">+</span>
-          <span>天</span>
-         <!--        <el-dropdown style="top:0px;background-color:#333">
-                   <button type="button" class="btn btn-sm btn-info">循环周期选择<i class="el-icon-arrow-down el-icon--right"></i></button>
-                   <el-dropdown-menu slot="dropdown">
-                     <el-dropdown-item><span style="color:#333">每周播放</span></el-dropdown-item>
-                     <el-dropdown-item><span style="color:#333">每天播放</span></el-dropdown-item> 
-                   </el-dropdown-menu>
-                 </el-dropdown> --> 
-        </div> 
+          <span>天</span> -->
+          <el-button type="info" @click="test">选择循环周期</el-button>  
+        </div>
       </div>
       <div class="settingMoudle">
         <div class="settingTitle">循环次数(-1为循环播放)</div>
@@ -147,7 +170,6 @@
           <span class="times" @click="addTime">+</span>
           <span>次</span>
         </div>
-
       </div>
       <div class="settingMoudle">
         <div class="settingTitle">播放文件类型</div>
@@ -220,6 +242,9 @@
         broad: '',
         dialogShow: false,
         dialogText: null,
+        num1: 1, 
+        dialogxVisible: false,  
+        dayOrWeek: 0,  //1代表每日播放，2代表每周播放
 	}
     },
     created() {
@@ -331,6 +356,16 @@
 
         _this.deviceList = Object.assign([], deviceList)
       },
+      everyWeek() {
+        this.dayOrWeek = 2 
+        console.log(this.dayOrWeek)
+        this.cycleIndex = 7 
+      },
+      everyDay() {
+        this.dayOrWeek = 1
+        console.log(this.dayOrWeek)
+        this.cycleIndex = 1
+      }, 
       textPlay() {
         this.xData.cmdtype = 2
       },
@@ -345,6 +380,9 @@
           this.cycleTime = this.cycleTime -1
         }
       },
+      test() {
+        this.dialogxVisible = true
+      },
       addTime() {
 	 if(this.cycleTime == -1){
            this.cycleTime = 1
@@ -354,11 +392,13 @@
         }
       },
       subtract() {
+        this.dayOrWeek = 0
         if(this.cycleIndex > 0) {
           this.cycleIndex = this.cycleIndex -1
         }
       },
       add() {
+        this.dayOrWeek = 0
         if(this.cycleIndex < 10) {
           this.cycleIndex = this.cycleIndex +1
         }
@@ -494,7 +534,7 @@
                 s.deviceid = s.userid;
               }.bind(this))
               this.formData.FeatureBases = this.selectDevice
-              console.log("this.formData.FeatureBases is:",this.formData.FeatureBases)
+              console.log("this.xData is:",this.xData)
               this.formData.planmodel=this.cycleTime
                 this.$ajax.post('Plan/Create', Object.assign(this.formData,this.xData))
                   .then((res) => {
@@ -525,6 +565,10 @@
   }
 </script>
 
-<style type="text/scss" rel="stylesheet/scss" lang="scss">
-
+<style>
+  .el-button--info {
+    color: #fff;
+    background-color: #697379bf;
+    border-color: #323439;
+  }
 </style>

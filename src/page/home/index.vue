@@ -68,6 +68,7 @@
       }),
     },
     watch: { 
+      'playFileDoneFlag':(item)=>{console.log('play file done' + item)},
       'TreeData':function(data){if(this.vertoHandle) this.refresh() },
       'callQueue':function(conf) { 
 	},
@@ -872,7 +873,7 @@
         // 订阅取消注册事件
         this.vertoHandle.subscribe("FSevent.custom::sofia::unregister", {handler: this.handleFSEventRegister.bind(this)});
         this.vertoHandle.subscribe("FSevent.channel_callstate", {handler: this.handleFSEventChannel.bind(this)});
-        this.vertoHandle.subscribe("FSevent.custom::conference::maintenance", {handler: this.closeMeeting.bind(this)});
+        //this.vertoHandle.subscribe("FSevent.custom::conference::maintenance", {handler: this.closeMeeting.bind(this)});
       },
       // 注册事件 和 取消注册事件
       handleExpire(v,e){
@@ -928,11 +929,14 @@
         
       },
       closeMeeting(v,e) {
-        if (e.data["Action"] == "play-file-done" && e.data["Conference-Name"] == this.broad + "-scc.ieyeplus.com")
+        if ((e.data["Action"] == "play-file-done") && (e.data["Conference-Name"] == this.broad + "-scc.ieyeplus.com" ) && (this.playFileDoneFlag==true))
             {
+	    console.log(this.playFileDoneFlag)
             console.log("ordered file playing is finished")
             this.fsAPI('conference',this.broad+'-scc.ieyeplus.com'+' ' +'hup'+' '+'all') 
             }
+	else if(this.playFileDoneFlag==true)
+	    this.$store.dispatch("setPlayFileDoneFlag",false)
       },
       fsAPI(cmd, arg, success_cb, failed_cb) {
         this.vertoHandle.sendMethod("jsapi",{
@@ -1045,7 +1049,7 @@
                 usersChanged = true;
               }
 	      else if(user.userID  == calleeNumber) {
-                user.channelUUID = channelUUID;
+                //user.channelUUID = channelUUID;
                 user.deviceState = channelCallState;
                 user.callDirection = callDirection;
 		user.calling = (channelCallState=="active" || channelCallState=="ringing")?(callerNumber?callerNumber:destinationNumber):null
@@ -1083,7 +1087,7 @@
                 usersChanged = true;
               }
 	      else if (user.userID  == callerNumber) {
-                user.channelUUID = channelUUID;
+                //user.channelUUID = channelUUID;
                 user.deviceState = channelCallState;
                 user.callDirection = callDirection;
 		user.oppoChannelUUID = opChannelUUID;

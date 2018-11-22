@@ -12,13 +12,9 @@
               type="datetimerange"
               range-separator="至"
               start-placeholder="开始日期"
-              end-placeholder="结束日期">
+              end-placeholder="结束日期"
+              style="color:#333;">
             </el-date-picker> 
-            <!-- <el-date-picker
-              v-model="formData.time"
-              type="date"
-              placeholder="选择日期时间">
-            </el-date-picker> -->
           </div>
           <div class="form-group">
             <label>主叫号码</label>
@@ -54,7 +50,7 @@
           <tr @click="selectClick(item, index)" v-for="(item, index) in dataAll">
             <td>{{item.startstamp}}</td>
             <td>{{item.callernumber}}</td>
-            <td>{{item.calleenumber}}</td>
+            <td>{{item.calleenumber.substring(0,4)}}</td>
             <td>{{item.duration}}</td>
             <td>应答</td>
             <!--    <td>
@@ -102,7 +98,7 @@
     computed: {
       ...mapGetters({
         pageData: 'pageData',
-        mediaPath: 'mediaPath',
+        // mediaPath: 'mediaPath',
         whetherPlayAnotherRecord: 'whetherPlayAnotherRecord',
       })
     },
@@ -130,7 +126,6 @@
             if(res.data.code == 1) {
               this.dataAll = res.data.result
               this.pageData.total = res.data.total
-              console.log("res.data.result is:",res.data.result)
             }
           }.bind(this))
       },
@@ -172,20 +167,26 @@
             this.recordState = '播放'
             var audio = document.getElementById("music");
             audio.src = this.mediaPath;
-            audio.play(); 
+            audio.pause(); 
           }else {
             this.recordState = '暂停'
             var audio = document.getElementById("music");
             audio.src = this.mediaPath;
-            audio.pause();
+            audio.play();
           }
         }else {
-         console.log("Another song");
-         this.recordState = '暂停'
-         var audio = document.getElementById("music");
-         audio.src = this.mediaPath;
-         audio.play(); 
-         this.$store.dispatch('setWhetherPlayAnotherRecord','no')
+         if(this.recordState == '播放') {
+           console.log("Another song");
+           this.recordState = '暂停'
+           var audio = document.getElementById("music");
+           audio.src = this.mediaPath;
+           audio.play(); 
+           this.$store.dispatch('setWhetherPlayAnotherRecord','no')
+         }else {
+           this.recordState = '播放'
+           var audio = document.getElementById("music");
+           audio.pause();    
+         }
         }
 
       },
@@ -245,5 +246,13 @@
       border: none;
     }
   }
-
+  /* .el-input input, label {
+    color: #555!important;
+  } */ 
+  .el-time-spinner__item {
+    color: #555!important;
+  }
+  .el-picker-panel .el-date-range-picker .has-time, .el-picker-panel__body-wrapper, .el-picker-panel__body, .el-date-range-picker__time-header, .el-date-range-picker__editors-wrap, .el-date-range-picker__time-picker-wrap {
+    color: #333;
+  }
 </style>

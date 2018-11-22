@@ -54,7 +54,7 @@
               width="30%"
               >
               <div style="display:block; float:clear;height:200px">
-                <span style="color:#333">未选设备列表（在线）</span>
+                <span style="color:#fff">未选设备列表（在线）</span>
                 <div class="selectedList">
                   <div class="singleFlies"
                     v-for="device in unselectDevice"
@@ -62,7 +62,7 @@
                 </div>
               </div>
               <div style="display:block; float:clear;height:200px"> 
-                <span style="color:#333">已选设备列表（在线）</span>
+                <span style="color:#fff">已选设备列表（在线）</span>
                 <div class="selectedList">
                   <div class="singleFlies selected"
                     v-for="device in selectDevice"
@@ -423,7 +423,7 @@
               if(this.unselectDevice[i].userid == this.dList[j]) {
                 this.unselectDevice.splice(i,1)
 		i-=1
-		continue
+	        break	
               }
             }
           }
@@ -546,15 +546,18 @@
 </script>
 
 <style>
+  /* .el-input__inner {
+    color: #fff !important; 
+  }*/ 
   #elsel span {
     color: #333 !important;
   }
-  .el-dialog {
-    background-color: #4e545a !important;
+  .el-dialog--small {
+    background-color: #333 !important;
   } 
-  .el-input input {
+  /* .el-input input {
     color: #fff !important;
-  }
+  } */  
   label {
     color: #fff !important;
   }

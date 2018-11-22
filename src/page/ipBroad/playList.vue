@@ -107,41 +107,40 @@
 	console.log(this.tabType)
       },
       play() {
-	if(this.text!=""){
-		this.fsAPI("conference", this.name +" " +  "say" + " " +  this.text)
-		this.text = ""
-	}
+        if(this.text!=""){
+          this.fsAPI("conference", this.name +" " +  "say" + " " +  this.text)
+          this.text = ""
+        }
         this.$store.dispatch('setWhetherPlayAnotherSong','yes')
-        
+        let files = []
         if(this.selectPhone.length!=0) {
          if(this.anotherSong[0] == null){
-          let usera = this.selectPlayList[0];
-          let users = this.selectPhone;
-          let _this = this;
-          
-          usera.Files.forEach(function(usern){
-            var x = usern.MediaPath.indexOf("IpBcFiles");
-            var y = usern.MediaPath.substring(x);
-            var z = "/var/lib/tomcat8/webapps/" + y;
-            users.forEach(function(user){
-              _this.fsAPI("conference"," " + _this.name + " " + "play" + " " + z,function(res){console.log("bofang")});
-            })
-          });
+          let usera = this.selectPlayList[0]
+          let _this = this
+          let file_string = "file_string://"
+          usera.Files.forEach((usern,index) => {
+            let x = usern.MediaPath.indexOf("IpBcFiles")
+            let y = usern.MediaPath.substring(x)
+            let z = "/var/lib/tomcat8/webapps/" + y
+            files.push(z)
+          })
+          file_string += files.join('!')
+          _this.fsAPI("conference"," " + _this.name + " " + "play" + " " + file_string ,function(res){console.log("bofang")})
          }else {
            this.selectPlayList[0] = this.anotherSong[0]
-           let usera = this.selectPlayList[0];
-           let users = this.selectPhone;
-           let _this = this;
-           _this.fsAPI("conference"," " + _this.name + " " + "stop",function(res){console.log("qie ge")});
-
-           users.Files.forEach(function(usern){
-             var x = usern.MediaPath.indexOf("IpBcFiles");
-             var y = usern.MediaPath.substring(x);
-             var z = "/var/lib/tomcat8/webapps/" + y;
-             users.forEach(function(user){
-               _this.fsAPI("conference"," " + _this.name + " " + "play" + " " + z,function(res){console.log("another song")});
-             })
-           });
+           let usera = this.selectPlayList[0]
+           let users = this.selectPhone
+           let file_string = "file_string://"
+           let _this = this
+           _this.fsAPI("conference"," " + _this.name + " " + "stop",function(res){console.log("qie ge")})
+           usera.Files.forEach((usern,index) => {
+            let x = usern.MediaPath.indexOf("IpBcFiles");
+            let y = usern.MediaPath.substring(x)
+            let z = "/var/lib/tomcat8/webapps/" + y
+            files.push(z)
+          })
+          file_string += files.join('!')
+          _this.fsAPI("conference"," " + _this.name + " " + "play" + " " + file_string ,function(res){console.log("bofang")});
          }
         }
       },

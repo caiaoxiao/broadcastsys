@@ -18,36 +18,52 @@
   export default {
     data () {
       return {
+        flag:"",
         liveArray:{},
         vertoConf:{},
         group_list:[],
-	usermap:{},
-	last_id:"",	
+        usermap:{},
+        last_id:"",	
         targetUserGroupId:"",
         verto: "",
         meeting: "",
         voice: "",
         broad: "",
         alarm: "",
-	username:"",
-	orgid:"",
+        username:"",
+        orgid:"",
+        deviceGroup_conf : [],
         instance : this.$ajax.create({
- 	 baseURL: 'https://scc.ieyeplus.com:8001/'
+ 	        baseURL: 'https://scc.ieyeplus.com:8001/'
         }),	
 
       }
     },
     created() {
       this.$nextTick(()=> {
-	  getHeights()
-	  this.orgid = this.get_user_info.user.organizationid  
-	  this.username = this.get_user_info.user.username
+          getHeights()
+          this.orgid = this.get_user_info.user.organizationid  
+          this.username = this.get_user_info.user.username
           this.verto = this.get_user_info.freeswitchData.VertoID
           this.meeting = this.get_user_info.freeswitchData.MeetingID
           this.voice = this.get_user_info.freeswitchData.VoiceCallID
           this.alarm = this.get_user_info.freeswitchData.AlarmID
           this.broad = this.get_user_info.freeswitchData.BroadID
-          $.verto.init({}, this.initVertoHandle)
+          this.instance({
+            'url':"Organization/getDeviceGroup/" + this.orgid,
+            'method':'get',
+          }).then((res)=>{
+            if(res.data.code===1){
+              this.deviceGroup_conf = res.data.result
+            }
+          })
+          if(this.vertoHandle ==null){
+            this.flag = false
+            $.verto.init({}, this.initVertoHandle)
+          }
+          else{
+            return
+          }
       })
     },
     computed: {
@@ -61,14 +77,42 @@
         callQueue:'callQueue',
         confLeft:'confLeft',
         confAlarm:'confAlarm',
+        confMeeing: 'confMeeing',
         confIpBoard: 'confIpBoard',
+        choosenConfLeft:'choosenConfLeft',
+        choosenConfMeeting:'choosenConfMeeting',
+        choosenConfIpboard: 'choosenConfIpboard',
         TreeData:'TreeData',
         freeswitchData:'freeswitchData',
         get_user_info: GET_USER_INFO,
+
       }),
     },
     watch: { 
-      'playFileDoneFlag':(item)=>{console.log('play file done' + item)},
+      'choosenConfLeft': function(conf) {
+        if(conf!="" && conf!=undefined){
+        this.voice = conf
+        this.vertoHandle.logout()
+        this.flag = true
+        $.verto.init({}, this.initVertoHandle)
+        }
+      },
+      'choosenConfMeeting' :function(conf) {
+        if(conf!="" && conf!=undefined){
+        this.meeting  = conf
+        this.vertoHandle.logout()
+        this.flag = true
+        $.verto.init({}, this.initVertoHandle)
+      }
+      },
+      'choosenConfIpboard' :function(conf){
+        if(conf!="" && conf!=undefined){
+        this.broad = conf
+        this.vertoHandle.logout()
+        this.flag = true
+        $.verto.init({}, this.initVertoHandle)
+      }
+      },
       'TreeData':function(data){if(this.vertoHandle) this.refresh() },
       'callQueue':function(conf) { 
 	},
@@ -127,6 +171,7 @@
           }, {
             onWSLogin(verto, success) {
               // 登录回调
+            
               _this.refresh()
               console.log('onWSLogin', success);
             },
@@ -232,7 +277,8 @@
 
             },
 
-            onMessage:function(verto, dialog, message, data) { 
+          
+          onMessage:function(verto, dialog, message, data) { 
               var initLiveArray =  function(verto, dialog, data,pbx,room) {
                 // Set up addtional configuration specific to the call.
                 var config = {subParams: {callID: dialog ? dialog.callID : null},};
@@ -264,6 +310,9 @@
                                 arr = _this.$store.getters.confMeeting
                                 action = 'setConfMeeting'
                                 }
+      else{
+        return
+      }
                   try {
                     switch (args.action) {
 
@@ -274,15 +323,15 @@
                       // New user joined conference.
                       case "add":
 		      if(liveArrayObj.name ==_this.meeting+'-scc.ieyeplus.com'){
-			let preId = ""	
-			let length = arr.length
-			arr.forEach((co,index)=>{
-			   if(index<length-1) 
-				preId+=(co.conf_id+",")
-			   else
-				preId+=co.conf_id
+              let preId = ""	
+              let length = arr.length
+              arr.forEach((co,index)=>{
+                if(index<length-1) 
+                preId+=(co.conf_id+",")
+                else
+                preId+=co.conf_id
 
-			})
+			  })
 			if(args.data[1]!=_this.verto){
 			_this.fsAPI('conference',liveArrayObj.name+' '+'relate'+' '+parseInt(args.data[0]).toString()+' '+preId + ' '+'nohear')
 			_this.fsAPI('conference',liveArrayObj.name+' '+'relate'+' '+preId+' '+parseInt(args.data[0]).toString() + ' '+'nohear')
@@ -314,7 +363,8 @@
 			*/
                         _this.$store.dispatch('setDeviceList',device)}
 			console.log('conference user added')
-	                var  data = JSON.parse(args.data[4])
+                  var  data = JSON.parse(args.data[4])
+                        if(!arr.some((it)=>{return it.caller_id_number == args.data[1] }))
                         arr.push({
                           conf_id : parseInt(args.data[0]).toString(),
                           caller_id_number : args.data[1],
@@ -325,6 +375,7 @@
                           key : args.key
 
                         })
+                        console.log(action,arr)
                         _this.$store.dispatch(action,arr)
       if( liveArrayObj.name ==_this.alarm+'-scc.ieyeplus.com' && args.data[1]!=_this.verto)
 			{
@@ -387,6 +438,7 @@
 
                       // Existing user's state changed (mute/unmute, talking, floor, etc)
                       case "modify":
+			console.log(args)
                         console.log('conference user changed')
 			var data = JSON.parse(args.data[4])
                         if(arr.length == 0 ||  arr.every(function(item,index,array){return item.key!=args.key}))
@@ -465,6 +517,9 @@
                   initLiveArray(verto, dialog, data,"conference-liveArray."+_this.alarm+"-scc.ieyeplus.com@scc.ieyeplus.com",_this.alarm+"-scc.ieyeplus.com");
                   initLiveArray(verto, dialog, data,"conference-liveArray."+_this.broad+"-scc.ieyeplus.com@scc.ieyeplus.com",_this.broad+"-scc.ieyeplus.com");
                   initLiveArray(verto, dialog, data,"conference-liveArray."+_this.meeting+"-scc.ieyeplus.com@scc.ieyeplus.com",_this.meeting+"-scc.ieyeplus.com");
+                  _this.deviceGroup_conf.forEach((con)=>{
+                    initLiveArray(verto, dialog, data, "conference-liveArray."  + con.conf_num + "-scc.ieyeplus.com@scc.ieyeplus.com" , con.conf_num + "-scc.ieyeplus.com")
+                  })
                   console.log('verto channel ready')
                   break;
               }
@@ -581,7 +636,7 @@
                               }
                               for(let item in this.usermap){
                                 let user = {}
-                                  user.deviceState = "unregistered"
+                                  user.deviceState = this.usermap[item].type == 2? "registeredM":"unregistered"
                                   user.calling = ""
                                   user.userID = item
                                   user.callDirection = null
@@ -629,9 +684,10 @@
                                         let application_des = ""
                                         let arr = []
                                         if(item.application == "conference"){
-                                        if(item.application_data.slice(0,2)=="93"){
+                                        if(item.application_data.slice(0,2)=="93" || item.application_data.slice(0,2) == "80" ){
                                           item.application_data = item.application_data.slice(0,item.application_data.indexOf('-'))+"-scc.ieyeplus.com"
                                         }
+                                        console.log("asdasdasdasdasda",item.application_data)
                                         this.vertoHandle.sendMethod("jsapi",{command:"fsapi", data:{cmd:"conference", arg:item.application_data  +  " " + "list as xml"}},
                                         (data)=>{
                                             switch(item.application_data){
@@ -671,6 +727,7 @@
                                           }
                                           }
                                         })
+                                        if(application_des == "setConfLeft" || application_des == "setConfAlarm" || application_des == "setConfIpBoard" || application_des == "setConfMeeting")
                                         this.$store.dispatch(application_des,arr)
                                         })
                                         }
@@ -861,7 +918,7 @@
                   this.$store.dispatch('setUserGroup',[])
                   
                 })
-                  	
+          if(this.flag==false)
           this.$store.dispatch('setDeviceList',deviceList)
           }.bind(this),function(data) {
             console.log("error:"+data)
@@ -948,7 +1005,6 @@
         }, success_cb, failed_cb);
       },
       handleFSEventChannel(v, e) {
-	console.log(e)
         let callDirection = e.data["Call-Direction"];            //入栈还是出栈
         let callerNumber = e.data["Caller-Caller-ID-Number"];    //主叫号码
         let calleeNumber = e.data["Caller-Callee-ID-Number"];  //被叫号码
@@ -997,20 +1053,21 @@
 	            })
         } //number 
 	    else if (channelCallState == "HANGUP") {
+	      console.log(e)
               users.forEach(function(user) {
-             if((e.data.hasOwnProperty("Channel-Presence-ID") && user.userID == e.data["Channel-Presence-ID"].slice(0,e.data["Channel-Presence-ID"].indexOf('@'))) || (!e.data.hasOwnProperty("Channel-Presence-ID") && user.userID == e.data["Channel-Name"].slice(15,e.data["Channel-Name"].indexOf('@')))) {
-		user.deviceState = "register"
+           if((e.data.hasOwnProperty("Channel-Presence-ID") && user.userID == e.data["Channel-Presence-ID"].slice(0,e.data["Channel-Presence-ID"].indexOf('@'))) || (!e.data.hasOwnProperty("Channel-Presence-ID") && user.userID == e.data["Channel-Name"].slice(15,e.data["Channel-Name"].indexOf('@'))) || (!e.data.hasOwnProperty("Channel-Presence-ID") && (e.data["Channel-Name"].slice(0,8)=="loopback")&& (e.data["Channel-Name"].slice(9,13)==user.userID))) {
+		user.deviceState = user.type==2?"registeredM":"registered"
 		user.calling = null
 		user.timer.s=0
 		user.timer.m=0
 		user.timer.h=0
 		user.timer.clock = false 
+                channelCallState = user.type==2?"registeredM":"registered";
 		user.timer.id.forEach((id)=>{
                  clearInterval(id)	
 		})
 		}
 		})
-                channelCallState = "register";
         }
         // 入栈
         if (callDirection == "inbound") {

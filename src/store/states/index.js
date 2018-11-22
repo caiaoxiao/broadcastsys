@@ -49,11 +49,15 @@ export default {
   confAlarm:[],
   confMeeting:[],
   confIpBoard:[],
+  choosenConfLeft: "",
+  choosenConfMeeting:"",
+  choosenConfIpboard: "",
   userGroup:[],
   selectedAlarm:[],
   // 控制播放音乐或者录音的路径
-  mediaPath: '111',
+  mediaPath: '',
   // 是否订阅会议回调
   use_livearray: false,
   alarmAddress:"",
+  playFileDoneFlag:false,
 }

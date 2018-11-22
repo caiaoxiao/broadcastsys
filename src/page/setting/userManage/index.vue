@@ -106,10 +106,9 @@
               <td>{{device.devicecode}}</td>
               <td>{{device.devicename}}</td>
               <td>
-                {{ device.type == 0 ? '单话机' : '视频话机' }}
+                {{ returnType(device.type) }}
               </td>
               <td>
-                <button type="button" class="btn btn-sm btn-info" @click="openModal(-1 ,device.deviceid)">修改</button>
                 <button type="button" class="btn btn-sm btn-default" @click="deleteDevice(device.deviceid,device.devicecode)">删除</button>
               </td>
             </tr>
@@ -250,6 +249,20 @@ export default {
     this.OrgUrl = 'Organization/TreeRoot/' + this.$store.state.user_info.user.organizationid
   },
   methods: {  //  组织机构树默认选中
+    returnType(type){
+      switch(type){
+        case 0:
+          return "语音终端"
+          break
+        case 1:
+          return "视频终端"
+          break
+        case 2:
+          return "组播终端"
+          break
+      }
+
+    },
     type(str){
 	let devicegroup_type
         switch(str){

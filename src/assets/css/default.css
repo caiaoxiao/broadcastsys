@@ -822,6 +822,13 @@ ul.choose>li.on {
 .online {
     background: #008C00
 }
+.onlineMulticast {
+    background: #74DF00 
+}
+.onlineMulticastSelected {
+    border: 1px solid #014F01;
+    background: url(../img/jiaobiao01.fw.png) no-repeat bottom right #74DF00; 
+}
 
 .onlineSelected {
     border: 1px solid #014F01;

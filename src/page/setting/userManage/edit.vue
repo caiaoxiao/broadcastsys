@@ -4,7 +4,7 @@
     <div class="popContent">
       <el-form class="form-horizontal" :model="formData" ref="formData" :rules="rules">
         <div class="row">
-          <div class="col-md-6">
+          <div class="col-md-6" v-if="formData.type!=2">
             <div class="form-group">
               <label class="col-sm-4 control-label">设备号</label>
               <div class="col-sm-8">
@@ -12,7 +12,7 @@
               </div>
             </div>
           </div>
-          <div class="col-md-6">
+          <div class="col-md-6"  v-if="formData.type!=2">
             <div class="form-group">
               <label class="col-sm-4 control-label">添加范围</label>
               <div class="col-sm-8">
@@ -20,7 +20,7 @@
               </div>
             </div>
           </div>
-          <div class="col-md-6">
+          <div class="col-md-6" >
             <div class="form-group">
               <label class="col-sm-4 control-label">设备名称</label>
               <div class="col-sm-8">
@@ -28,11 +28,27 @@
               </div>
             </div>
           </div>
-	<div class="col-md-6">
+        <div class="col-md-6" v-if="formData.type!=2">
             <div class="form-group">
               <label class="col-sm-4 control-label">密码</label>
               <div class="col-sm-8">
                 <input type="text" class="form-control" v-model="formData.password">
+              </div>
+            </div>
+          </div>
+        <div class="col-md-6" v-if="formData.type==2">
+            <div class="form-group">
+              <label class="col-sm-4 control-label">IP地址</label>
+              <div class="col-sm-8">
+                <input type="text" class="form-control" v-model="formData.ipaddress">
+              </div>
+            </div>
+          </div>
+        <div class="col-md-6" v-if="formData.type==2">
+            <div class="form-group">
+              <label class="col-sm-4 control-label">端口号</label>
+              <div class="col-sm-8">
+                <input type="text" class="form-control" v-model="formData.port">
               </div>
             </div>
           </div>
@@ -48,6 +64,9 @@
                 </label>
                 <label class="radio-inline">
                   <input type="radio" value="1" v-model="formData.type">视频终端
+                </label>
+		<label class="radio-inline">
+                  <input type="radio" value="2" v-model="formData.type">组播终端
                 </label>
               </div>
             </div>
@@ -78,12 +97,16 @@ export default {
 	      password:'',
         type: 0,
         devicevedios: [{ vediourl: '' }, { vediourl: '' }, { vediourl: '' }, { vediourl: '' }],
-        feature:{ organizationid :  this.transferdata.targetMenuId ,aliasname:""}
-
+        feature:{ organizationid :  this.transferdata.targetMenuId ,aliasname:""},
+        ipaddress:"",
+        port:""
       },
       rules: {},
       self: this,
       range:'',
+      instance:this.$ajax.create({
+        baseURL:'https://scc.ieyeplus.com:8001/'
+      })
     }
   },
   created () {
@@ -120,22 +143,35 @@ export default {
        let flag = this.formData.devicename == this.formData.devicecode?true:false
        let range = this.range==''?1:parseInt(this.range)
        for(let i = 0;i < range;i++){
-        let temp = new Object()
-        temp.devicecode = String(parseInt(this.formData.devicecode)+i)
-        temp.devicename =  flag == true ? temp.devicecode : this.formData.devicename+"-"+String(i+1)
-	      temp.password = this.formData.password
-        temp.type = this.formData.type
-        temp.devicevedios = this.formData.devicevedios
-        temp.feature = this.formData.feature
-        axios.push(this.$ajax.post('Device/Create',temp))
-       }
+	      if(this.formData.type!=2){
+          let temp = new Object()
+          temp.devicecode = String(parseInt(this.formData.devicecode)+i)
+          temp.devicename =  flag == true ? temp.devicecode : this.formData.devicename+"-"+String(i+1)
+          temp.password = this.formData.password
+          temp.type = this.formData.type
+          temp.devicevedios = this.formData.devicevedios
+          temp.feature = this.formData.feature
+          axios.push(this.$ajax.post('Device/Create',temp))
+         }
+        else if(this.formData.type==2){
+          let temp = new Object()
+          temp.ipaddress = this.formData.ipaddress
+          temp.organizationid = this.transferdata.targetMenuId
+          temp.port = this.formData.port
+          temp.type = this.formData.type
+          temp.devicename = this.formData.devicename
+          axios.push(this.instance({url:'Device/CreateMulticast',method:'post',data:temp}))
+         }
+        }
        this.$ajax.all(axios).then(res => {
-	 res.forEach((re)=>{
-         if(re.data.code == 0)
-	   setTimeout(()=>{this.$message.success("某个设备已存在,请勿重复添加")},500)
-	 else
-	  setTimeout(()=>{this.$message.success(re.data.result.devicecode+"添加成功")},500)
-	})
+	        res.forEach((re)=>{
+            if(re.data.code == 0)
+                setTimeout(()=>{this.$message.success("某个设备已存在,请勿重复添加")},500)
+            else if(re.data.code == 2)
+                setTimeout(()=>{this.$message.success(res.data.result)},500)
+            else
+                setTimeout(()=>{this.$message.success(re.data.result.devicecode+"添加成功")},500)
+      	  })
          this.$store.dispatch('update', 1)
        })
     }

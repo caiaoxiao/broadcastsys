@@ -14,9 +14,9 @@
         <div data-name="con">
           <div class="moduleList " id="height01">
             <div class="singleM" v-for="item in deviceList">
-              <div class="moduleStyle" :class="returnClass(item.deviceState)" @click.stop="itemClick($event, item)">
+              <div class="moduleStyle" :class="returnClass(item.deviceState,item.type)" @click.stop="itemClick($event, item)">
                 <div class="moduleNum"><i class="fa fa-video-camera" aria-hidden="true"></i>{{item.userID + " " + (item.name==null?"":item.name)}}</div>
-                <div class="moduleKind">{{(item.type=='1'?'视频':'话机') + '终端' +'  '}}
+                <div class="moduleKind">{{returnType(item.type)}}
 			<i class="fa fa-user" v-if = "item.deviceState=='active' || item.deviceState=='ringing'"></i>
                         {{(item.calling==null?"":item.calling)}}
 		</div>
@@ -41,9 +41,9 @@
               <div class="departDetail">
                 <div class="detailCon">
                   <div class="singleM" v-show="returnGroup(item)" v-for="item in deviceList">
-			<div class="moduleStyle" :class="returnClass(item.deviceState)" @click.stop="itemClick($event, item)">
+			<div class="moduleStyle" :class="returnClass(item.deviceState,item.type)" @click.stop="itemClick($event, item)">
                 <div class="moduleNum"><i class="fa fa-video-camera" aria-hidden="true"></i>{{item.userID + " " + (item.name==null?"":item.name)}}</div>
-		<div class="moduleKind">{{(item.type=='1'?'视频':'话机') + '终端' +'  '}}
+		<div class="moduleKind">{{returnType(item.type)}}
                         <i class="fa fa-user" v-if = "item.deviceState=='active' || item.deviceState=='ringing'"></i>
                         {{(item.calling==null?"":item.calling)}}
                 </div>
@@ -159,13 +159,30 @@ export default {
     this.selectPhone = []
     $('.onlineSelected').removeClass('onlineSelected').addClass('online')
     },
+    returnType(type){
+      switch(type){
+        case 0:
+          return "语音终端"
+	  break
+	case 1:
+          return "视频终端"
+          break
+        case 2:
+          return "组播终端"
+          break
+      }
+
+    },
     returnGroup(item){
       return item.groupid.some((it)=>{return it==this.groupShow})
     },
-    returnClass(status){
+    returnClass(status,type){
       switch(status){
         case "registered":
           return "online"
+          break
+        case "registeredM":
+          return "onlineMulticast"
           break
         case "unregistered":
           return "offline"
@@ -179,12 +196,15 @@ export default {
         case "register":
           return "online"
           break
-	default:
-	  return "online"
+        default:
+          return "online"
       }
     },
     returnState(status){
       switch(status){
+	case "registeredM":
+          return "在线"
+          break
         case "registered":
           return "在线"
           break
@@ -230,7 +250,21 @@ export default {
           $(target).addClass("onlineSelected");
           this.selectPhone.push(row)
         }
-      } else if ($(target).hasClass("calling")) {
+      } 
+      else if ($(target).hasClass('onlineMulticast')) {
+        if ($(target).hasClass("onlineMulticastSelected")) {
+          $(target).removeClass("onlineMulticastSelected")
+          this.selectPhone.forEach(function (s, i) {
+            if (s.userID == row.userID) {
+              _this.selectPhone.splice(i, 1)
+            }
+          })
+        } else {
+          $(target).addClass("onlineMulticastSelected");
+          this.selectPhone.push(row)
+        }
+      }
+	else if ($(target).hasClass("calling")) {
         if ($(target).hasClass("callingSelected")) {
           $(target).removeClass("callingSelected");
           this.selectNowCall.forEach(function (s, i) {
@@ -275,7 +309,7 @@ export default {
       let users = this.deviceList
       let userChanged = false
       let select = this.selectNowCall[0]
-     
+      console.log(select)    
       if (userChanged) this.$store.dispatch('setDeviceList', users)
       this.vertoHandle.newCall({
         destination_number: '9001' + select.channelUUID,
@@ -389,13 +423,7 @@ export default {
 
      // 实现呼叫转移
        callTraverse() {
-         console.log(this.selectNowCall[0].channelUUID);
-         console.log(this.selectPhone[0].userID);
-         console.log(this.selectPhone[0].networkIP);
-         console.log(this.selectPhone[0].networkPort);
-         console.log(this.selectPhone[0]);
-         console.log(this.deviceList[0]);
-         console.log("1234567890");
+         console.log(this.deviceList);
          this.fsAPI("uuid_transfer",this.selectNowCall[0].channelUUID+" "+"sip:"+this.selectPhone[0].userID+"@"+this.selectPhone[0].networkIP+":"+this.selectPhone[0].networkPort,function(res) {console.log("call traverse")}.bind(this));
          this.selectPhone = [];
 	 $('.onlineSelected').removeClass('onlineSelected').addClass('online')

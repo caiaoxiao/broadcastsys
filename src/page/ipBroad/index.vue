@@ -11,9 +11,9 @@
         <div data-name="con">
           <div class="moduleList" id="height01">
             <div class="singleM" v-for="item in deviceList">
-		<div class="moduleStyle" :class="returnClass(item.deviceState)" @click.stop="itemClick($event, item)">
+		<div class="moduleStyle" :class="returnClass(item.deviceState,item.type)" @click.stop="itemClick($event, item)">
                 <div class="moduleNum"><i class="fa fa-video-camera" aria-hidden="true"></i>{{item.userID + " " + (item.name==null?"":item.name)}}</div>
-                <div class="moduleKind">{{(item.type=='1'?'视频':'话机') + '终端' +'  '}}
+                <div class="moduleKind">{{returnType(item.type)}}
                         <i class="fa fa-user" v-if = "item.deviceState=='active' || item.deviceState=='ringing'"></i>
                         {{(item.calling==null?"":item.calling)}}
                 </div>
@@ -38,9 +38,9 @@
               <div class="departDetail">
                 <div class="detailCon">
 		<div class="singleM" v-show="returnGroup(item)" v-for="item in deviceList">
-			<div class="moduleStyle" :class="returnClass(item.deviceState)" @click.stop="itemClick($event, item)">
+			<div class="moduleStyle" :class="returnClass(item.deviceState,item.type)" @click.stop="itemClick($event, item)">
                 <div class="moduleNum"><i class="fa fa-video-camera" aria-hidden="true"></i>{{item.userID + " " + (item.name==null?"":item.name)}}</div>
-		<div class="moduleKind">{{(item.type=='1'?'视频':'话机') + '终端' +'  '}}
+		<div class="moduleKind">{{returnType(item.type)}}
                         <i class="fa fa-user" v-if = "item.deviceState=='active' || item.deviceState=='ringing'"></i>
                         {{(item.calling==null?"":item.calling)}}
                 </div>
@@ -68,8 +68,8 @@
           <li id="a2" @click="startIpbroad" @mousedown="$btnMousedown" @mouseup="$btnMouseup" @touchend = "$btnMouseup" @touchstart = "$btnMousedown">
 		<i :class="returnVertoState()"  aria-hidden="true"></i>
 		<span>{{mute}}</span></li>
-          <li id="a3" @click="play" @mousedown="$btnMousedown" @mouseup="$btnMouseup" @touchend = "$btnMouseup" @touchstart = "$btnMousedown"><i class="fa fa-play-circle-o fa-2x" aria-hidden="true"></i><span>播放</span></li>
-          <li id="a4" @click="pauseOrPlay" @mousedown="$btnMousedown" @mouseup="$btnMouseup" @touchend = "$btnMouseup" @touchstart = "$btnMousedown"><i :class="ifPlay(playState)" aria-hidden="true"></i><span>{{playState}}</span></li>
+          <!-- <li id="a3" @click="play" @mousedown="$btnMousedown" @mouseup="$btnMouseup" @touchend = "$btnMouseup" @touchstart = "$btnMousedown"><i class="fa fa-play-circle-o fa-2x" aria-hidden="true"></i><span>播放</span></li> -->
+          <li id="a4" @click="pauseOrPlay" @mousedown="$btnMousedown" @mouseup="$btnMouseup" @touchend = "$btnMouseup" @touchstart = "$btnMousedown"><i class="fa fa-fast-forward fa-2x" aria-hidden="true"></i><span>播放/暂停</span></li>
           <li id="a5" @click="allOver" @mousedown="$btnMousedown" @mouseup="$btnMouseup" @touchend = "$btnMouseup" @touchstart = "$btnMousedown"><i class="fa fa-window-close fa-2x" aria-hidden="true"></i><span>全部结束</span></li>
           <li id="a5" @click="selectAll" @mousedown="$btnMousedown" @mouseup="$btnMouseup" @touchend = "$btnMouseup" @touchstart = "$btnMousedown"><i class="fa fa-group fa-2x" aria-hidden="true"></i><span>全选</span></li>
         </ul>
@@ -118,7 +118,11 @@
   import {leftPhone, rightPhone,switchs,callDivert} from 'components'
 
   export default {
-    watch:{},
+    watch:{
+	'choosenConfIpboard':function(conf){
+	this.name = conf + "-scc.ieyeplus.com" 
+	}
+    },
     data() {
       this.deviceList
       return {
@@ -167,6 +171,7 @@
 	      callQueue:'callQueue',
 	      userGroup:'userGroup',
 	      confIpBoard:'confIpBoard',
+	      choosenConfIpboard:'choosenConfIpboard',
         whetherPlayAnotherSong:'whetherPlayAnotherSong',
         get_user_info: GET_USER_INFO,
       }),
@@ -190,13 +195,30 @@
 		return "fa fa-bullhorn fa-2x"
 		}
     },
+      returnType(type){
+      switch(type){
+        case 0:
+          return "语音终端"
+	        break
+	      case 1:
+          return "视频终端"
+          break
+        case 2:
+          return "组播终端"
+          break
+      }
+
+    },
       returnGroup(item){
       return item.groupid.some((it)=>{return it==this.groupShow})
     },
-    returnClass(status){
+    returnClass(status,type){
       switch(status){
-        case "registered":
-          return "online"
+	case "registered":
+	  return "online"
+          break
+        case "registeredM":
+	  return "onlineMulticast"
           break
         case "unregistered":
           return "offline"
@@ -217,6 +239,9 @@
     },
     returnState(status){
       switch(status){
+	case "registeredM":
+          return "在线"
+          break
         case "registered":
           return "在线"
           break
@@ -258,7 +283,7 @@
           }
         })
     },
-	    itemClick (e, row) {
+   itemClick (e, row) {
       let target = e.currentTarget
       let _this = this
 
@@ -274,7 +299,21 @@
           $(target).addClass("onlineSelected");
           this.selectPhone.push(row)
         }
-      } else if ($(target).hasClass("calling")) {
+      } 
+      else if ($(target).hasClass('onlineMulticast')) {
+        if ($(target).hasClass("onlineMulticastSelected")) {
+          $(target).removeClass("onlineMulticastSelected")
+          this.selectPhone.forEach(function (s, i) {
+            if (s.userID == row.userID) {
+              _this.selectPhone.splice(i, 1)
+            }
+          })
+        } else {
+          $(target).addClass("onlineMulticastSelected");
+          this.selectPhone.push(row)
+        }
+      }
+	else if ($(target).hasClass("calling")) {
         if ($(target).hasClass("callingSelected")) {
           $(target).removeClass("callingSelected");
           this.selectNowCall.forEach(function (s, i) {
@@ -360,34 +399,37 @@
       },
 
       playMusic() {
+        let files = []
         this.$store.dispatch('setWhetherPlayAnotherSong','yes')
         let music = this.selectPlayList[0].mediapath;
-
-        
           if(this.anotherSong[0] == null){
             let usera = this.selectPlayList[0];
             let _this = this;
-      
-            usera.Files.forEach(function(usern){
-              var x = usern.mediapath.indexOf("IpBcFiles") ;
-              var y = usern.mediapath.substring(x);
-	      console.log(usern.mediapath)
-              var z = "/var/lib/tomcat8/webapps/"+y;
-              _this.fsAPI("conference"," " + _this.name + " " + "play" + " " + z,function(res){console.log("bofang")});
-            });
+            let file_string = "file_string://"
+            usera.Files.forEach((usern,index) =>{
+              let  x = usern.mediapath.indexOf("IpBcFiles") ;
+              let  y = usern.mediapath.substring(x);
+              let  z = "/var/lib/tomcat8/webapps/"+y;
+              files.push(z)
+            })
+            file_string += files.join('!')
+            this.fsAPI("conference"," " + _this.name + " " + "play" + " " + file_string,function(res){console.log("bofang")})
           }else {
             this.selectPlayList[0] = this.anotherSong[0]
-            let usera = this.selectPlayList[0];
-            let _this = this;
-            _this.fsAPI("conference"," " + _this.name + " " + "stop",function(res){console.log("qie ge")});
-            usera.Files.forEach(function(usern){
-              var x = usern.mediapath.indexOf("IpBcFiles");
-              var y = usern.mediapath.substring(x);
-              var z = "/var/lib/tomcat8/webapps/" + y;
-              _this.fsAPI("conference"," " + _this.name + " " + "play" + " " + z,function(res){console.log("another song")});
-            });
+            let usera = this.selectPlayList[0]
+            let _this = this
+            let file_string = "file_string://"
+	    this.$store.dispatch("setPlayFileDoneFlag", true )
+            this.fsAPI("conference"," " + _this.name + " " + "stop",function(res){console.log("qie ge")});
+            usera.Files.forEach((usern,index)=>{
+              let  x = usern.mediapath.indexOf("IpBcFiles") ;
+              let  y = usern.mediapath.substring(x);
+              let  z = "/var/lib/tomcat8/webapps/"+y;
+              files.push(z)
+            })
+            file_string += files.join('!')
+            this.fsAPI("conference"," " + _this.name + " " + "play" + " " + file_string ,function(res){console.log("qiege")})
           }
-        
       },  
 
       pauseOrPlay() {
@@ -410,7 +452,7 @@
 
       shout() {
         this.vertoHandle.newCall({
-          destination_number: this.broad,
+          destination_number: this.choosenConfIpboard,
           caller_id_name: this.verto,
           caller_id_number: this.verto,
           outgoingBandwidth: 'default',
@@ -474,7 +516,7 @@
       },
       allOver() {
         // 结束全部喊话和播放
-	this.fsAPI('conference',this.broad+'-scc.ieyeplus.com'+' '+'hup'+' '+'all')
+	this.fsAPI('conference',this.choosenConfIpboard+'-scc.ieyeplus.com'+' '+'hup'+' '+'all')
 	this.selectPhone = []
 	$('.onlineSelected').removeClass('onlineSelected').addClass('online')
       },
@@ -482,7 +524,7 @@
           // this.fsAPI("conference",this.name + " " + "pause_play" + "all",function(res) {console.log("zan ting")}.bind(this));
         this.confIpBoard.forEach((item,index)=>{	
 	if(item.caller_id_number==this.verto)
-	this.fsAPI('conference',this.broad+'-scc.ieyeplus.com'+' '+'tmute'+' '+item.conf_id)
+	this.fsAPI('conference',this.choosenConfIpboard+'-scc.ieyeplus.com'+' '+'tmute'+' '+item.conf_id)
 	})
 	}
     }

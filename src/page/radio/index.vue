@@ -10,9 +10,9 @@
           <div data-name="con">
             <div class="moduleList" id = "height01" >
               <div class="singleM" v-for="item in deviceList">
-		<div class="moduleStyle" :class="returnClass(item.deviceState)" @click.stop="itemClick($event, item)">
+		<div class="moduleStyle" :class="returnClass(item.deviceState,item.type)" @click.stop="itemClick($event, item)">
                 <div class="moduleNum"><i class="fa fa-video-camera" aria-hidden="true"></i>{{item.userID + " " + (item.name==null?"":item.name)}}</div>
-		<div class="moduleKind">{{(item.type=='1'?'视频':'话机') + '终端' +'  '}}
+		<div class="moduleKind">{{returnType(item.type)}}
                         <i class="fa fa-user" v-if = "item.deviceState=='active' || item.deviceState=='ringing'"></i>
                         {{(item.calling==null?"":item.calling)}}
                 </div>
@@ -37,9 +37,9 @@
                 <div class="departDetail">
                   <div class="detailCon">
 		  <div class="singleM" v-show="returnGroup(item)" v-for="item in deviceList">
-			<div class="moduleStyle" :class="returnClass(item.deviceState)" @click.stop="itemClick($event, item)">
+			<div class="moduleStyle" :class="returnClass(item.deviceState,item.type)" @click.stop="itemClick($event, item)">
                 <div class="moduleNum"><i class="fa fa-video-camera" aria-hidden="true"></i>{{item.userID + " " + (item.name==null?"":item.name)}}</div>
-		<div class="moduleKind">{{(item.type=='1'?'视频':'话机') + '终端' +'  '}}
+		<div class="moduleKind">{{returnType(item.type)}}
                         <i class="fa fa-user" v-if = "item.deviceState=='active' || item.deviceState=='ringing'"></i>
                         {{(item.calling==null?"":item.calling)}}
                 </div>
@@ -140,10 +140,27 @@
       returnGroup(item){
       return item.groupid.some((it)=>{return it==this.groupShow})
     },
-    returnClass(status){
+    returnType(type){
+      switch(type){
+        case 0:
+          return "语音终端"
+	        break
+	      case 1:
+          return "视频终端"
+          break
+        case 2:
+          return "组播终端"
+          break
+      }
+
+    },
+    returnClass(status,type){
       switch(status){
-        case "registered":
-          return "online"
+	case "registered":
+	  return "online"
+          break
+        case "registeredM":
+	  return "onlineMulticast"
           break
         case "unregistered":
           return "offline"
@@ -157,13 +174,15 @@
         case "register":
           return "online"
           break
-	case undefined:
-          return "online"
-          break
+	default:
+	  return "online"
       }
     },
     returnState(status){
       switch(status){
+        case "registeredM":
+          return "在线"
+          break
         case "registered":
           return "在线"
           break
@@ -209,9 +228,21 @@
             $(target).addClass("onlineSelected");
             this.selectPhone.push(row)
           }
-
-
-        }else if($(target).hasClass("calling")) {
+        }
+	else if ($(target).hasClass('onlineMulticast')) {
+        if ($(target).hasClass("onlineMulticastSelected")) {
+          $(target).removeClass("onlineMulticastSelected")
+          this.selectPhone.forEach(function (s, i) {
+            if (s.userID == row.userID) {
+              _this.selectPhone.splice(i, 1)
+            }
+          })
+        } else {
+          $(target).addClass("onlineMulticastSelected");
+          this.selectPhone.push(row)
+        }
+      }
+	else if($(target).hasClass("calling")) {
           if($(target).hasClass("callingSelected")) {
             $(target).removeClass("callingSelected");
             this.selectNowSession.forEach(function(s,i) {
@@ -241,7 +272,7 @@
           //  单个设备开始会议
           this.selectPhone.forEach((s, i)=>{
             this.fsAPI("conference",
-              this.name + " " + "bgdial" + " " + "user/"+this.selectPhone[i].userID+" " + this.meeting+"-"+this.org+"会议呼叫",function(res){
+              this.name + " " + "bgdial" + " " + (s.type==2?"loopback":"user/")+this.selectPhone[i].userID+" " + this.meeting+"-"+this.org+"会议呼叫",function(res){
               console.log("邀请会议",res)
             });
           })

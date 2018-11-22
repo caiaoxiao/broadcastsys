@@ -1,7 +1,20 @@
 <template>
   <div class="phone left">
     <div class="phoneTitle">
-       <i class="fa fa-phone" aria-hidden="true"></i>语音
+     <i class="fa fa-phone" aria-hidden="true"></i>{{this.confname.show + "队列"}}
+     <el-dropdown 
+        @command = "handleCommand" 
+        :hide-on-click = "true"
+        trigger= "click"
+        @visible-change = "count"
+      >
+     <el-button type="primary"  >
+      {{this.choosenConf}}<i class="el-icon-arrow-down el-icon--right" ></i>
+    </el-button>
+     <el-dropdown-menu slot="dropdown">
+    <el-dropdown-item v-for="con in conf_detail"  :command ="con.conf_num">{{con.conf_num + " " + con.group_name + " 人数:" + con.num}}</el-dropdown-item>
+  </el-dropdown-menu>
+  </el-dropdown>
       <div 
 		:class="(!flag_conf)&&(conf.length>0)?'phoneMeeting meetingOut':(flag_conf?'phoneMeeting meetingIn':'phoneMeeting')"
 		@click="toggle_enter"><!--进入为phoneMeeting 离开添加meetingOut-->
@@ -60,13 +73,13 @@
     props:{
 	  selectPhone:{
 	    type: Array,
-	    default: []},
+      default: []},
     },
     data() {
       return {
         btnData,
-	selected:[],
-	status:"进入",
+        selected:[],
+        status:"进入",
         conf:[],
         confname:{},
         userDeflect:"",
@@ -78,19 +91,27 @@
         voice: "",
         broad: "",
         alarm: "",
-	org:"",
+	      org:"",
+        choosenConf : "",
+        instance : this.$ajax.create({
+         baseURL: 'https://scc.ieyeplus.com:8001/'
+        }),
+        conf_detail:[],
+        role_id:"",
       }
     },
     created() {
       this.$nextTick(function () {
         // getHeight()
         // $.verto.init({}, this.bootstrap);
+        this.organizationid = this.get_user_info.user.organizationid
         this.verto = this.get_user_info.freeswitchData.VertoID
         this.meeting = this.get_user_info.freeswitchData.MeetingID
         this.voice = this.get_user_info.freeswitchData.VoiceCallID
         this.alarm = this.get_user_info.freeswitchData.AlarmID
         this.broad = this.get_user_info.freeswitchData.BroadID
-	this.org = this.get_user_info.user.orgname
+        this.org = this.get_user_info.user.orgname
+        
         if(this.$router.history.current.fullPath=="/voiceCall"){
           this.conf = this.$store.getters.confLeft
           this.confname = {name:'confleft',num: this.voice,show:"通话"}
@@ -99,20 +120,45 @@
           this.conf = this.$store.getters.confIpBoard
           this.confname = {name:'confipboard',num:this.broad,show:"广播"}
         }
-	else if(this.$router.history.current.fullPath=="/meeting") {
-          this.conf = this.$store.getters.confMeeting
-          this.confname = {name:'confmeeting',num:this.meeting,show:"会议"}
+        else if(this.$router.history.current.fullPath=="/meeting") {
+                this.conf = this.$store.getters.confMeeting
+                this.confname = {name:'confmeeting',num:this.meeting,show:"会议"}
         }
-	else if(this.$router.history.current.fullPath=="/radio") {
-          this.conf = this.$store.getters.confMeeting
-          this.confname = {name:'confmeeting',num:this.meeting,show:"对讲"}
+        else if(this.$router.history.current.fullPath=="/radio") {
+                this.conf = this.$store.getters.confMeeting
+                this.confname = {name:'confmeeting',num:this.meeting,show:"对讲"}
         }
-	
+        else if(this.$router.history.current.fullPath=="/alarm") {
+                this.conf = this.$store.getters.confAlarm
+                this.confname = {name:'confalarm',num:this.alarm,show:"告警"}
+        }
+        this.refresh()
       })
     },
     mounted(){
     },
     watch: {
+        'choosenConfLeft': function(conf) {
+        if(conf!="" && conf!=undefined){
+        if(this.confname.name == 'confleft')
+        this.confname.num = conf
+        this.voice = conf
+        }
+      },
+      'choosenConfMeeting' :function(conf) {
+        if(conf!="" && conf!=undefined){
+        if(this.confname.name == 'confmeeting')
+        this.confname.num = conf
+        this.meeting = conf
+        }
+      },
+      'choosenConfIpboard' :function(conf){
+       if(conf!="" && conf!=undefined){
+        if(this.confname.name == 'confipboard')
+        this.confname.num = conf
+        this.broad = conf
+        }
+      },
         callQueue:function(callqueue)
         {
         if(callqueue.length>0){
@@ -165,57 +211,138 @@
         confIpBoard : 'confIpBoard',
         selectedAlarm : 'selectedAlarm',
         get_user_info: GET_USER_INFO,
-
+        vertoHandle: 'vertoHandle',
+        choosenConfLeft:'choosenConfLeft',
+        choosenConfMeeting:'choosenConfMeeting',
+        choosenConfIpboard: 'choosenConfIpboard',
       }),
     },
     methods: {
-      callStatus(item){
+      count(status){
+        console.log(status)
+        this.conf_detail.forEach((co,index)=>{
+          this.vertoHandle.sendMethod("jsapi",{command:"fsapi", data:{cmd:"conference", arg:co.conf_name  +  " " + "list as xml"}},
+          (data)=>{
+              if(data.message.slice(0,4)=="-ERR"){
+                co.num = 0
+                this.$set(this.conf_detail, index,co )
+              }
+              else{
+                co.num = data.message.split('\n').length - 1
+                this.$set(this.conf_detail, index,co )
+              }
+          })
+        })
+        this.conf_detail.sort((x,y)=>{return y.num - x.num} )
+      },
+  refresh(){
+     this.$ajax.post(`Role/List`)
+                    .then((res) => {
+                      if (res.data.code === 1) {
+                        let groupList = res.data.result
+                        groupList.forEach(element => {
+                          if(element.rolename == this.get_user_info.user.orgname){
+                            this.roleid = element.roleid
+                          }
+                        })
+                            this.instance({
+                              method:'post',
+                              url:'Conference/Detail',
+                              data:{
+                                "confname":this.$router.history.current.fullPath.slice(1),
+                                "organizationid":this.organizationid,
+                                "roleid":this.roleid
+                              }
+                            }).then((re)=>{
+                              this.conf_detail  = re.data.result
+                              this.choosenConf = this.conf_detail[0].conf_num
+                              this.conf_detail.forEach((co)=>{
+                                co.num = 0
+                              })
+                          })
+                      }
+                  })
 
-	if(item.muted == true && item.deaf == true)
-		return 'fa fa-spinner red'
-	else if(item.muted == true && item.deaf == false)
-		return 'fa fa-microphone-slash blue'
-	else if(item.muted == false && item.deaf == false)
-		return 'fa fa-microphone green'
-	else 
-		return 'fa fa-circle orange'
+  },
+      handleCommand(conf){
+        if(this.choosenConf == conf)
+          return 
+        else{
+            this.choosenConf = conf
+            let application_des = ""
+            let arr = []
+            switch(this.confname.name){
+                    case 'confleft':
+                    arr = this.$store.getters.confLeft
+                    while(arr.length>0)
+                    arr.pop()
+                    this.$store.dispatch('setConfLeft',arr)
+                    this.$store.dispatch('setChoosenConfLeft',conf)
+                    break
+                    case 'confipboard':
+                    arr = this.$store.getters.confIpBoard
+                    while(arr.length>0)
+                    arr.pop()
+                    this.$store.dispatch('setConfIpBoard',arr)
+                    this.$store.dispatch('setChoosenConfIpboard',conf)
+                    break
+                    case 'confmeeting':
+                    arr = this.$store.getters.confMeeting
+                    while(arr.length>0)
+                    arr.pop()
+                    this.$store.dispatch('setConfMeeting',arr)
+                    this.$store.dispatch('setChoosenConfMeeting',conf)
+                    break
+              }
+            }
+      },
+      callStatus(item){
+          if(item.muted == true && item.deaf == true)
+            return 'fa fa-spinner red'
+          else if(item.muted == true && item.deaf == false)
+            return 'fa fa-microphone-slash blue'
+          else if(item.muted == false && item.deaf == false)
+            return 'fa fa-microphone green'
+          else 
+            return 'fa fa-circle orange'
       },
       toggle_enter(){
-	if(this.conf.length>0)
-	this.fsAPI('conference',this.confname.num+"-scc.ieyeplus.com"+" "+"pause_play"+" " +this.conf[0].conf_id) 
-        let _this = this
-	if(this.flag_conf==true)
-	{
-        this.conf.forEach((item,index,array)=>{
-          if(item.caller_id_number == this.verto)
-          	this.fsAPI('conference',this.confname.num+"-scc.ieyeplus.com"+" "+"hup"+" "+item.conf_id)
-  	  if(_this.confname.num==this.alarm){
-	  this.fsAPI('conference',this.confname.num+"-scc.ieyeplus.com"+" "+"mute"+" "+item.conf_id)
-	  this.fsAPI('conference',this.confname.num+"-scc.ieyeplus.com"+" "+"deaf"+" "+item.conf_id)}
-        })
-	}
-      else			
-	{
-               this.vertoHandle.newCall({
-          		destination_number: this.confname.num,
-            		caller_id_name: "LegalHigh",
-          		caller_id_number: this.verto,
-          		outgoingBandwidth: "default",
-          		incomingBandwidth: "default",
-          		useStereo: true,
-          		dedEnc: false,
-          		tag: "video-container",
-          		deviceParams: {
-            		useMic: "any",
-            		useSpeak: "any",
-            		useCamera: "any"
-          		}
-        		})
-	if(this.confname.num==this.alarm){
-	_this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"unmute"+" "+_this.conf[0].conf_id)
-	_this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"undeaf"+" "+_this.conf[0].conf_id)
-		}
-	}
+          if(this.conf.length>0)
+          this.fsAPI('conference',this.confname.num+"-scc.ieyeplus.com"+" "+"pause_play"+" " +this.conf[0].conf_id) 
+                let _this = this
+          if(this.flag_conf==true)
+          {
+                this.conf.forEach((item,index,array)=>{
+                  if(item.caller_id_number == this.verto)
+                    this.fsAPI('conference',this.confname.num+"-scc.ieyeplus.com"+" "+"hup"+" "+item.conf_id)
+              if(_this.confname.num==this.alarm){
+            this.fsAPI('conference',this.confname.num+"-scc.ieyeplus.com"+" "+"mute"+" "+item.conf_id)
+            this.fsAPI('conference',this.confname.num+"-scc.ieyeplus.com"+" "+"deaf"+" "+item.conf_id)}
+                })
+          }
+              else			
+          {           
+                      this.vertoHandle.hangup()
+                      this.vertoHandle.newCall({
+                      destination_number: this.confname.num,
+                        caller_id_name: "LegalHigh",
+                      caller_id_number: this.verto,
+                      outgoingBandwidth: "default",
+                      incomingBandwidth: "default",
+                      useStereo: true,
+                      dedEnc: false,
+                      tag: "video-container",
+                      deviceParams: {
+                        useMic: "any",
+                        useSpeak: "any",
+                        useCamera: "any"
+                      }
+                    })
+          if(this.confname.num==this.alarm){
+          _this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"unmute"+" "+_this.conf[0].conf_id)
+          _this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"undeaf"+" "+_this.conf[0].conf_id)
+            }
+          }
       },
       fsAPI(cmd, arg, success_cb, failed_cb) {
         this.vertoHandle.sendMethod("jsapi", {
@@ -317,12 +444,12 @@
 	   case '邀请成员':
 		if(this.selectPhone.length > 0 && this.flag_confalarm == true){
                  this.selectPhone.forEach((a,i)=>{
-                  this.fsAPI('conference',this.alarm+"-scc.ieyeplus.com"+" "+"bgdial"+" "+"user/"+  a.userID+" "+this.alarm + "warning")
+                  this.fsAPI('conference',this.alarm+"-scc.ieyeplus.com"+" "+"bgdial"+" "+(a.type==2?"loopback/":"user/")+  a.userID+" "+this.alarm + "warning")
                 })
                 }
 		else if(this.selectPhone.length > 0 ){
                  this.selectPhone.forEach((a,i)=>{
-                  this.fsAPI('conference',this.confname.num+"-scc.ieyeplus.com"+(this.confname.num==this.broad ? '+flags{mute}' :'') +" "+"bgdial"+" "+"user/"+  a.userID+" " + this.confname.num )
+                  this.fsAPI('conference',this.confname.num+"-scc.ieyeplus.com"+(this.confname.num==this.broad ? '+flags{mute}' :'') +" "+"bgdial"+" "+(a.type==2?"loopback/":"user/")+  a.userID+" " + this.confname.num )
                 })
                 }
 		this.$emit('reset')
@@ -398,5 +525,27 @@
   }
 </script>
 
-<style type="text/scss" rel="stylesheet/scss" lang="scss">
+<style scoped>
+  .el-dropdown {
+    vertical-align: top;
+  }
+  .el-dropdown-group {
+    background-color:#4E545A;
+    color:white;
+    border:none;
+  }
+  .el-dropdown-menu {
+    background-color:#4E545A;
+    color:white;
+    border:none;
+  }
+  .el-icon-arrow-down {
+    font-size: 12px;
+  }
+  .el-button{
+    background-color:#69C7F9;
+    padding: 8px 20px;
+    margin-left:5px; 
+  }
+
 </style>

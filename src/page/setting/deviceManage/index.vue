@@ -32,7 +32,7 @@
             <td>{{item.devicecode}}</td>
             <td>{{item.devicename}}</td>
             <td>
-              {{ item.type == 0 ? '单话机' : '视频话机' }}
+              {{ returnType(item.type)}}
             </td>
             <td> {{item.organizationid}} </td>
             <td>
@@ -90,6 +90,20 @@ export default {
     basechange
   },
   methods: {
+    returnType(type){
+      switch(type){
+        case 0:
+          return "语音终端"
+          break
+        case 1:
+          return "视频终端"
+          break
+        case 2:
+          return "组播终端"
+          break
+      }
+
+    },
     refresh () {
       
       let  organizationID_requests = []

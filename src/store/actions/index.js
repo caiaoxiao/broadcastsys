@@ -108,4 +108,16 @@ export default {
   setAlarmAddress({ commit }, data) {
     commit('SET_ALARM_ADDRESS', data)
   },
+  setPlayFileDoneFlag({ commit }, data) {
+    commit('SET_PLAY_FILE_DONE_FLAG', data)
+  },
+  setChoosenConfLeft({ commit }, data) {
+    commit('SET_CHOOSEN_CONF_LEFT', data)
+  },
+  setChoosenConfIpboard({ commit }, data) {
+    commit('SET_CHOOSEN_CONF_IPBOARD', data)
+  },
+  setChoosenConfMeeting({ commit }, data) {
+    commit('SET_CHOOSEN_CONF_MEETING', data)
+  },
 }

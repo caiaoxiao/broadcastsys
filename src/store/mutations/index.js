@@ -109,4 +109,16 @@ export default {
   SET_ALARM_ADDRESS: (state, data) => {
     state.alarmAddress = data
   },
+  SET_PLAY_FILE_DONE_FLAG: (state, data) => {
+    state.playFileDoneFlag = data
+  },
+  SET_CHOOSEN_CONF_LEFT: (state, data) => {
+    state.choosenConfLeft = data
+  },
+  SET_CHOOSEN_CONF_MEETING: (state, data) => {
+    state.choosenConfMeeting = data
+  },
+  SET_CHOOSEN_CONF_IPBOARD: (state, data) => {
+    state.choosenConfIpboard = data
+  },
 }

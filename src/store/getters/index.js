@@ -107,4 +107,16 @@ export default {
   alarmAddress: state=> {
     return  state.alarmAddress
   },
+  playFileDoneFlag: state=> {
+    return  state.playFileDoneFlag
+  },
+  choosenConfLeft: state=> {
+    return  state.choosenConfLeft
+  },
+  choosenConfIpboard: state=> {
+    return  state.choosenConfIpboard
+  },
+  choosenConfMeeting: state=> {
+    return  state.choosenConfMeeting
+  },
 }

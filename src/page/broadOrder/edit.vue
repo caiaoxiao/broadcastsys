@@ -66,8 +66,9 @@
             <div class="selectedList" id="height04">
               <div class="singleFlies"
                    :class="device.selected ? 'selected' : ''"
+		   v-if="device.deviceState == 'registered'|| device.deviceState=='registeredM'"
                    v-for="device in deviceList"
-                   @click="selectItem(device)">{{device.userid}}</div>
+                   @click="selectItem(device)">{{device.userID}}</div>
             </div>
             <div class="selectAll" @click="selectAll(1)">全选</div>
           </div>
@@ -105,7 +106,7 @@
           <div class="menuType"><i class="fa fa-th-large" aria-hidden="true"></i>播放设备列表</div>
           <div class="selectedList" id="height07">
             <div class="singleFlies selectDelate" v-for="device in selectDevice" @click="deleteDevice(device)">
-              {{device.userid}}</div>
+              {{device.userID}}</div>
           </div>
           <div class="selectAll" @click="deleteAll()">全部删除</div>
         </div>
@@ -210,7 +211,6 @@
         playList: [],       // 歌单列表
         selectDevice: [],   // 已勾选的设备
         checkplaylist: [],
-        deviceList: [],     // 在线设备列表
         isSelectAll: false, // 是否全选
         playCount: 0,
         cycleIndex: 0,      // 预案循环次数
@@ -255,8 +255,8 @@
         this.verto = this.get_user_info.freeswitchData.VertoID
         this.meeting = this.get_user_info.freeswitchData.MeetingID
         this.voice = this.get_user_info.freeswitchData.VoiceCallID
-    	  this.alarm = this.get_user_info.freeswitchData.AlarmID
-	      this.broad = this.get_user_info.freeswitchData.BroadID
+    	this.alarm = this.get_user_info.freeswitchData.AlarmID
+	this.broad = this.get_user_info.freeswitchData.BroadID
       })
     },
     components: {
@@ -266,6 +266,7 @@
       ...mapGetters({
         vertoHandle:'vertoHandle',
         currentLoginUser: 'currentLoginUser',
+	deviceList:'deviceList',
 	get_user_info: GET_USER_INFO,
       }),
     },
@@ -303,7 +304,7 @@
                 registrations.push(msg);
               }
             }
-
+	  /* 
             registrations.forEach(function(r) {
               let user = {}
               user.deviceState = "registered"
@@ -312,16 +313,17 @@
               user.selected = false
               deviceList.push(user)
             })
+	    
             if (deviceList.length) this.deviceList = deviceList
-
+	  */
           }.bind(this),function(data) {
             console.log("error:"+data)
           }.bind(this))
 
         // 订阅注册事件
-        this.vertoHandle.subscribe("FSevent.custom::sofia::register", {handler: this.handleFSEventRegister.bind(this)});
+        //this.vertoHandle.subscribe("FSevent.custom::sofia::register", {handler: this.handleFSEventRegister.bind(this)});
         // 订阅取消注册事件
-        this.vertoHandle.subscribe("FSevent.custom::sofia::unregister", {handler: this.handleFSEventRegister.bind(this)});
+        //this.vertoHandle.subscribe("FSevent.custom::sofia::unregister", {handler: this.handleFSEventRegister.bind(this)});
       },
       // 注册事件 和 取消注册事件
       handleFSEventRegister(v, e) {
@@ -448,7 +450,7 @@
       },
       deleteDevice(device) {
         this.selectDevice.forEach(function(s,i) {
-          if(device.userid == s.userid) {
+          if(device.userID == s.userID) {
 
             this.selectDevice.splice(i,1)
           }
@@ -531,7 +533,7 @@
             this.dialogShow = true
           }else {
               this.selectDevice.forEach(function(s,i) {
-                s.deviceid = s.userid;
+                s.deviceid = s.userID;
               }.bind(this))
               this.formData.FeatureBases = this.selectDevice
               console.log("this.xData is:",this.xData)
@@ -545,7 +547,7 @@
               this.selectDevice.forEach((element,i) => {
                 if(i!=0)
                 device_ids+="-"
-                device_ids+=element.userid
+               device_ids+=element.userID
               })
 		let planid = res.data.result.planid
 		this.$ajax.get('https://scc.ieyeplus.com:8082/api/scheds/'+ planid+'%'+device_ids+'%'+this.cycleTime)

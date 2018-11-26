@@ -105,6 +105,9 @@ export default {
   setUserGroup({ commit }, data) {
     commit('SET_USER_GROUP', data)
   },
+  setZhiBan({ commit }, data) {
+    commit('SET_ZHI_BAN', data)
+  },
   setAlarmAddress({ commit }, data) {
     commit('SET_ALARM_ADDRESS', data)
   },

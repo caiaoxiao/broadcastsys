@@ -322,6 +322,7 @@ export default {
       this.editwatcher = true
     },
     setWatcherState(state){
+      console.log(state)
       this.instance({
     			method: 'post',
           url: '/watcher/'+ this.transferdata.targetMenuId,

@@ -116,6 +116,9 @@ export default {
   choosenConfIpboard: state=> {
     return  state.choosenConfIpboard
   },
+  zhiBan: state=> {
+    return  state.zhiBan
+  },
   choosenConfMeeting: state=> {
     return  state.choosenConfMeeting
   },

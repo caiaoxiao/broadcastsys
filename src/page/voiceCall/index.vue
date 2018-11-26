@@ -121,6 +121,9 @@ export default {
       currentCall: null,
       destination_number: '',
       nowCall: [],
+      instance : this.$ajax.create({
+                         baseURL: 'https://scc.ieyeplus.com:8001/'
+      }),
       selectNowCall: [],
       selectPhone: [],
       selectRingCall: [],
@@ -136,6 +139,7 @@ export default {
       getHeight()
       getHeights()
       this.verto = this.get_user_info.freeswitchData.VertoID
+      this.organizationid = this.get_user_info.user.organizationid
       //this.initData()
     })
   },
@@ -305,28 +309,34 @@ export default {
 
 
     // 实现管理员和指定话机的强行通话
-    strongCall () {
+    async strongCall () {
       let users = this.deviceList
       let userChanged = false
       let select = this.selectNowCall[0]
-      console.log(select)    
       if (userChanged) this.$store.dispatch('setDeviceList', users)
-      this.vertoHandle.newCall({
-        destination_number: '9001' + select.channelUUID,
-        caller_id_name: this.verto,
-        caller_id_number: this.verto,
-        outgoingBandwidth: 'default',
-        incomingBandwidth: 'default',
-        useStereo: true,
-        dedEnc: false,
-        tag: "video-container",
-        deviceParams: {
-          useMic: "any",
-          useSpeak: "any",
-          useCamera: "any",
-        }
-      })
-
+      let result = await this.instance({
+                        method: 'get',
+          url: '/organization/'+ this.organizationid,
+                        })
+      if(result.data.enable_watcher){
+         this.fsAPI("originate","user/"+result.data.watcher+" 9001"+select.channelUUID+" XML default");
+       }else {
+         this.vertoHandle.newCall({
+           destination_number: '9001' + select.channelUUID,
+           caller_id_name: this.verto,
+           caller_id_number: this.verto,
+           outgoingBandwidth: 'default',
+           incomingBandwidth: 'default',
+           useStereo: true,
+           dedEnc: false,
+           tag: "video-container",
+           deviceParams: {
+             useMic: "any",
+             useSpeak: "any",
+             useCamera: "any",
+           }
+         }) 
+       }     
       this.selectNowCall = [];
       $('.onlineSelected').removeClass('onlineSelected').addClass('online')
     },
@@ -349,81 +359,98 @@ export default {
       },
 
     // 实现管理员对指定通话的强插
-    strongJoin () {
+    async strongJoin () {
       let select = this.selectNowCall[0];
-      this.vertoHandle.newCall({
-        destination_number: '9003' + select.channelUUID,
-        caller_id_name: this.verto,
-        caller_id_number: this.verto,
-        outgoingBandwidth: 'default',
-        incomingBandwidth: 'default',
-        useStereo: true,
-        dedEnc: false,
-        tag: "video-container",
-        deviceParams: {
-          useMic: "any",
-          useSpeak: "any",
-          useCamera: "any",
-        }
-      })
+      let result = await this.instance({
+                        method: 'get',
+          url: '/organization/'+ this.organizationid,
+                        })
+      if(result.data.enable_watcher){
+         this.fsAPI("originate","user/"+result.data.watcher+" 9003"+select.channelUUID+" XML default");
+       }else {
+         this.vertoHandle.newCall({
+           destination_number: '9003' + select.channelUUID,
+           caller_id_name: this.verto,
+           caller_id_number: this.verto,
+           outgoingBandwidth: 'default',
+           incomingBandwidth: 'default',
+           useStereo: true,
+           dedEnc: false,
+           tag: "video-container",
+           deviceParams: {
+             useMic: "any",
+             useSpeak: "any",
+             useCamera: "any",
+           }
+         })
+       }
       this.selectNowCall = [];
 	$('.callingSelected').removeClass('callingSelected').addClass('calling')
     },
 
     // 实现管理员对指定通话的监听
-    observe () {
-
+    async observe () {
       let select = this.selectNowCall[0];
-      console.log(this.selectNowCall[0].channelUUID);
-      this.vertoHandle.newCall({
-        destination_number: '9002' + select.channelUUID,
-        caller_id_name: this.verto,
-        caller_id_number: this.verto,
-        outgoingBandwidth: 'default',
-        incomingBandwidth: 'default',
-        useStereo: true,
-        dedEnc: false,
-        tag: "video-container",
-        deviceParams: {
-          useMic: "any",
-          useSpeak: "any",
-          useCamera: "any",
-        }
-      })
-
+      let result = await this.instance({
+                        method: 'get',
+          url: '/organization/'+ this.organizationid,
+                        })
+      if(result.data.enable_watcher){
+         this.fsAPI("originate","user/"+result.data.watcher+" 9002"+select.channelUUID+" XML default");
+       }else {
+         this.vertoHandle.newCall({
+           destination_number: '9002' + select.channelUUID,
+           caller_id_name: this.verto,
+           caller_id_number: this.verto,
+           outgoingBandwidth: 'default',
+           incomingBandwidth: 'default',
+           useStereo: true,
+           dedEnc: false,
+           tag: "video-container",
+           deviceParams: {
+             useMic: "any",
+             useSpeak: "any",
+             useCamera: "any",
+           }
+         })
+       } 
       this.selectNowCall = [];
       $('.callingSelected').removeClass('callingSelected').addClass('calling')
     },
 
     // 实现第三方对于指定通话中一方的代接
-    daiJie () {
-
+    async daiJie () {
       let users = this.deviceList;
       let userChanged = false;
       let select = this.selectRingCall[0];
-
-      this.vertoHandle.newCall({
-        destination_number: '9004' + this.selectRingCall[0].oppoChannelUUID,
-        caller_id_name: this.verto,
-        caller_id_number: this.verto,
-        outgoingBandwidth: 'default',
-        incomingBandwidth: 'default',
-        useStereo: true,
-        dedEnc: false,
-        tag: "video-container",
-        deviceParams: {
-          useMic: "any",
-          useSpeak: "any",
-          useCamera: "any",
-        }
-      })
-      console.log(select.userID);
+      let result = await this.instance({
+                        method: 'get',
+          url: '/organization/'+ this.organizationid,
+                        })
+      if(result.data.enable_watcher){
+         this.fsAPI("originate","user/"+result.data.watcher+" 9004"+this.selectRingCall[0].oppoChannelUUID+" XML default");
+       }else {
+         this.vertoHandle.newCall({
+           destination_number: '9004' + this.selectRingCall[0].oppoChannelUUID,
+           caller_id_name: this.verto,
+           caller_id_number: this.verto,
+           outgoingBandwidth: 'default',
+           incomingBandwidth: 'default',
+           useStereo: true,
+           dedEnc: false,
+           tag: "video-container",
+           deviceParams: {
+             useMic: "any",
+             useSpeak: "any",
+             useCamera: "any",
+           }
+         })
+       }
       this.selectRingCall = [];
     },
 
      // 实现呼叫转移
        callTraverse() {
-         console.log(this.deviceList);
          this.fsAPI("uuid_transfer",this.selectNowCall[0].channelUUID+" "+"sip:"+this.selectPhone[0].userID+"@"+this.selectPhone[0].networkIP+":"+this.selectPhone[0].networkPort,function(res) {console.log("call traverse")}.bind(this));
          this.selectPhone = [];
 	 $('.onlineSelected').removeClass('onlineSelected').addClass('online')
@@ -432,24 +459,32 @@ export default {
       },
 
       // call
-      call() {
-       this.vertoHandle.newCall({
-        destination_number : this.selectPhone[0].userID,
-        caller_id_name: this.verto,
-        caller_id_number: this.verto,
-        outgoingBandwidth: 'default',
-        incomingBandwidth: 'default',
-        useStereo: true,
-        dedEnc: false,
-        tag: "video-container",
-        deviceParams: {
-          useMic: "any",
-          useSpeak: "any",
-          useCamera: "any",
-        }
-      })
-      this.selectPhone = [];
-	$('.onlineSelected').removeClass('onlineSelected').addClass('online')
+      async call() {
+       let result = await this.instance({
+                        method: 'get',
+          url: '/organization/'+ this.organizationid,
+                        })
+       if(result.data.enable_watcher){
+         this.fsAPI("originate","user/"+result.data.watcher+" "+this.selectPhone[0].userID+" XML default");    
+       }else {
+         this.vertoHandle.newCall({
+           destination_number : this.selectPhone[0].userID,
+           caller_id_name: this.verto,
+           caller_id_number: this.verto,
+           outgoingBandwidth: 'default',
+           incomingBandwidth: 'default',
+           useStereo: true,
+           dedEnc: false,
+           tag: "video-container",
+           deviceParams: {
+             useMic: "any",
+             useSpeak: "any",
+             useCamera: "any",
+           }
+         })
+       }
+       this.selectPhone = [];
+       $('.onlineSelected').removeClass('onlineSelected').addClass('online')
     },
 
     hangupCall () {

@@ -118,6 +118,9 @@ export default {
   SET_CHOOSEN_CONF_MEETING: (state, data) => {
     state.choosenConfMeeting = data
   },
+  SET_ZHI_BAN: (state, data) => {
+    state.zhiBan = data
+  },
   SET_CHOOSEN_CONF_IPBOARD: (state, data) => {
     state.choosenConfIpboard = data
   },

@@ -342,7 +342,7 @@
                         useCamera: "any"
                       }
                     })
-          if(this.confname.num==this.alarm){
+          if(this.confname.num!=this.alarm){
           _this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"unmute"+" "+_this.conf[0].conf_id)
           _this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"undeaf"+" "+_this.conf[0].conf_id)
             }
@@ -394,10 +394,10 @@
           case '排队等待':
               if(this.selected.length > 0){
                 this.selected.forEach((a,i)=>{
-		              this.fsAPI('conference',this.confname.num+"-scc.ieyeplus.com"+" "+"pause_play"+" "+a.conf_id)
+		  this.fsAPI('conference',this.confname.num+"-scc.ieyeplus.com"+" "+"pause_play"+" "+a.conf_id)
                   this.fsAPI('conference',this.confname.num+"-scc.ieyeplus.com"+" "+"mute"+" "+a.conf_id		   )
                   this.fsAPI('conference',this.confname.num+"-scc.ieyeplus.com"+" "+"deaf"+" "+a.conf_id		   )
-		              this.fsAPI('conference',this.confname.num+"-scc.ieyeplus.com"+" "+"pause_play"+" "+a.conf_id)
+		  //this.fsAPI('conference',this.confname.num+"-scc.ieyeplus.com"+" "+"pause_play"+" "+a.conf_id)
 		            })
 		            $('.selected').removeClass().addClass('unselected')
            	    this.selected = []
@@ -454,6 +454,7 @@
 		else if(this.selectPhone.length > 0 ){
                  this.selectPhone.forEach((a,i)=>{
                   this.fsAPI('conference',this.confname.num+"-scc.ieyeplus.com"+(this.confname.num==this.broad ? '+flags{mute}' :'') +" "+"bgdial"+" "+(a.type==2?"loopback/":"user/")+  a.userID+" " + this.confname.num )
+
                 })
                 }
 		this.$emit('reset')

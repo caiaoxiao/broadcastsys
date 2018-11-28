@@ -322,6 +322,7 @@
 
                       // New user joined conference.
                       case "add":
+	     console.log(args)
 		      if(liveArrayObj.name ==_this.meeting+'-scc.ieyeplus.com' || liveArrayObj.name.slice(0,2) == '83'){
               let preId = ""	
               let length = arr.length
@@ -420,8 +421,8 @@
 						}
 					})//device获取videourl
 		}//liveArrayObj.name =='9110-scc.ieyeplus.com'i && args.data[1]!='9000'
-			if((liveArrayObj.name ==_this.voice+'-scc.ieyeplus.com')  && args.data[1]!=_this.verto){ 
-                        _this.fsAPI('conference',liveArrayObj.name+' '+'stop'+' '+'all'+' '+ parseInt(args.data[0]).toString())
+			if((liveArrayObj.name ==_this.voice+'-scc.ieyeplus.com')  && (args.data[1]!=_this.verto) && (args.data[2] == args.data[1])){ 
+			console.log("asdasdasdasdasd",args.data[2],args.data[1])
 			_this.fsAPI('conference',liveArrayObj.name+' '+'play'+' '+'/usr/local/freeswitch/sounds/music/8000/danza-espanola-op-37-h-142-xii-arabesca.wav'+ ' '+ parseInt(args.data[0]).toString()) 
 			}
                         break;
@@ -438,7 +439,6 @@
 
                       // Existing user's state changed (mute/unmute, talking, floor, etc)
                       case "modify":
-			console.log(args)
                         console.log('conference user changed')
 			var data = JSON.parse(args.data[4])
                         if(arr.length == 0 ||  arr.every(function(item,index,array){return item.key!=args.key}))

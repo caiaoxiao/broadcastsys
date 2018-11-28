@@ -49,12 +49,12 @@ export default {
   confAlarm:[],
   confMeeting:[],
   confIpBoard:[],
-  choosenConfLeft: "",
-  choosenConfMeeting:"",
-  choosenConfIpboard: "",
+  choosenConfLeft: "9201",
+  choosenConfMeeting:"9401",
+  choosenConfIpboard: "9301",
   userGroup:[],
   selectedAlarm:[],
-  zhiBan: 1,  //1代表正常模式，2代表值班模式
+  selectPhonex: null,  
   // 控制播放音乐或者录音的路径
   mediaPath: '',
   // 是否订阅会议回调

@@ -6,48 +6,48 @@
         <div class="row">
           <div class="col-md-6" v-if="formData.type!=2">
             <div class="form-group">
-              <label class="col-sm-4 control-label">设备号</label>
-              <div class="col-sm-8">
+              <label class="col-sm-6 control-label">设备号</label>
+              <div class="col-sm-6">
                 <input type="text" class="form-control" v-model="formData.devicecode">
               </div>
             </div>
           </div>
           <div class="col-md-6"  v-if="formData.type!=2">
             <div class="form-group">
-              <label class="col-sm-4 control-label">添加范围</label>
-              <div class="col-sm-8">
+              <label class="col-sm-6 control-label">添加范围</label>
+              <div class="col-sm-6">
                 <input type="text"  class="form-control" v-model="range">
               </div>
             </div>
           </div>
           <div class="col-md-6" >
             <div class="form-group">
-              <label class="col-sm-4 control-label">设备名称</label>
-              <div class="col-sm-8">
+              <label class="col-sm-6 control-label">设备名称</label>
+              <div class="col-sm-6">
                 <input type="text" placeholder="" class="form-control" v-model="formData.devicename">
               </div>
             </div>
           </div>
         <div class="col-md-6" v-if="formData.type!=2">
             <div class="form-group">
-              <label class="col-sm-4 control-label">密码</label>
-              <div class="col-sm-8">
+              <label class="col-sm-6 control-label">密码</label>
+              <div class="col-sm-6">
                 <input type="text" class="form-control" v-model="formData.password">
               </div>
             </div>
           </div>
         <div class="col-md-6" v-if="formData.type==2">
             <div class="form-group">
-              <label class="col-sm-4 control-label">IP地址</label>
-              <div class="col-sm-8">
+              <label class="col-sm-6 control-label">IP地址</label>
+              <div class="col-sm-6">
                 <input type="text" class="form-control" v-model="formData.ipaddress">
               </div>
             </div>
           </div>
         <div class="col-md-6" v-if="formData.type==2">
             <div class="form-group">
-              <label class="col-sm-4 control-label">端口号</label>
-              <div class="col-sm-8">
+              <label class="col-sm-6 control-label">端口号</label>
+              <div class="col-sm-6">
                 <input type="text" class="form-control" v-model="formData.port">
               </div>
             </div>
@@ -56,8 +56,8 @@
         <div class="row">
           <div class="col-md-6">
             <div class="form-group">
-              <label class="col-sm-4 control-label">设备类型</label>
-              <div class="col-sm-8">
+              <label class="col-sm-6 control-label">设备类型</label>
+              <div class="col-sm-6">
                 <label class="radio-inline">
                   <input type="radio" value="0" v-model="formData.type">单话机
 
@@ -146,7 +146,7 @@ export default {
 	      if(this.formData.type!=2){
           let temp = new Object()
           temp.devicecode = String(parseInt(this.formData.devicecode)+i)
-          temp.devicename =  flag == true ? temp.devicecode : this.formData.devicename+"-"+String(i+1)
+          temp.devicename =  flag == true ? temp.devicecode : (range==1?this.formData.devicename:(this.formData.devicename+'-'+String(i)))
           temp.password = this.formData.password
           temp.type = this.formData.type
           temp.devicevedios = this.formData.devicevedios

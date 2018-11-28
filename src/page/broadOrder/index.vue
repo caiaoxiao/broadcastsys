@@ -11,6 +11,7 @@
               title="预约"
               :visible.sync="dialogVisible"
               width="25%"
+              style="color:#fff;"              
               >
               <el-form ref="form" :model="detailData" label-width="80px">
                 <el-form-item label="预案名称:" :label-width="formLabelWidth">
@@ -553,7 +554,7 @@
     color: #333 !important;
   }
   .el-dialog--small {
-    background-color: #333 !important;
+    background-color: #313439 !important;
   } 
   /* .el-input input {
     color: #fff !important;
@@ -561,4 +562,10 @@
   label {
     color: #fff !important;
   }
+  .el-dialog__wrapper, .el-dialog .el-dialog--small, .el-dialog__header, .el-dialog__title {
+    color: #fff;
+  }
+  .el-dialog__wrapper, .el-dialog .el-dialog--small, .el-dialog__body, .el-form, .el-form-item, .el-form-item__content, .el-input, .el-input__inner {
+    color: #fff;
+  }  
 </style>

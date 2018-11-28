@@ -5,150 +5,18 @@
         <span>您好 {{this.username}}<a @click="logout()"> [退出]</a>
           <a @click="setting()"><i class="fa fa-cogs"></i>系统设置</a>
 	  <a @click="$router.go(0)"><i class="fa fa-refresh"></i>刷新页面</a></span>
-	  
-
       </div>
     </div>
     <audio id="music"></audio>
     <div class="span_large">
       <div class="location_indicator"></div>
     </div>
-    <!--正在进行-->
-    <div class="deviceStatus" style="display:none;">
-      <div class="deviceModule">
-        <table class="table">
-          <thead><tr><td colspan="3"><i class="fa fa-circle-o-notch fa-spin"></i>语音通话[2]</td></tr></thead>
-          <tbody>
-          <tr>
-            <td>600</td>
-            <td>正在通话</td>
-            <td><a>查看</a></td>
-          </tr>
-          <tr>
-            <td>600</td>
-            <td>正在通话</td>
-            <td><a>查看</a></td>
-          </tr>
-          </tbody>
-
-        </table>
-      </div>
-      <div class="deviceModule">
-        <table class="table">
-          <thead><tr><td colspan="4"><i class="fa fa-music fa-spin"></i>IP广播[4]</td></tr></thead>
-          <tbody>
-          <tr>
-            <td>600</td>
-            <td colspan="2">正在喊话</td>
-            <td><a>查看</a></td>
-          </tr>
-          <tr>
-            <td>600</td>
-            <td colspan="2">正在喊话</td>
-            <td><a>查看</a></td>
-          </tr>
-          <tr>
-            <td>部门一</td>
-            <td>正在播放</td>
-            <td>歌单：我们的心向着太阳！</td>
-            <td><a>查看</a></td>
-          </tr>
-          <tr>
-            <td>600</td>
-            <td>正在播放</td>
-            <td>洗刷刷.mp3</td>
-            <td><a>查看</a></td>
-          </tr>
-          </tbody>
-
-        </table>
-      </div>
-      <div class="deviceModule">
-        <table class="table">
-          <thead><tr><td colspan="3"><div class="circle p"></div> 会议[16]</td></tr></thead>
-          <tbody>
-          <tr>
-            <td>600,部门一,8009</td>
-            <td>会议中</td>
-            <td><a>查看</a></td>
-          </tr>
-
-          </tbody>
-
-        </table>
-      </div>
-      <div class="deviceModule">
-        <table class="table">
-          <thead><tr><td colspan="3"><div class="eye p"></div>视频[16]</td></tr></thead>
-          <tbody>
-          <tr>
-            <td>6001</td>
-            <td>视频中</td>
-            <td><a>查看</a></td>
-          </tr>
-
-          </tbody>
-
-        </table>
-      </div>
-      <div class="deviceModule">
-        <table class="table">
-          <thead><tr><td colspan="4"><div class="timer p"></div>预约播放[3]</td></tr></thead>
-          <tbody>
-          <tr>
-            <td>预案名称一</td>
-            <td>2017-12-31 12:00:00</td>
-            <td><a>查看</a><a>立即执行</a></td>
-          </tr>
-
-          </tbody>
-
-        </table>
-      </div>
-    </div>
-    <div class="audio-box">
-      <audio ref="audio" ></audio>
-      <span class="fa fa-times" @click="close"></span>
+    <div class="audio-box" style="top: 5px;">
+       <audio ref="audio" ></audio>
       <div class="audio-container">
         <div class="audio-view">
-          <div class="audio-title">{{ activeIndex == -1 ? '' : playlist[activeIndex].FileName }}</div>
-          <div class="audio-body">
-            <div class="audio-backs">
-              <div class="audio-this-time">{{now}}</div>
-              <div class="audio-count-time">{{ activeIndex == -1 ? '' : playlist[activeIndex].FileTime }}</div>
-              <div class="audio-setbacks">
-                <i class="audio-this-setbacks">
-                  <span class="audio-backs-btn"></span>
-                </i>
-                <span class="audio-cache-setbacks">
-								</span>
-              </div>
-            </div>
-          </div>
-          <div class="audio-btn">
-            <div class="audio-select">
-              <div class="audio-prev" @click="prev"></div>
-              <div class="audio-play" @click="playToggle()"></div>
-              <div class="audio-next" @click="next"></div>
-              <div class="audio-menu" @click="openSonglist"></div>
-              <div class="audio-volume" @click="mute"></div>
-            </div>
-            <div class="audio-set-volume">9
-              <div class="volume-box">
-                <i><span></span></i>
-              </div>
-            </div>
-            <div class="audio-list" v-show="songlistShow">
-              <div class="audio-list-head">
-                <p>☺随心听</p>
-                <span class="menu-close" @click="openSonglist">关闭</span>
-              </div>
-              <ul class="audio-inline">
-                <li v-for="song in playlist" style="">{{ song.FileName }}</li>
-              </ul>
-            </div>
-          </div>
-        </div>
+          <span>设备号码:{{this.selectPhonex==null?'':this.selectPhonex.userID}}   设备名字:{{this.selectPhonex==null?'':this.selectPhonex.name}}   IP地址:{{this.selectPhonex==null?'':this.selectPhonex.networkIP+":"+this.selectPhonex.networkPort}}</span>
+        </div> 
       </div>
     </div>
   </div>
@@ -177,7 +45,7 @@
 
       }
     },
-    mounted() {
+    /*mounted() {
       this.$refs.audio.addEventListener('play', function() {
         // 播放时长解析
         // 1. 进度条移动
@@ -212,14 +80,15 @@
             this.now = '00:00'
          $('.audio-backs-btn').css('right', "-4px")
       }.bind(this), false);
-    },
+    },*/   
     created() {
     },
     computed: {
       ...mapGetters({
         play: 'play',
         playlist: 'playlist',
-        mediaPath: 'mediaPath'
+        mediaPath: 'mediaPath',
+        selectPhonex: 'selectPhonex'
       }),
     },
     watch: {

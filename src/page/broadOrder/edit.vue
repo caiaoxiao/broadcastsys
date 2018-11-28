@@ -427,22 +427,29 @@
       selectItem(device) {
         if(!device.selected) {
           this.selectDevice.push(device)
+          device.selected = true 
         }else {
           this.deleteDevice(device)
         }
-        device.selected = !device.selected
 
       },
       selectAll(type) {
         if(type == 1) {
           if(!this.isSelectAll) {
-            this.deviceList.forEach(function(d,i){
+	    this.selectDevice = []
+            this.deviceList.forEach((d,i)=>{
+	      if(d.deviceState == 'registered' || d.deviceState == 'registeredM'){
               d.selected = true
+	      this.selectDevice.push(d)
+	     }
             })
-            this.selectDevice = this.deviceList
           }else {
-            this.deviceList.forEach(function(d,i){
-              d.selected = false
+	     this.selectDevice = []
+            this.deviceList.forEach((d,i)=>{
+	      if(d.deviceState == 'registered' || d.deviceState == 'registeredM'){
+	       d.selected = false
+	       this.deleteDevice(d) 
+	     }
             })
           }
           this.isSelectAll = !this.isSelectAll
@@ -454,6 +461,7 @@
 
             this.selectDevice.splice(i,1)
           }
+          device.selected = false 
         }.bind(this))
       },
       deleteAll() {

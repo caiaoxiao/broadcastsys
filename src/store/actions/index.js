@@ -105,8 +105,9 @@ export default {
   setUserGroup({ commit }, data) {
     commit('SET_USER_GROUP', data)
   },
-  setZhiBan({ commit }, data) {
-    commit('SET_ZHI_BAN', data)
+  //  当前选中的设备队列
+  setSelectPhonex({ commit }, data) {
+    commit('SET_SELECT_PHONEX', data)
   },
   setAlarmAddress({ commit }, data) {
     commit('SET_ALARM_ADDRESS', data)

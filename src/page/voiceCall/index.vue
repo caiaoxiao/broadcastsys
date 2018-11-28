@@ -15,7 +15,7 @@
           <div class="moduleList " id="height01">
             <div class="singleM" v-for="item in deviceList">
               <div class="moduleStyle" :class="returnClass(item.deviceState,item.type)" @click.stop="itemClick($event, item)">
-                <div class="moduleNum"><i class="fa fa-video-camera" aria-hidden="true"></i>{{item.userID + " " + (item.name==null?"":item.name)}}</div>
+                <div class="moduleNum" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><i class="fa fa-video-camera" aria-hidden="true"></i>{{item.userID + " " + (item.name==null?"":item.name)}}</div>
                 <div class="moduleKind">{{returnType(item.type)}}
 			<i class="fa fa-user" v-if = "item.deviceState=='active' || item.deviceState=='ringing'"></i>
                         {{(item.calling==null?"":item.calling)}}
@@ -141,6 +141,7 @@ export default {
       this.verto = this.get_user_info.freeswitchData.VertoID
       this.organizationid = this.get_user_info.user.organizationid
       //this.initData()
+      this.refresh()
     })
   },
   computed: {
@@ -155,6 +156,7 @@ export default {
       currentLoginUser:'currentLoginUser',
       userGroup:'userGroup',
       get_user_info: GET_USER_INFO,
+      selectPhonex: 'selectPhonex',
     })
   },
   methods: {
@@ -227,6 +229,9 @@ export default {
       }
     },
     refresh (item) {
+      this.$store.dispatch('setSelectPhonex',null)
+      console.log("111")
+      console.log(this.selectPhonex)
       this.userGroup.forEach((r, i) => {
               r.selected = false
             })
@@ -241,8 +246,28 @@ export default {
       console.log(row)
       let target = e.currentTarget
       let _this = this
-
-      if ($(target).hasClass('online')) {
+      let ifAdd = 0
+      this.selectPhone.forEach(function (s, i) {
+        if (s.userID === row.userID) {
+          ifAdd = 1 
+        }
+      })
+      if (this.selectPhonex === null && ifAdd === 0) {
+        this.$store.dispatch('setSelectPhonex',row) 
+      }else if(this.selectPhonex === null && ifAdd === 1) {
+        this.$store.dispatch('setSelectPhonex',null)
+      }else {
+        if (this.selectPhonex.userID === row.userID) {
+          this.$store.dispatch('setSelectPhonex',null) 
+        }else {
+          if(ifAdd === 1) {
+          }else { 
+            this.$store.dispatch('setSelectPhonex',row) 
+          }
+        }
+      }
+      console.log(this.selectPhonex)
+     if ($(target).hasClass('online')) {
         if ($(target).hasClass("onlineSelected")) {
           $(target).removeClass("onlineSelected")
           this.selectPhone.forEach(function (s, i) {

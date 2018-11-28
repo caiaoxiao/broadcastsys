@@ -168,12 +168,13 @@
         vertoHandle:'vertoHandle',           // verto初始化
         deviceList:'deviceList',                       // 所有设备
         currentLoginUser:'currentLoginUser',  // 当前用户
-	      callQueue:'callQueue',
-	      userGroup:'userGroup',
-	      confIpBoard:'confIpBoard',
-	      choosenConfIpboard:'choosenConfIpboard',
+	callQueue:'callQueue',
+	userGroup:'userGroup',
+	confIpBoard:'confIpBoard',
+	choosenConfIpboard:'choosenConfIpboard',
         whetherPlayAnotherSong:'whetherPlayAnotherSong',
         get_user_info: GET_USER_INFO,
+        selectPhonex: 'selectPhonex',
       }),
     },
     methods: {
@@ -286,7 +287,16 @@
    itemClick (e, row) {
       let target = e.currentTarget
       let _this = this
-
+      /* let ifAdd = 0
+      this.selectPhonex.forEach(function (s, i) {
+        if (s.userID == row.userID) {
+          ifAdd = 1
+          _this.selectPhonex.splice(i, 1)
+        }
+      })
+      if (ifAdd===0) {
+        this.selectPhonex.push(row)
+      }  */
       if ($(target).hasClass('online')) {
         if ($(target).hasClass("onlineSelected")) {
           $(target).removeClass("onlineSelected")
@@ -522,6 +532,7 @@
       },
       tmute(){
           // this.fsAPI("conference",this.name + " " + "pause_play" + "all",function(res) {console.log("zan ting")}.bind(this));
+	console.log(this.confIpBoard)
         this.confIpBoard.forEach((item,index)=>{	
 	if(item.caller_id_number==this.verto)
 	this.fsAPI('conference',this.choosenConfIpboard+'-scc.ieyeplus.com'+' '+'tmute'+' '+item.conf_id)

@@ -124,6 +124,7 @@
         this.$ajax.post('CallRecord/List', this.formData)
           .then(function(res) {
             if(res.data.code == 1) {
+              console.log(res.data.result)
               this.dataAll = res.data.result
               this.pageData.total = res.data.total
             }
@@ -246,9 +247,6 @@
       border: none;
     }
   }
-  /* .el-input input, label {
-    color: #555!important;
-  } */ 
   .el-time-spinner__item {
     color: #555!important;
   }

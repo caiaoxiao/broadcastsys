@@ -115,22 +115,27 @@
         if(this.$router.history.current.fullPath=="/voiceCall"){
           this.conf = this.$store.getters.confLeft
           this.confname = {name:'confleft',num: this.voice,show:"通话"}
+	  this.choosenConf = this.voice
         }
         else if(this.$router.history.current.fullPath=="/ipBroad") {
           this.conf = this.$store.getters.confIpBoard
           this.confname = {name:'confipboard',num:this.broad,show:"广播"}
+	  this.choosenConf = this.broad
         }
         else if(this.$router.history.current.fullPath=="/meeting") {
                 this.conf = this.$store.getters.confMeeting
                 this.confname = {name:'confmeeting',num:this.meeting,show:"会议"}
+	  this.choosenConf = this.meeting
         }
         else if(this.$router.history.current.fullPath=="/radio") {
                 this.conf = this.$store.getters.confMeeting
                 this.confname = {name:'confmeeting',num:this.meeting,show:"对讲"}
+	  this.choosenConf = this.meeting
         }
         else if(this.$router.history.current.fullPath=="/alarm") {
                 this.conf = this.$store.getters.confAlarm
                 this.confname = {name:'confalarm',num:this.alarm,show:"告警"}
+	  this.choosenConf = this.alarm
         }
         this.refresh()
       })
@@ -254,8 +259,7 @@
                                 "roleid":this.roleid
                               }
                             }).then((re)=>{
-                              this.conf_detail  = re.data.result
-                              this.choosenConf = this.conf_detail[0].conf_num
+                              this.conf_detail = re.data.result
                               this.conf_detail.forEach((co)=>{
                                 co.num = 0
                               })

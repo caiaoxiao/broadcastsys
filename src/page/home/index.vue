@@ -322,7 +322,7 @@
 
                       // New user joined conference.
                       case "add":
-		      if(liveArrayObj.name ==_this.meeting+'-scc.ieyeplus.com'){
+		      if(liveArrayObj.name ==_this.meeting+'-scc.ieyeplus.com' || liveArrayObj.name.slice(0,2) == '83'){
               let preId = ""	
               let length = arr.length
               arr.forEach((co,index)=>{
@@ -595,6 +595,8 @@
                                   this.usermap[r.devicecode].list = []
                                   this.usermap[r.devicecode].type =r.type
                                   this.usermap[r.devicecode].name = r.devicename
+                                  this.usermap[r.devicecode].ip = r.type == 2?r.ipaddress:null 
+                                  this.usermap[r.devicecode].port = r.type == 2?r.port:null 
                                 }
                             })
 			                  if(this.targetUserGroupId!="" || this.TreeData.parentid=="0")
@@ -641,8 +643,8 @@
                                   user.userID = item
                                   user.callDirection = null
                                   user.channelUUID = null
-                                  user.networkIP = null
-                                  user.networkPort = null
+                                  user.networkIP = this.usermap[item].type == 2?this.usermap[item].ip:null 
+                                  user.networkPort = this.usermap[item].type == 2?this.usermap[item].port:null 
                                   user.operationState = 0
                                   user.oppoChannelUUID = null
                                   user.groupid = this.usermap[item].list
@@ -713,7 +715,7 @@
                                           if( element!= ""){
                                           let conference_data = element.split(";")
                                           let sound = conference_data[5].split("|")
-                                          if(conference_data[4] == item.presence_id.slice(0,item.presence_id.indexOf('@'))){
+                                          if(conference_data[4] == item.presence_id.slice(0,item.presence_id.indexOf('@')) || conference_data[4] == item.cid_num){
                                               if(arr.length == 0 ||  arr.every(function(item,index,array){return item.key!=conference_data[2]}))
                                               arr.push({
                                                 conf_id : conference_data[0],
@@ -733,7 +735,7 @@
                                         }
                                         let deviceList = this.$store.getters.deviceList
                                         deviceList.forEach((device,index) => {
-                                          if(device.userID == item.presence_id.slice(0,item.presence_id.indexOf('@'))){
+                                          if(device.userID == item.presence_id.slice(0,item.presence_id.indexOf('@')) || device.userID == item.name.slice(item.name.indexOf('/')+1,item.name.indexOf('-')) && item.name[item.name.length-1]=='a'){
                                             if(item.callstate == "RINGING"  || item.callstate == "EARLY" || item.callstate =="RING_WAIT")
                                               device.deviceState = "ringing"
                                             else if(item.callstate == "ACTIVE"){
@@ -857,7 +859,7 @@
                                           if( element!= ""){
                                           let conference_data = element.split(";")
                                           let sound = conference_data[5].split("|")
-                                          if(conference_data[4] == item.presence_id.slice(0,item.presence_id.indexOf('@'))){
+                                          if(conference_data[4] == item.presence_id.slice(0,item.presence_id.indexOf('@')) || conference_data[4] == item.cid_num){
                                               if(arr.length == 0 ||  arr.every(function(item,index,array){return item.key!=conference_data[2]}))
                                               arr.push({
                                                 conf_id : conference_data[0],
@@ -876,7 +878,7 @@
                                         }
                                         let deviceList = this.$store.getters.deviceList
                                         deviceList.forEach((device,index) => {
-                                          if(device.userID == item.presence_id.slice(0,item.presence_id.indexOf('@'))){
+                                          if(device.userID == item.presence_id.slice(0,item.presence_id.indexOf('@')) || device.userID == item.name.slice(item.name.indexOf('/')+1,item.name.indexOf('-')) &&item.name[item.name.length-1]=='a'){
                                             if(item.callstate == "RINGING"  || item.callstate == "EARLY" || item.callstate =="RING_WAIT")
                                               device.deviceState = "ringing"
                                             else if(item.callstate == "ACTIVE"){

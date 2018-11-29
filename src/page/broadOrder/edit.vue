@@ -75,28 +75,38 @@
           <div>
             <div class="sp-department">
               <ul data-name="title">
-                <li class="on">部门一</li>
-                <li>部门二bum</li>
+                <li class="on">广播组</li>
+                <li>顺振队列组</li>
+                <li>同振队列组</li>
+                <li>对讲组</li>
+                <li>会议组</li>
               </ul>
             </div>
             <div class="sp-right" data-name="con">
               <div>
                 <div class="selectedList" id="height05">
-                  <div class="singleFlies">1002</div>
-                  <div class="singleFlies">2008</div>
-                  <div class="singleFlies">9281</div>
-                  <div class="singleFlies">9809</div>
+                  <div class="singleFlies" :class="conf.selected ? 'selected' : ''" v-for="conf in group1" @click="selectItemx(conf)">{{conf.conf_num}}</div>
                 </div>
-                <div class="selectAll">全部</div>
               </div>
               <div>
                 <div class="selectedList" id="height06">
-                  <div class="singleFlies">123</div>
-                  <div class="singleFlies">98760</div>
-                  <div class="singleFlies">8866</div>
-                  <div class="singleFlies">01928</div>
+                  <div class="singleFlies" :class="conf.selected ? 'selected' : ''" v-for="conf in group2" @click="selectItemx(conf)">{{conf.conf_num}}</div>
+                </div> 
+              </div>
+              <div>
+                <div class="selectedList" id="height10">
+                  <div class="singleFlies" :class="conf.selected ? 'selected' : ''" v-for="conf in group3" @click="selectItemx(conf)">{{conf.conf_num}}</div>
                 </div>
-                <div class="selectAll">全部</div>
+              </div>
+              <div>
+                <div class="selectedList" id="height11">
+                  <div class="singleFlies" :class="conf.selected ? 'selected' : ''" v-for="conf in group4" @click="selectItemx(conf)">{{conf.conf_num}}</div>
+                </div>
+              </div>
+              <div>
+                <div class="selectedList" id="height12">
+                  <div class="singleFlies" :class="conf.selected ? 'selected' : ''" v-for="conf in group5" @click="selectItemx(conf)">{{conf.conf_num}}</div>
+                </div>
               </div>
             </div>
 
@@ -210,11 +220,20 @@
       return {
         playList: [],       // 歌单列表
         selectDevice: [],   // 已勾选的设备
+        selectConf: [],     // 已勾选的组
         checkplaylist: [],
         isSelectAll: false, // 是否全选
         playCount: 0,
         cycleIndex: 0,      // 预案循环次数
         cycleTime:-1,
+        group1: [],
+        group2: [],
+        group3: [],
+        group4: [],
+        group5: [],
+        instance : this.$ajax.create({
+          baseURL: 'https://scc.ieyeplus.com:8001/'
+        }),
         formData: {
           CreateUserID: '133585596bb04c9cbe311d0859dd7196',
           PlanName: '',
@@ -257,6 +276,7 @@
         this.voice = this.get_user_info.freeswitchData.VoiceCallID
     	this.alarm = this.get_user_info.freeswitchData.AlarmID
 	this.broad = this.get_user_info.freeswitchData.BroadID
+        this.organizationid = this.get_user_info.user.organizationid
       })
     },
     components: {
@@ -271,7 +291,21 @@
       }),
     },
     methods: {
-      refresh() {
+      async refresh() {
+        let resultxxx = await this.instance({method:'get',url:`Organization/getDeviceGroup/${this.get_user_info.user.organizationid}`})
+        resultxxx.data.result.forEach((s,i) => {
+          if(s.conf_num.substring(0,2)==='80') {
+            this.group1.push(s)
+          }else if (s.conf_num.substring(0,2)==='81') {
+            this.group2.push(s)
+          }else if (s.conf_num.substring(0,2)==='82') {
+            this.group3.push(s)
+          }else if (s.conf_num.substring(0,2)==='83') {
+            this.group4.push(s)
+          }else {
+            this.group5.push(s)
+          } 
+        }) 
         // 1、查询歌单数组
         this.$ajax.get('Folder/getTreeFiles', {params: {UserID: '133585596bb04c9cbe311d0859dd7196'}})
           .then(res => {
@@ -304,20 +338,7 @@
                 registrations.push(msg);
               }
             }
-	  /* 
-            registrations.forEach(function(r) {
-              let user = {}
-              user.deviceState = "registered"
-              user.userid = r.reg_user
-              user.callDirection = null
-              user.selected = false
-              deviceList.push(user)
-            })
-	    
-            if (deviceList.length) this.deviceList = deviceList
-	  */
           }.bind(this),function(data) {
-            console.log("error:"+data)
           }.bind(this))
 
         // 订阅注册事件
@@ -360,12 +381,10 @@
       },
       everyWeek() {
         this.dayOrWeek = 2 
-        console.log(this.dayOrWeek)
         this.cycleIndex = 7 
       },
       everyDay() {
         this.dayOrWeek = 1
-        console.log(this.dayOrWeek)
         this.cycleIndex = 1
       }, 
       textPlay() {
@@ -406,8 +425,6 @@
         }
       },
       selectSonglist(songlist){
-        console.log("The vertoHandle is:",this.vertoHandle) 
-
         if(!songlist.selected) {
            this.formData.folders.push(songlist)   
            this.selectSongList.push(songlist);
@@ -420,8 +437,6 @@
             }
           }.bind(this))
         }
-
- 
         songlist.selected = !songlist.selected
       },
       selectItem(device) {
@@ -431,7 +446,37 @@
         }else {
           this.deleteDevice(device)
         }
-
+      },
+      async selectItemx(conf) {
+        if(!conf.selected) {
+          let deviceyyy = []
+          let resultyyy = await this.instance({method:'get',url:`DeviceGroup/Detail/${conf.id}`})
+          resultyyy.data.result.deviceGroups.forEach((s,i) => {
+            deviceyyy.push(s.devicecode)
+          })
+          let deviceyyyadd = []
+          this.deviceList.forEach((s,i) => {
+            deviceyyy.forEach((x,y) => {
+              if(s.userID==x){
+                deviceyyyadd.push(s)
+              }
+            })
+          })
+          deviceyyyadd.forEach((s,i) => {
+            let exist = 0 
+            this.selectDevice.forEach((x,y) => {
+              if(s.userID == x.userID) {
+                exist = 1
+              }
+            })
+            if(exist==0) {
+              s.selected = true
+              this.selectDevice.push(s)
+            }
+          })   
+        }else {
+          this.deleteConf(conf)
+        }
       },
       selectAll(type) {
         if(type == 1) {
@@ -458,10 +503,17 @@
       deleteDevice(device) {
         this.selectDevice.forEach(function(s,i) {
           if(device.userID == s.userID) {
-
             this.selectDevice.splice(i,1)
           }
           device.selected = false 
+        }.bind(this))
+      },
+      deleteConf(conf) {
+        this.selectConf.forEach(function(s,i) {
+          if(conf.conf_num == s.conf_num) {
+            this.selectConf.splice(i,1)
+          }
+          conf.selected = false
         }.bind(this))
       },
       deleteAll() {
@@ -480,7 +532,6 @@
         this.dialogShow = false
       },
       submitPlan() {
-        console.log(this.selectSongList)  
 	Date.prototype.format = function(format)
 {
  var o = {
@@ -500,12 +551,9 @@
  ("00"+ o[k]).substr((""+ o[k]).length));
  return format;
 }
-        console.log("The time1 is:",this.formData.PlanPreTime)
- 	console.log("broad is:" ,this.broad)
         this.xData.period = String(this.cycleIndex * 86400);
         let path = '';
         this.xData.time = this.formData.PlanPreTime.format('yyyy-MM-dd hh:mm:ss')
-        console.log("The time2 is:",this.xData.time)
         this.xData.meeting = this.broad
         if(this.xData.cmdtype == 1) {
            this.selectSongList.forEach(function(c,i) {
@@ -516,21 +564,6 @@
            }.bind(this))  
            this.xData.path = path
         }
-	/*
-        this.$ajax.post('QzTask/add',this.xData)
-          .then((res) => {
-            if(res.data.code == 1) {
-              let device_ids = ""
-              this.selectDevice.forEach((element,i) => {
-                if(i!=0)
-                device_ids+="-"
-                device_ids+=element.userid
-              })
-              this.$ajax.get('https://scc.ieyeplus.com:8082/api/scheds/'+res.data.result.id+'%'+this.broad+'%'+this.cycleTime)
-            }else {
-            }
-          })
-	*/
         // 提交预案
         if(this.formData.PlanName == ''){
           this.dialogText = '预案名称不能为空'
@@ -544,13 +577,10 @@
                 s.deviceid = s.userID;
               }.bind(this))
               this.formData.FeatureBases = this.selectDevice
-              console.log("this.xData is:",this.xData)
               this.formData.planmodel=this.cycleTime
                 this.$ajax.post('Plan/Create', Object.assign(this.formData,this.xData))
                   .then((res) => {
                     if(res.data.code == 1) {
-                      console.log("success"); 
-                      console.log(res.data.result.planid);
 		      let device_ids = ""
               this.selectDevice.forEach((element,i) => {
                 if(i!=0)
@@ -562,7 +592,6 @@
                       //this.$ajax.post(''+res.data.result.planid) 
                       this.$emit('close',1)
                     }else {
-                      console.log(res)
                     }
                   })
           }

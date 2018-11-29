@@ -298,7 +298,6 @@ export default {
             alarm_control:this.alarm_control 
           }           
           }).then((res)=>{
-          console.log("alarm_control更新成功")
           })
 
     },
@@ -314,7 +313,6 @@ export default {
             watcher:text
           }
   			}).then((res)=>{
-		      console.log("watcher更新成功")
 		    })
     },
     editWatcher(){
@@ -322,7 +320,6 @@ export default {
       this.editwatcher = true
     },
     setWatcherState(state){
-      console.log(state)
       this.instance({
     			method: 'post',
           url: '/watcher/'+ this.transferdata.targetMenuId,
@@ -341,7 +338,6 @@ export default {
     },
     // 渲染表格数据
     refresh () {
-      console.log(this.transferdata)
       let request = {
         organizationid: this.targetMenu.organizationid
       }
@@ -409,7 +405,6 @@ export default {
 	            }
               this.$ajax.all(axios)
                   .then((res) => {
-		      console.log(res)
                       for (let i = 0 ; i<length ; i++){
 			if(!this.deviceGroups.some((item)=>{return item.devicegroupid == res[i].data.result.devicegroupid})){
           res[i].data.result.deviceGroups.sort((x,y)=>{return x.devicecode - y.devicecode})
@@ -417,7 +412,6 @@ export default {
           this.deviceGroupsDelete.push(res[i].data.result.devicegroupid)
 		        	}
                 }
-                console.log(this.deviceGroups)
                })
             }
           })
@@ -455,7 +449,6 @@ export default {
       this.$ajax.post('Device/deletes', [request])
         .then(res => {
           if (res.data.code === 1) {
-            console.log('删除成功')
 	    this.deviceGroups = []
             this.refresh()
           }
@@ -465,7 +458,6 @@ export default {
       this.$ajax.delete(`User/Remove/${userId}`)
         .then(res => {
           if (res.data.code === 1) {
-            console.log('删除成功')
             this.refresh()
           }
         })
@@ -492,7 +484,6 @@ export default {
             this.$ajax.post(`Role/opRoleDevice/${this.targetUserGroupId}`,this.deviceGroups)              
               .then(res => {
                  if (res.data.code === 1) {
-                   console.log('新增成功')
                    this.refresh()
                  }
               })
@@ -509,7 +500,6 @@ export default {
 		})
       .then(res => {
           if (res.data.code === 1 ) {
-            console.log('删除成功')
             this.deviceGroups = []	
             this.refresh()
           }

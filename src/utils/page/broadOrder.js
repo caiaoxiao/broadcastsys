@@ -12,6 +12,15 @@ export function getHeights() {
 	  $("#height07").slimScroll({
 		      height: contentHeight / 2 - 220
 		    });
+          $("#height10").slimScroll({
+                      height: contentHeight / 2 - 170
+                    });
+          $("#height11").slimScroll({
+                      height: contentHeight / 2 - 170
+                    });
+          $("#height12").slimScroll({
+                      height: contentHeight / 2 - 170
+                    });
 	  $("#height04").slimScroll({
 		      height: contentHeight / 2 - 170
 		    });

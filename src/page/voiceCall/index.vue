@@ -229,6 +229,7 @@ export default {
       }
     },
     refresh (item) {
+      console.log(this.organizationid)  
       this.$store.dispatch('setSelectPhonex',null)
       console.log("111")
       console.log(this.selectPhonex)
@@ -335,6 +336,7 @@ export default {
 
     // 实现管理员和指定话机的强行通话
     async strongCall () {
+      console.log(this.organizationid)
       let users = this.deviceList
       let userChanged = false
       let select = this.selectNowCall[0]

@@ -30,7 +30,7 @@
 			<li
                 @click="refresh(item)"
 		:class="{on: item.selected}"
-                 v-for='item in userGroup'>{{ item.name }}</li>
+                 v-for='item in userGroup'>{{  item.name + " " + item.devicegroup_extn }}</li>
                 </ul>
               </div>
               <div class="rightDetailList" data-name="con">

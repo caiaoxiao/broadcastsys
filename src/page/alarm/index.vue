@@ -6,7 +6,7 @@
       <video width=800 id="webcam" autoplay="autoplay" hidden="true"></video>
     </div>
     <div ref="conf" class="middleCon">
-		<iframe  v-if="!alarm_address==''" allowTransparency="true" height = "20000" width = "100%" :src="alarm_address"></iframe>
+      <iframe  v-if="!alarm_address==''" allowTransparency="true" height = "20000" width = "100%" :src="alarm_address"></iframe>
       <div class="functionMenu">
       </div>
     </div>

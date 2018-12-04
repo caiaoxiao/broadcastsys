@@ -133,9 +133,9 @@
 	  this.choosenConf = this.meeting
         }
         else if(this.$router.history.current.fullPath=="/alarm") {
-                this.conf = this.$store.getters.confAlarm
-                this.confname = {name:'confalarm',num:this.alarm,show:"告警"}
-	  this.choosenConf = this.alarm
+                this.conf = this.$store.getters.confLeft
+                this.confname = {name:'confleft',num:this.voice,show:"语音"}
+	  this.choosenConf = this.voice
         }
         this.refresh()
       })

@@ -1208,26 +1208,7 @@
 
         if (callDirection == "inbound") { 
 
-          if ('9000' == callerNumber && '9001' == calleeNumber && channelCallState == 'ringing') {
-            users.forEach(function(user) {
-              if(user.operationState == 1) {
-                user.operationState = 0;
-                _this.fsAPI("uuid_bridge", channelUUID + " " + user.channelUUID, function(res) {console.log("qiang call")}.bind(this));
-                usersChanged = true;
-              }
-              else if (user.operationState == 2) {
-                user.operationState = 0
-                _this.fsAPI("uuid_bridge", channelUUID + " " + user.oppoChannelUUID, function(res) {console.log("qiang delete")}.bind(this))
-                usersChanged = true;
-              }
-              else if (user.operationState == 3) {
-                user.operationState = 0
-                _this.fsAPI("uuid_bridge", user.oppoChannelUUID + " " + channelUUID, function(res) {console.log("daijie")}.bind(this))
-                usersChanged = true;
-              }
-            })
-          }
-          if (callerNumber == currentLoginUser.userID) {
+         if (callerNumber == currentLoginUser.userID) {
             currentLoginUser.deviceState = caller_status
             currentLoginUser.channelUUID = channelUUID;
             currentLoginUser.callDirection = callDirection;

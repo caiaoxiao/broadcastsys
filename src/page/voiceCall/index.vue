@@ -346,10 +346,10 @@ export default {
           url: '/organization/'+ this.organizationid,
                         })
       if(result.data.enable_watcher){
-         this.fsAPI("originate","user/"+result.data.watcher+" 9001"+select.channelUUID+" XML default");
+         this.fsAPI("originate","user/"+result.data.watcher+" 9801"+select.channelUUID+" XML default");
        }else {
          this.vertoHandle.newCall({
-           destination_number: '9001' + select.channelUUID,
+           destination_number: '9801' + select.channelUUID,
            caller_id_name: this.verto,
            caller_id_number: this.verto,
            outgoingBandwidth: 'default',
@@ -393,10 +393,10 @@ export default {
           url: '/organization/'+ this.organizationid,
                         })
       if(result.data.enable_watcher){
-         this.fsAPI("originate","user/"+result.data.watcher+" 9003"+select.channelUUID+" XML default");
+         this.fsAPI("originate","user/"+result.data.watcher+" 9803"+select.channelUUID+" XML default");
        }else {
          this.vertoHandle.newCall({
-           destination_number: '9003' + select.channelUUID,
+           destination_number: '9803' + select.channelUUID,
            caller_id_name: this.verto,
            caller_id_number: this.verto,
            outgoingBandwidth: 'default',
@@ -423,10 +423,10 @@ export default {
           url: '/organization/'+ this.organizationid,
                         })
       if(result.data.enable_watcher){
-         this.fsAPI("originate","user/"+result.data.watcher+" 9002"+select.channelUUID+" XML default");
+         this.fsAPI("originate","user/"+result.data.watcher+" 9802"+select.channelUUID+" XML default");
        }else {
          this.vertoHandle.newCall({
-           destination_number: '9002' + select.channelUUID,
+           destination_number: '9802' + select.channelUUID,
            caller_id_name: this.verto,
            caller_id_number: this.verto,
            outgoingBandwidth: 'default',
@@ -455,10 +455,10 @@ export default {
           url: '/organization/'+ this.organizationid,
                         })
       if(result.data.enable_watcher){
-         this.fsAPI("originate","user/"+result.data.watcher+" 9004"+this.selectRingCall[0].oppoChannelUUID+" XML default");
+         this.fsAPI("originate","user/"+result.data.watcher+" 9804"+this.selectRingCall[0].oppoChannelUUID+" XML default");
        }else {
          this.vertoHandle.newCall({
-           destination_number: '9004' + this.selectRingCall[0].oppoChannelUUID,
+           destination_number: '9804' + this.selectRingCall[0].oppoChannelUUID,
            caller_id_name: this.verto,
            caller_id_number: this.verto,
            outgoingBandwidth: 'default',

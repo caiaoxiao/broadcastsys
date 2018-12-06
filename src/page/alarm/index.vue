@@ -50,6 +50,7 @@ export default {
       this.height = this.$refs.conf.offsetHeight
       //console.log(this.height)
       this.verto = this.get_user_info.freeswitchData.VertoID
+      this.refresh()
     })
   },
   computed: {
@@ -65,9 +66,13 @@ export default {
       userGroup:'userGroup',
       get_user_info: GET_USER_INFO,
       alarm_address:'alarmAddress',
+      selectPhonex: 'selectPhonex',
     })
   },
   methods: {
+    refresh(){
+      this.$store.dispatch('setSelectPhonex',null)
+    },
     // 获取设备分组数据
     reset(){
     },

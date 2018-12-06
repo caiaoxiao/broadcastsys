@@ -156,6 +156,7 @@
         this.verto = this.get_user_info.freeswitchData.VertoID
         this.broad = this.get_user_info.freeswitchData.BroadID
         this.name = this.broad + '-' + window.location.hostname
+        this.refresh()
         this.reFresh()
       })
     },
@@ -261,6 +262,7 @@
       }
     },
     refresh (item) {
+      this.$store.dispatch('setSelectPhonex',null)
       this.userGroup.forEach((r, i) => {
               r.selected = false
             })

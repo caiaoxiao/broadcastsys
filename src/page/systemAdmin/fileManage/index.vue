@@ -183,6 +183,7 @@
     computed: {
       ...mapGetters({
         dialogStatu: 'dialogStatu',
+        selectPhonex: 'selectPhonex',
       }),
     }, 
     directives: {
@@ -213,6 +214,7 @@
         }
       },
       refresh() {
+        this.$store.dispatch('setSelectPhonex',null)
         // 1、查询歌单数组
         this.$ajax.get('Folder/getTreeFiles', {params: {UserID: '133585596bb04c9cbe311d0859dd7196'}})
           .then(res => {

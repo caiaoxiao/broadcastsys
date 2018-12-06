@@ -112,6 +112,9 @@ export default {
   setAlarmAddress({ commit }, data) {
     commit('SET_ALARM_ADDRESS', data)
   },
+  setVertoClose({ commit }, data) {
+    commit('SET_VERTO_CLOSE', data)
+  },
   setPlayFileDoneFlag({ commit }, data) {
     commit('SET_PLAY_FILE_DONE_FLAG', data)
   },

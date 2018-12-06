@@ -59,6 +59,7 @@ export default {
   mediaPath: '',
   // 是否订阅会议回调
   use_livearray: false,
+  vertoClose: 0,
   alarmAddress:"",
   playFileDoneFlag:false,
 }

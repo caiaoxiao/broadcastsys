@@ -198,6 +198,7 @@
         dialogShow: 'dialogShow',
 	get_user_info: GET_USER_INFO,
         // deviceList:'deviceList',
+        selectPhonex: 'selectPhonex',
       }),
     },
     components: {
@@ -235,6 +236,7 @@
 	return (year+"-"+month+"-"+date+" "+hour+":"+minutes+":"+second);
       },
       refresh() {
+       this.$store.dispatch('setSelectPhonex',null)
        this.instance({
 	  method: 'post',
           url : '/Plan/List',

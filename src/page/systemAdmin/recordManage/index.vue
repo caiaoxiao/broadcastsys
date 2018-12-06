@@ -50,7 +50,7 @@
           <tr @click="selectClick(item, index)" v-for="(item, index) in dataAll">
             <td>{{item.startstamp}}</td>
             <td>{{item.callernumber}}</td>
-            <td>{{item.calleenumber.substring(0,4)}}</td>
+            <td>{{item.calleenumber==null?'':item.calleenumber.substring(0,4)}}</td>
             <td>{{item.duration}}</td>
             <td>应答</td>
             <!--    <td>

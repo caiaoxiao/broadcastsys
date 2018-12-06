@@ -15,7 +15,7 @@
        <audio ref="audio" ></audio>
       <div class="audio-container">
         <div class="audio-view">
-          <span>设备号码:{{this.selectPhonex==null?'':this.selectPhonex.userID}}   设备名字:{{this.selectPhonex==null?'':this.selectPhonex.name}}   IP地址:{{this.selectPhonex==null?'':this.selectPhonex.networkIP+":"+this.selectPhonex.networkPort}}</span>
+          <span>{{this.selectPhonex==null?'':'设备号码:'+this.selectPhonex.userID}}   {{this.selectPhonex==null?'':'设备名字:'+this.selectPhonex.name}}   {{(this.selectPhonex==null||this.selectPhonex.networkIP==null)?'':'IP地址:'+this.selectPhonex.networkIP+":"+this.selectPhonex.networkPort}}</span>
         </div> 
       </div>
     </div>

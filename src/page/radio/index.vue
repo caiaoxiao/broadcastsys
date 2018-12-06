@@ -115,6 +115,7 @@
 	      userGroup:'userGroup',
         confMeeting:'confMeeting',
         get_user_info: GET_USER_INFO,
+        selectPhonex: 'selectPhonex',
       }),
     },
     components: {
@@ -130,6 +131,7 @@
         this.name = this.get_user_info.freeswitchData.MeetingID + '-' + window.location.hostname
         this.meeting = this.get_user_info.freeswitchData.MeetingID
 	this.org =  this.get_user_info.user.OrgName
+        this.refresh()
       })
     },
     methods: {
@@ -201,6 +203,7 @@
       }
     },
     refresh (item) {
+      this.$store.dispatch('setSelectPhonex',null)
       this.userGroup.forEach((r, i) => {
               r.selected = false
             })

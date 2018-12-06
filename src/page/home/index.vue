@@ -5,6 +5,10 @@
     <footNav :username = "username"></footNav>
     <switch-left></switch-left>
     <tree-list @refresh = "refresh"> </tree-list>
+    <!--audio ref = "alarm"  src = "/static/alarm.mp3" ></audio-->
+    <audio ref = "alarm"  src = "alarm.mp3" ></audio>
+    <!--audio ref = "voice"  src = "/static/voice.mp3" ></audio-->
+    <audio ref = "voice"  src = "voice.mp3" ></audio>
   </div>
 </template>
 
@@ -147,9 +151,23 @@
 		})
 	   this.$store.dispatch('setConfAlarm',[])
 	}
+      },
+      'confLeft':function(conf){
+        for(var  i = 0;i < conf.length;i++)
+                  if(conf[i].caller_id_number == this.verto)
+                        {   this.flag_conf = true
+			    this.$refs.voice.pause()
+			    this.$refs.voiceLong.pause()
+                            break
+                        }
+        if(i==conf.length)
+             this.flag_conf = false
       }
     },
     methods: {
+      console(){
+	console.log("asdasdas")
+      },
       initVertoHandle(status) {
         let _this = this
         this.$store.dispatch('setVertoInit',
@@ -380,8 +398,17 @@
                         })
                         console.log(action,arr)
                         _this.$store.dispatch(action,arr)
+      if( liveArrayObj.name ==_this.voice+'-scc.ieyeplus.com' && !arr.some((it)=>{return it.caller_id_number == _this.verto}) && _this.currentLoginUser.deviceState == 'registered')
+	{
+	  _this.$refs.voice.play()
+	}
+      else if( liveArrayObj.name ==_this.voice+'-scc.ieyeplus.com' && args.data[1]!=_this.verto)
+	  {
+	  _this.$refs.voice.play()
+	  }
       if( liveArrayObj.name ==_this.alarm+'-scc.ieyeplus.com' && args.data[1]!=_this.verto)
 			{
+	  _this.$refs.alarm.play()
           let deviceCode = args.data[1]
           _this.$ajax.post('Basic/List')
           .then(res=>{

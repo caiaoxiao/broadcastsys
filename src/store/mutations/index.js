@@ -121,6 +121,9 @@ export default {
   SET_SELECT_PHONEX: (state, data) => {
     state.selectPhonex = data
   },
+  SET_VERTO_CLOSE: (state, data) => {
+    state.vertoClose = data
+  },
   SET_CHOOSEN_CONF_IPBOARD: (state, data) => {
     state.choosenConfIpboard = data
   },

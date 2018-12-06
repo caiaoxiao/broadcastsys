@@ -9,7 +9,7 @@
     </div>
     <audio id="music"></audio>
     <div class="span_large">
-      <div class="location_indicator"></div>
+      <div :class="this.vertoClose==0?'':'location_indicator'"></div>
     </div>
     <div class="audio-box" style="top: 5px;">
        <audio ref="audio" ></audio>
@@ -88,7 +88,8 @@
         play: 'play',
         playlist: 'playlist',
         mediaPath: 'mediaPath',
-        selectPhonex: 'selectPhonex'
+        selectPhonex: 'selectPhonex',
+        vertoClose: 'vertoClose',
       }),
     },
     watch: {

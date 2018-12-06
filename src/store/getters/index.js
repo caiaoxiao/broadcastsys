@@ -53,6 +53,9 @@ export default {
     return state.phoneNum
   },
   // verto.js about
+  vertoClose: state => {
+    return state.vertoClose
+  },
   vertoHandle: state => {
     return state.vertoHandle
   },

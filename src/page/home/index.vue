@@ -90,7 +90,7 @@
         TreeData:'TreeData',
         freeswitchData:'freeswitchData',
         get_user_info: GET_USER_INFO,
-
+        vertoClose: 'vertoClose',
       }),
     },
     watch: { 
@@ -190,11 +190,12 @@
           }, {
             onWSLogin(verto, success) {
               // 登录回调
-            
+              _this.$store.dispatch('setVertoClose',0) 
               _this.refresh()
               console.log('onWSLogin', success);
             },
             onWSClose(verto, success) {
+              _this.$store.dispatch('setVertoClose',1)
               console.log('onWSClose', success);
             },
             onDialogState: function(d) {

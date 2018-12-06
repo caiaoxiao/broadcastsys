@@ -94,7 +94,7 @@ export default {
       formData: {
         devicecode: '',
         devicename: '',
-	      password:'',
+	password:'',
         type: 0,
         devicevedios: [{ vediourl: '' }, { vediourl: '' }, { vediourl: '' }, { vediourl: '' }],
         feature:{ organizationid :  this.transferdata.targetMenuId ,aliasname:""},
@@ -147,7 +147,7 @@ export default {
           let temp = new Object()
           temp.devicecode = String(parseInt(this.formData.devicecode)+i)
           temp.devicename =  flag == true ? temp.devicecode : (range==1?this.formData.devicename:(this.formData.devicename+'-'+String(i)))
-          temp.password = this.formData.password
+          temp.password = this.formData.password == ''?this.formData.devicecode:this.formData.password
           temp.type = this.formData.type
           temp.devicevedios = this.formData.devicevedios
           temp.feature = this.formData.feature

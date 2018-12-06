@@ -466,10 +466,13 @@
 								if(res.data.alarm_control == 'popup'){
                    window.open(url,'newwindow','height=1920,width=1080,top=0,left=0,toolbar=no,menubar=no,scrollbars=no,location=no, status=no')
 								}
-								else{
+								else if (res.data.alarm_control == 'router'){
 								_this.$store.dispatch('setAlarmAddress',url)	
 								_this.$router.push('/alarm')
 								}
+								else if (res.data.alarm_control == 'matrix'){
+								_this.$ajax.get("https://scc.ieyeplus.com:8001/" + basic_id + alarm_devices.join('|'))
+                                                                }
 								})
         			}) 				
 						}

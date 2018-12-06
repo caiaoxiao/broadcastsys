@@ -55,7 +55,7 @@
               <td>{{broad}}</td>
               <td>{{meeting}}</td>
               <td  :contenteditable = "contenteditable" @blur="()=>{this.editwatcher = false ;this.contenteditable = false}" @keydown.13 = "editWatcherFinished($event)" v-focus = "editwatcher" >{{enable_watcher==true?watcher:""}}</td>
-	      <td> {{alarm_control=="popup"?"弹窗模式":"路由模式"}} </td>
+	      <td> {{alarm_control=="popup"?"弹窗模式":(alarm_control=="matrix"?"矩阵模式":"路由模式")}} </td>
             </tr>
           </tbody>
         </table>
@@ -287,9 +287,12 @@ export default {
     changeAlarmControl(){
 	if(this.alarm_control=="popup")
 	this.alarm_control = "router"
- 	else{
-	this.alarm_control = "popup"	
+ 	else if(this.alarm_control=="router"){
 	this.$store.dispatch("setAlarmAddress","")
+	this.alarm_control = "matrix"	
+	}
+	else if(this.alarm_control=="matrix"){
+	this.alarm_control = "popup"
 	}
 	this.instance({
           method: 'post',
@@ -367,10 +370,7 @@ export default {
                         method: 'get',
                         url: '/alarm_control/'+ this.transferdata.targetMenuId,
                         }).then((res)=>{
-			if(res.data.alarm_control=="popup")
-                        this.alarm_control = "popup" 
-			else
-			this.alarm_control = "router"
+                        this.alarm_control = res.data.alarm_control 
                 })
           }
       })

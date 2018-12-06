@@ -472,7 +472,7 @@
 								_this.$router.push('/alarm')
 								}
 								else if (res.data.alarm_control == 'matrix'){
-								_this.$ajax.get("https://scc.ieyeplus.com:8001/" + basic_id + alarm_devices.join('|'))
+								_this.$ajax.get("https://scc.ieyeplus.com:8001/" + "kbs_wc/" + alarm_devices.join('|'))
                                                                 }
 								})
         			}) 				

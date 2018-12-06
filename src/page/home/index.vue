@@ -364,7 +364,8 @@
                         })
 			*/
                         _this.$store.dispatch('setDeviceList',device)}
-			console.log('conference user added')
+      console.log('conference user added')
+                      
                   var  data = JSON.parse(args.data[4])
                         if(!arr.some((it)=>{return it.caller_id_number == args.data[1] }))
                         arr.push({
@@ -385,7 +386,32 @@
           _this.$ajax.post('Basic/List')
           .then(res=>{
 					if (res.data.code === 1 && res.data.result.length>0){ 
-								let basic_id = res.data.result[0].uniqueid
+                let basic_id = res.data.result[0].uniqueid
+                ////////////////////////////////////////////////
+                ////////////////////////////////////////////////
+                ////////////////////////////////////////////////
+                ///这里实现开启shinobi摄像头的功能
+                let apiKey = basic_id.split('/')[0]
+                let groupKey = basic_id.split('/')[2]
+                let startUrl = "https://scc.ieyeplus.com:8432/" + apiKey + "/monitor/" + groupKey
+                _this.$ajax.get(startUrl).then((res)=>{
+                  if(res.status == 200){
+                  let axios = []
+                  res.data.forEach( re => {
+                  let parsed = JSON.parse(re.details).groups_name
+                  if((re.mode == "idle" || re.mode == "stop" ) && parsed.slice(1,parsed.length-1).split(',').some((item)=>{return item == '"' + deviceCode + '"'}))
+                  axios.push(_this.$ajax.get("https://scc.ieyeplus.com:8432/" + apiKey + "/monitor/" + groupKey + "/" + re.mid +"/start"))
+                  })
+                  _this.$ajax.all(axios).then((res)=>{
+                    res.forEach(element => {
+                      console.log("aaaaaaaaaaaaaaaaaaaaa",element)
+                    })
+                  })
+                  }
+                })
+                ////////////////////////////////////////////////
+                ////////////////////////////////////////////////
+                ////////////////////////////////////////////////
 								if(basic_id=="") return 
 								let alarm_devices  = [] 
 							        _this.instance({
@@ -402,28 +428,27 @@
 									else{
 								arr.forEach((de)=>{
 									if(de.caller_id_number!=deviceCode && de.caller_id_number!=_this.verto)
-                                                                        alarm_devices.push(de.caller_id_number)
-                                                                })
+                     alarm_devices.push(de.caller_id_number)
+                 })
 								}
 								_this.instance({
-                                                                        method: 'get',
-                                                                        url: '/alarm_control/'+ _this.orgid,
-                                                                }).then((res)=>{
+                    method: 'get',
+                    url: '/alarm_control/'+ _this.orgid,
+                }).then((res)=>{
 								let url = "https://scc.ieyeplus.com:8432/"+ basic_id + alarm_devices.join('|')
 								if(res.data.alarm_control == 'popup'){
-                                                                window.open(url,'newwindow','height=1920,width=1080,top=0,left=0,toolbar=no,menubar=no,scrollbars=no,location=no, status=no')
+                   window.open(url,'newwindow','height=1920,width=1080,top=0,left=0,toolbar=no,menubar=no,scrollbars=no,location=no, status=no')
 								}
 								else{
 								_this.$store.dispatch('setAlarmAddress',url)	
 								_this.$router.push('/alarm')
 								}
-									})
-        							}) 				
+								})
+        			}) 				
 						}
 					})//device获取videourl
 		}//liveArrayObj.name =='9110-scc.ieyeplus.com'i && args.data[1]!='9000'
 			if((liveArrayObj.name ==_this.voice+'-scc.ieyeplus.com')  && (args.data[1]!=_this.verto) && (args.data[2] == args.data[1])){ 
-			console.log("asdasdasdasdasd",args.data[2],args.data[1])
 			_this.fsAPI('conference',liveArrayObj.name+' '+'play'+' '+'/usr/local/freeswitch/sounds/music/8000/danza-espanola-op-37-h-142-xii-arabesca.wav'+ ' '+ parseInt(args.data[0]).toString()) 
 			}
                         break;
@@ -689,7 +714,7 @@
                                         let application_des = ""
                                         let arr = []
                                         if(item.application == "conference"){
-                                        if(item.application_data.slice(0,2)=="93" || item.application_data.slice(0,2) == "85" ){
+                                        if(item.application_data.slice(0,2)=="93" || item.application_data.slice(0,2) == "85" || item.application_data.slice(0,2) == "91"){
                                           item.application_data = item.application_data.slice(0,item.application_data.indexOf('-'))+"-scc.ieyeplus.com"
                                         }
                                         this.vertoHandle.sendMethod("jsapi",{command:"fsapi", data:{cmd:"conference", arg:item.application_data  +  " " + "list as xml"}},
@@ -714,6 +739,9 @@
                                             }
                                           let conferences = data.message.split('\n')
                                           conferences.forEach( (element,index) => {
+
+                                          /////对于每个conference的状态，都要进行判断
+
                                           if( element!= ""){
                                           let conference_data = element.split(";")
                                           let sound = conference_data[5].split("|")
@@ -729,14 +757,82 @@
                                                 key : conference_data[2] 
                                               })
                                           }
+                                                if( item.application_data == this.alarm +'-scc.ieyeplus.com')
+                                                    {
+                                                        let groupName = conference_data[4]
+                                                        let deviceCode = conference_data[4]
+                                                        this.$ajax.post('Basic/List')
+                                                        .then(res=>{
+                                                        if (res.data.code === 1 && res.data.result.length>0){ 
+                                                              let basic_id = res.data.result[0].uniqueid
+                                                              ////////////////////////////////////////////////
+                                                              ////////////////////////////////////////////////
+                                                              ////////////////////////////////////////////////
+                                                              ///这里实现开启shinobi摄像头的功能
+                                                              let apiKey = basic_id.split('/')[0]
+                                                              let groupKey = basic_id.split('/')[2]
+                                                              let startUrl = "https://scc.ieyeplus.com:8432/" + apiKey + "/monitor/" + groupKey
+                                                              this.$ajax.get(startUrl).then((res)=>{
+                                                                if(res.status == 200){
+                                                                let axios = []
+                                                                res.data.forEach( re => {
+                                                                  let parsed = JSON.parse(re.details).groups_name
+                                                                  if((re.mode == "idle" || re.mode == "stop" ) && parsed.slice(1,parsed.length-1).split(',').some((item)=>{return item == '"' + groupName + '"'}))
+                                                                  axios.push(this.$ajax.get("https://scc.ieyeplus.com:8432/" + apiKey + "/monitor/" + groupKey + "/" + re.mid +"/start"))
+                                                                })
+                                                                this.$ajax.all(axios).then((res)=>{
+                                                                  res.forEach(element => {
+                                                                    console.log("aaaaaaaaaaaaaaaaaaaaa",element)
+                                                                  })
+                                                                })
+                                                                }
+                                                              })
+                                                              ////////////////////////////////////////////////
+                                                              ////////////////////////////////////////////////
+                                                              ////////////////////////////////////////////////
+                                                              if(basic_id=="") return 
+                                                              let alarm_devices  = [] 
+                                                                    this.instance({
+                                                                      method: 'get',
+                                                                      url: '/organization/'+ this.orgid,
+                                                                  }).then((res)=>{
+                                                                      if(deviceCode!=res.data.watcherid)
+                                                                {
+                                                                      arr.forEach((de)=>{
+                                                                if(de.caller_id_number!=this.verto)
+                                                                alarm_devices.push(de.caller_id_number)
+                                                              })
+                                                                }
+                                                                else{
+                                                              arr.forEach((de)=>{
+                                                                if(de.caller_id_number!=deviceCode && de.caller_id_number!=this.verto)
+                                                                  alarm_devices.push(de.caller_id_number)
+                                                              })
+                                                              }
+                                                              this.instance({
+                                                                  method: 'get',
+                                                                  url: '/alarm_control/'+ this.orgid,
+                                                              }).then((res)=>{
+                                                              let url = "https://scc.ieyeplus.com:8432/"+ basic_id + alarm_devices.join('|')
+                                                              if(res.data.alarm_control == 'popup'){
+                                                                window.open(url,'newwindow','height=1920,width=1080,top=0,left=0,toolbar=no,menubar=no,scrollbars=no,location=no, status=no')
+                                                              }
+                                                              else{
+                                                              this.$store.dispatch('setAlarmAddress',url)	
+                                                              this.$router.push('/alarm')
+                                                              }
+                                                              })
+                                                            }) 				
+                                                          }
+                                                        })//device获取videourl
+                                                  }//liveArrayObj.name =='9110-scc.ieyeplus.com'i && args.data[1]!='9000'
                                           }
                                         })
-                                        if(application_des == "setConfLeft" || application_des == "setConfAlarm" || application_des == "setConfIpBoard" || application_des == "setConfMeeting")
+                                        if( application_des == "setConfLeft" || application_des == "setConfAlarm" || application_des == "setConfIpBoard" || application_des == "setConfMeeting")
                                         this.$store.dispatch(application_des,arr)
                                         })
                                         }
                                         let channelCallState = ""
-                                        console.log(item)
                                         let callerNumber = item["cid_num"]   //主叫号码
                                         let calleeNumber = item["callee_num"]; 
                                         let deviceList = this.$store.getters.deviceList
@@ -848,7 +944,7 @@
                                         let application_des = ""
                                         let arr = []
                                         if(item.application == "conference"){
-                                        if(item.application_data.slice(0,2)=="93" || item.application_data.slice(0,2)=="85"){
+                                        if(item.application_data.slice(0,2)=="93" || item.application_data.slice(0,2)=="85" || item.application_data.slice(0,2) == "91"){
                                           item.application_data = item.application_data.slice(0,item.application_data.indexOf('-'))+"-scc.ieyeplus.com"
                                         }
                                         this.vertoHandle.sendMethod("jsapi",{command:"fsapi", data:{cmd:"conference", arg:item.application_data  +  " " + "list as xml"}},
@@ -888,6 +984,75 @@
                                                 key : conference_data[2] 
                                               })
                                           }
+                                           if( item.application_data == this.alarm +'-scc.ieyeplus.com')
+                                                    {
+                                                        let groupName = conference_data[4]
+                                                        let deviceCode = conference_data[4]
+                                                        this.$ajax.post('Basic/List')
+                                                        .then(res=>{
+                                                        if (res.data.code === 1 && res.data.result.length>0){ 
+                                                              let basic_id = res.data.result[0].uniqueid
+                                                              ////////////////////////////////////////////////
+                                                              ////////////////////////////////////////////////
+                                                              ////////////////////////////////////////////////
+                                                              ///这里实现开启shinobi摄像头的功能
+                                                              let apiKey = basic_id.split('/')[0]
+                                                              let groupKey = basic_id.split('/')[2]
+                                                              let startUrl = "https://scc.ieyeplus.com:8432/" + apiKey + "/monitor/" + groupKey
+                                                              this.$ajax.get(startUrl).then((res)=>{
+                                                                if(res.status == 200){
+                                                                let axios = []
+                                                                res.data.forEach( re => {
+                                                                let parsed = JSON.parse(re.details).groups_name
+                                                                  if((re.mode == "idle" || re.mode == "stop" ) && parsed.slice(1,parsed.length-1).split(',').some((item)=>{return item == '"' + groupName + '"'}))
+                                                                  axios.push(this.$ajax.get("https://scc.ieyeplus.com:8432/" + apiKey + "/monitor/" + groupKey + "/" + re.mid +"/start"))
+                                                                })
+                                                                this.$ajax.all(axios).then((res)=>{
+                                                                  res.forEach(element => {
+                                                                    console.log("aaaaaaaaaaaaaaaaaaaaa",element)
+                                                                  })
+                                                                })
+                                                                }
+                                                              })
+                                                              ////////////////////////////////////////////////
+                                                              ////////////////////////////////////////////////
+                                                              ////////////////////////////////////////////////
+                                                              if(basic_id=="") return 
+                                                              let alarm_devices  = [] 
+                                                                    this.instance({
+                                                                      method: 'get',
+                                                                      url: '/organization/'+ this.orgid,
+                                                                  }).then((res)=>{
+                                                                      if(deviceCode!=res.data.watcherid)
+                                                                {
+                                                                      arr.forEach((de)=>{
+                                                                if(de.caller_id_number!=this.verto)
+                                                                alarm_devices.push(de.caller_id_number)
+                                                              })
+                                                                }
+                                                                else{
+                                                              arr.forEach((de)=>{
+                                                                if(de.caller_id_number!=deviceCode && de.caller_id_number!=this.verto)
+                                                                  alarm_devices.push(de.caller_id_number)
+                                                              })
+                                                              }
+                                                              this.instance({
+                                                                  method: 'get',
+                                                                  url: '/alarm_control/'+ this.orgid,
+                                                              }).then((res)=>{
+                                                              let url = "https://scc.ieyeplus.com:8432/"+ basic_id + alarm_devices.join('|')
+                                                              if(res.data.alarm_control == 'popup'){
+                                                                window.open(url,'newwindow','height=1920,width=1080,top=0,left=0,toolbar=no,menubar=no,scrollbars=no,location=no, status=no')
+                                                              }
+                                                              else{
+                                                              this.$store.dispatch('setAlarmAddress',url)	
+                                                              this.$router.push('/alarm')
+                                                              }
+                                                              })
+                                                            }) 				
+                                                          }
+                                                        })//device获取videourl
+                                                  }//liveArrayObj.name =='9110-scc.ieyeplus.com'i && args.data[1]!='9000'
                                           }
                                         })
                                         this.$store.dispatch(application_des,arr)
@@ -1114,9 +1279,7 @@
                 
               }
                 if(!flag){
-                console.log(user.deviceState)
                 user.deviceState = user.type == 2? "registeredM":"registered"
-                console.log(user.deviceState)
                 user.calling = null
                 user.timer.s=0
                 user.timer.m=0
@@ -1131,7 +1294,6 @@
         }
         else if(channelCallState == "HELD"){
           channelCallState = "ringing"
-
         }
         // 入栈
           let callernumber = parseInt(callerNumber)
@@ -1208,7 +1370,26 @@
 
         if (callDirection == "inbound") { 
 
-         if (callerNumber == currentLoginUser.userID) {
+          if ('9000' == callerNumber && '9001' == calleeNumber && channelCallState == 'ringing') {
+            users.forEach(function(user) {
+              if(user.operationState == 1) {
+                user.operationState = 0;
+                _this.fsAPI("uuid_bridge", channelUUID + " " + user.channelUUID, function(res) {console.log("qiang call")}.bind(this));
+                usersChanged = true;
+              }
+              else if (user.operationState == 2) {
+                user.operationState = 0
+                _this.fsAPI("uuid_bridge", channelUUID + " " + user.oppoChannelUUID, function(res) {console.log("qiang delete")}.bind(this))
+                usersChanged = true;
+              }
+              else if (user.operationState == 3) {
+                user.operationState = 0
+                _this.fsAPI("uuid_bridge", user.oppoChannelUUID + " " + channelUUID, function(res) {console.log("daijie")}.bind(this))
+                usersChanged = true;
+              }
+            })
+          }
+          if (callerNumber == currentLoginUser.userID) {
             currentLoginUser.deviceState = caller_status
             currentLoginUser.channelUUID = channelUUID;
             currentLoginUser.callDirection = callDirection;

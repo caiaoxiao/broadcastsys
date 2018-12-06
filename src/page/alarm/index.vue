@@ -7,7 +7,13 @@
     </div>
     <div ref="conf" class="middleCon">
       <iframe  v-if="!alarm_address==''" allowTransparency="true" height = "20000" width = "100%" :src="alarm_address"></iframe>
-      <div class="functionMenu">
+    <div class="functionMenu">
+        <ul class="nav nav-justified menuList">
+          <li id="a1" @click="clear" @mousedown="$btnMousedown" @mouseup="$btnMouseup" @touchend = "$btnMouseup" @touchstart = "$btnMousedown">
+            <i class="fa fa-phone fa-2x" aria-hidden="true"></i>
+            <span>清空</span>
+          </li>
+        </ul>
       </div>
     </div>
     <right-phone></right-phone>
@@ -70,6 +76,28 @@ export default {
     // 获取设备分组数据
     reset(){
     },
+    clear(){
+    let apiKey = this.alarm_address.split('/')[3]
+    let groupKey = this.alarm_address.split('/')[5]
+    let groupName = this.alarm_address.split('/')[6]
+    let startUrl = "https://scc.ieyeplus.com:8432/" + apiKey + "/monitor/" + groupKey
+    this.$ajax.get(startUrl).then((res)=>{
+        if(res.status == 200){
+            let axios = []
+            res.data.forEach( re => {
+	    let parsed = JSON.parse(re.details).groups_name
+            if(re.mode == "start" && parsed.slice(1,parsed.length-1).split(',').some((item)=>{return item == '"' + groupName + '"'}))
+            axios.push(this.$ajax.get("https://scc.ieyeplus.com:8432/" + apiKey + "/monitor/" + groupKey + "/" + re.mid +"/stop"))
+            })
+            this.$ajax.all(axios).then((res)=>{
+                res.forEach(element => {
+                console.log("aaaaaaaaaaaaaaaaaaaaa",element)
+                })
+            })
+        }
+    })
+    this.$store.dispatch("setAlarmAddress","")
+   },
   }
 }
 </script>

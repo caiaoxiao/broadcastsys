@@ -38,9 +38,13 @@
               <td>广播号码</td>
               <td>会议呼叫号码
 	     </td>
-              <td>值班电话号码  
-             <button type="button" class="btn btn-sm btn-info watcher"  @click = "enable_watcher==true?editWatcher():setWatcherState(true)" > {{enable_watcher==true?"修改值班电话":"启用值班模式"}}</button>
-                <button type="button" v-if = "enable_watcher"  class="btn btn-sm btn-info watcher"  @click = "setWatcherState(false)" > {{"关闭值班模式"}}</button>  
+              <td>左话机值班电话号码  
+             <button type="button" class="btn btn-sm btn-info watcher"  @click = "enable_left_watcher==true?editLeftWatcher():setLeftWatcherState(true)" > {{enable_left_watcher==true?"修改值班电话":"启用值班模式"}}</button>
+                <button type="button" v-if = "enable_left_watcher"  class="btn btn-sm btn-info watcher"  @click = "setLeftWatcherState(false)" > {{"关闭值班模式"}}</button>  
+              </td>
+	      <td>右话机值班电话号码
+             <button type="button" class="btn btn-sm btn-info watcher"  @click = "enable_right_watcher==true?editRightWatcher():setRightWatcherState(true)" > {{enable_right_watcher==true?"修改值班电话":"启用值班模式"}}</button>
+                <button type="button" v-if = "enable_right_watcher"  class="btn btn-sm btn-info watcher"  @click = "setRightWatcherState(false)" > {{"关闭值班模式"}}</button>
               </td>
 	      <td>视频告警联动模式
 	      <button type="button" class="btn btn-sm btn-info alarm_control"  @click = "changeAlarmControl()" > 修改</button>
@@ -54,7 +58,8 @@
               <td>{{voice}}</td>
               <td>{{broad}}</td>
               <td>{{meeting}}</td>
-              <td  :contenteditable = "contenteditable" @blur="()=>{this.editwatcher = false ;this.contenteditable = false}" @keydown.13 = "editWatcherFinished($event)" v-focus = "editwatcher" >{{enable_watcher==true?watcher:""}}</td>
+              <td  :contenteditable = "left_contenteditable" @blur="()=>{this.editleftwatcher = false ;this.left_contenteditable = false}" @keydown.13 = "editLeftWatcherFinished($event)" v-focus = "editleftwatcher" >{{enable_left_watcher==true?left_watcher:""}}</td>
+	      <td  :contenteditable = "right_contenteditable" @blur="()=>{this.editrightwatcher = false ;this.right_contenteditable = false}" @keydown.13 = "editRightWatcherFinished($event)" v-focus = "editrightwatcher" >{{enable_right_watcher==true?right_watcher:""}}</td>
 	      <td> {{alarm_control=="popup"?"弹窗模式":(alarm_control=="matrix"?"矩阵模式":"路由模式")}} </td>
             </tr>
           </tbody>
@@ -194,14 +199,18 @@ export default {
       voice: "",
       broad: "",
       alarm: "",
-      watcher:"",
-      enable_watcher:"",
+      left_watcher:"",
+      right_watcher:"",
+      enable_left_watcher:"",
+      enable_right_watcher:"",
       instance : this.$ajax.create({
    			 baseURL: 'https://scc.ieyeplus.com:8001/'
       }),
       alarm_control:"",
-      contenteditable:false,
-      editwatcher:false,
+      left_contenteditable:false,
+      right_contenteditable:false,
+      editleftwatcher:false,
+      editrightwatcher:false,
     }
   },
   watch: {
@@ -304,34 +313,63 @@ export default {
           })
 
     },
-    editWatcherFinished(event){
-       this.editwatcher = false
+    editLeftWatcherFinished(event){
+       this.editleftwatcher = false
        event.target.contentEditable = "false"
        let text = event.target.textContent
-       this.watcher = text
+       this.left_watcher = text
        this.instance({
           method: 'post',
-          url: '/watcher/update/'+ this.transferdata.targetMenuId,
+          url: '/watcher/update/left/'+ this.transferdata.targetMenuId,
           data:{
             watcher:text
           }
   			}).then((res)=>{
 		    })
     },
-    editWatcher(){
-      this.contenteditable = true
-      this.editwatcher = true
+    editRightWatcherFinished(event){
+       this.editrightwatcher = false
+       event.target.contentEditable = "false"
+       let text = event.target.textContent
+       this.right_watcher = text
+       this.instance({
+          method: 'post',
+          url: '/watcher/update/right/'+ this.transferdata.targetMenuId,
+          data:{
+            watcher:text
+          }
+                        }).then((res)=>{
+                    })
     },
-    setWatcherState(state){
+     editLeftWatcher(){
+      this.left_contenteditable = true
+      this.editleftwatcher = true
+    },
+    editRightWatcher(){
+      this.right_contenteditable = true
+      this.editrightwatcher = true
+    },
+    setLeftWatcherState(state){
       this.instance({
     			method: 'post',
-          url: '/watcher/'+ this.transferdata.targetMenuId,
+          url: '/watcher/left/'+ this.transferdata.targetMenuId,
           data:{
-            enable_watcher: state
+            enable_left_watcher: state
           }
   			}).then((res)=>{
-          this.enable_watcher = state
+          this.enable_left_watcher = state
 		    })
+    },
+    setRightWatcherState(state){
+      this.instance({
+           method: 'post',
+          url: '/watcher/right/'+ this.transferdata.targetMenuId,
+          data:{
+            enable_right_watcher: state
+          }
+                        }).then((res)=>{
+          this.enable_right_watcher = state
+                    })
     },
     initDatas (data) {
       if (!this.targetMenu.hasOwnProperty('organizationid') && data) {
@@ -363,8 +401,10 @@ export default {
     			method: 'get',
     		        url: '/organization/'+ this.transferdata.targetMenuId,
   			}).then((res)=>{
-    			this.watcher = res.data.watcher
-		        this.enable_watcher = res.data.enable_watcher
+    			this.left_watcher = res.data.left_watcher
+    			this.right_watcher = res.data.right_watcher
+		        this.enable_left_watcher = res.data.enable_left_watcher
+		        this.enable_right_watcher = res.data.enable_right_watcher
 		})
 		this.instance({
                         method: 'get',

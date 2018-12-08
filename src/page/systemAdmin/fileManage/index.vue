@@ -195,17 +195,11 @@
     },    
     methods: {
       getFocus(item,index) {
-        console.log("Begin1:",item.contenteditable)
         item.contenteditable=true
-        console.log("Finish1:",item.contenteditable)
-        /* if(item.contenteditable){
-          document.getElementById(index).focus() 
-        } */
         this.renameChange = true
         this.ifFocus = true 
       },
       addBlur(file) {
-        console.log(this.playList);
         if(file) {
           file.songListShow = !file.songListShow
 
@@ -219,15 +213,12 @@
         this.$ajax.get('Folder/getTreeFiles', {params: {UserID: '133585596bb04c9cbe311d0859dd7196'}})
           .then(res => {
             if(res.data.code == 1) {
-              console.log("The res.data.result is:",res.data.result); 
               let result = res.data.result 
               result.forEach(function(r,i){
                 r.contenteditable = false 
                 r.unfold = false
               })
-              console.log("The result is:",result); 
               this.playList = result
-              console.log("The playList is:",this.playList); 
             }
           })
         this.queryDefaultList()
@@ -238,7 +229,6 @@
           this.$ajax.post('File/List', {FileName: this.queryFileName})
             .then(res => {
               if(res.data.code == 1) {
-                console.log("文件列表查询成功")
                 let result =  res.data.result
                 result.forEach(function(r,i){
                   r.songListShow = false
@@ -251,7 +241,6 @@
           this.$ajax.post('File/List', {pageIndex:1,pageSize:1000})
             .then(res => {
               if(res.data.code == 1) {
-                console.log("文件列表查询成功")
                 let result =  res.data.result
                 if(result != null) {
                   result.forEach(function(r,i){
@@ -276,7 +265,6 @@
         audio.pause();
       },
       audition(file) {
-        console.log(this.defaultList[0].mediaPath);
         let playlist = this.$store.state.player.playlist
         if(file != '') {
           playlist.push(file)
@@ -321,8 +309,6 @@
 
       // 添加指定歌曲到指定歌单
       addFileToPlaylist(file, songList) {
-        console.log("88888888")
-        // 添加文件至歌单
         if(file == '') {
           if(this.filePaths.length != 0) {
             this.$ajax.post(`FolderMedia/CreateList/${songList.folderid}`, this.filePaths)
@@ -349,7 +335,6 @@
               if(res.data.code == 1) {
                 this.refresh()
               }else {
-                console.log("歌单中已有此文件，不能重复添加")
               }
             })
         }
@@ -542,10 +527,8 @@
       addText() {
         // 添加文本
         if(this.TextSubject =='' || this.Content =='') {
-          console.log("输入的文本不能为空")
           return;
         }
-
         this.$store.dispatch('setDialogShow', true)
         this.submitType = 4
         this.dialogText = "您确定要添加文本吗?"

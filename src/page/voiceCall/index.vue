@@ -2,9 +2,9 @@
 <template>
   <div >
      <left-phone  :select-phone="selectPhone" @reset='reset'></left-phone>
-    <div id="media">
+     <div id="media">
       <video width=800 id="webcam" autoplay="autoplay" hidden="true"></video>
-    </div>
+    </div> 
     <div class="middleCon">
       <div class="module">
         <ul class="nav nav-justified choose" data-name="title">
@@ -141,9 +141,17 @@ export default {
       this.verto = this.get_user_info.freeswitchData.VertoID
       this.organizationid = this.get_user_info.user.organizationid
       //this.initData()
+      console.log(this.vertoHandle);
       this.refresh()
     })
   },
+  /*  watch: {
+    vertoHandle: {
+      vertox() {
+       console.log("111111")
+      }
+    }
+  }, */ 
   computed: {
 
     ...mapGetters({
@@ -502,6 +510,11 @@ export default {
            incomingBandwidth: 'default',
            useStereo: true,
            dedEnc: false,
+           videoParams: {
+              "minWidth": "1280",
+              "minHeight": "720",
+              "minFrameRate": 30
+            },
            tag: "video-container",
            deviceParams: {
              useMic: "any",
@@ -509,7 +522,9 @@ export default {
              useCamera: "any",
            }
          })
+         // this.$store.dispatch('setVertoInit',this.vertoHandle)
        }
+       console.log(this.vertoHandle);
        this.selectPhone = [];
        $('.onlineSelected').removeClass('onlineSelected').addClass('online')
     },

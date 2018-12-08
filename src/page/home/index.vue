@@ -1,5 +1,8 @@
 <template>
   <div>
+    <div id="media">
+      <video width=800 id="webcam" autoplay="autoplay" hidden="true"></video>
+    </div>
     <topMenu></topMenu>
     <container></container>
     <footNav :username = "username"></footNav>
@@ -22,6 +25,7 @@
   export default {
     data () {
       return {
+        flag_router:false,
         flag:"",
         liveArray:{},
         vertoConf:{},
@@ -62,13 +66,18 @@
               this.deviceGroup_conf = res.data.result
             }
           })
-          if(this.vertoHandle ==null){
-            this.flag = false
-            $.verto.init({}, this.initVertoHandle)
+          $.verto.init({}, this.initVertoHandle)
+
+
+	      this.$router.afterEach((to,from,next)=>{
+          this.flag_router = true
+          if(this.currentLoginUser.deviceState != "registered"){
+            this.vertoHandle.logout()
+		        $.verto.init({}, this.initVertoHandle)
           }
-          else{
-            return
-          }
+          
+	})
+
       })
     },
     computed: {
@@ -94,6 +103,7 @@
       }),
     },
     watch: { 
+      /*
       'choosenConfLeft': function(conf) {
         if(conf!="" && conf!=undefined){
         this.voice = conf
@@ -118,13 +128,14 @@
         $.verto.init({}, this.initVertoHandle)
       }
       },
+      */
       'TreeData':function(data){if(this.vertoHandle) this.refresh() },
       'callQueue':function(conf) { 
 	},
       'confAlarm': function(conf) {
         if(conf.length>0 && !conf.some((item,indexs,array)=>{return item.caller_id_number==this.verto}))
         {
-          if(this.callQueue.some((item,index,array)=>{return  item.des==this.verto}))
+          if(this.callQueue.some((item,index,array)=>{return  item.des== this.verto}))
           this.vertoHandle.hangup()
           this.vertoHandle.newCall({
           // Extension to dial.
@@ -182,7 +193,7 @@
               "minFrameRate": 30
             },
             iceServers: [],
-            tag: "audio-container",
+            tag: "webcam",
             deviceParams: {
               useMic: "any",
               useSpeak: "any"
@@ -191,7 +202,9 @@
             onWSLogin(verto, success) {
               // 登录回调
               _this.$store.dispatch('setVertoClose',0) 
-              _this.refresh()
+              if(_this.flag_router != 1){
+                  _this.refresh()
+              }
               console.log('onWSLogin', success);
             },
             onWSClose(verto, success) {
@@ -342,6 +355,11 @@
 
                       // New user joined conference.
                       case "add":
+                      if (_this.currentLoginUser.userID == args.data[1] ) {
+                        let currentLoginUser = _this.currentLoginUser
+                        currentLoginUser.deviceState = channelCallState
+                        _this.$store.dispatch('setCurrentLoginUser', currentLoginUser)
+                      }
 	     console.log(args)
 		      if(liveArrayObj.name ==_this.meeting+'-scc.ieyeplus.com' || liveArrayObj.name.slice(0,2) == '83'){
               let preId = ""	
@@ -446,7 +464,7 @@
         								method: 'get',
         								url: '/organization/'+ _this.orgid,
     								}).then((res)=>{
-        								if(deviceCode!=res.data.watcherid)
+        								if(deviceCode!=res.data.right_watcher)
 									{
 								        arr.forEach((de)=>{
 									if(de.caller_id_number!=_this.verto)
@@ -594,6 +612,7 @@
         //let xuiUsername = localStorage.getItem('xui.username')
 	//this.$ajax.post('Role/Create',{roleName:"湖北监控中心",childData:0})
         let xuiUsername = this.verto // 过滤掉登陆者
+        this.deviceStatus[this.verto] = {}
         this.$store.dispatch('setCurrentLoginUser',{
           deviceState: "registered",
           userID: xuiUsername,
@@ -609,7 +628,7 @@
 
             let registrations = [];
             let deviceList = []
-            this.deviceStatus[xuiUsername] = {}
+	    this.deviceStatus[xuiUsername] = {}
             this.usermap = new Object()
             if(msg) {
               if (isArray(msg.row)) {
@@ -827,7 +846,7 @@
                                                                       method: 'get',
                                                                       url: '/organization/'+ this.orgid,
                                                                   }).then((res)=>{
-                                                                      if(deviceCode!=res.data.watcherid)
+                                                                      if(deviceCode!=res.data.right_watcher)
                                                                 {
                                                                       arr.forEach((de)=>{
                                                                 if(de.caller_id_number!=this.verto)
@@ -902,11 +921,15 @@
                                       }) //deviceList
                                       let callernumber = parseInt(callerNumber)
                                       let calleenumber = parseInt(calleeNumber)
-                                      if(!isNaN(callernumber) && (callerNumber[0]!='8' &&  callerNumber[0]!='9' || callerNumber.slice(0,2)=='80' || callerNumber.slice(0,2)=='96' ))
+                                      if(!isNaN(callernumber) && (callerNumber[0]!='8' &&  callerNumber[0]!='9' || callerNumber.slice(0,2)=='80' || callerNumber.slice(0,2)=='96' || callerNumber.slice(0,2)=='99' ))
                                       this.deviceStatus[callerNumber][calleeNumber] = channelCallState
-                                      if(!isNaN(calleenumber) && (calleeNumber[0]!='8' &&  calleeNumber[0]!='9' ||  calleeNumber.slice(0,2)=='80' || calleeNumber.slice(0,2)=='96' ))
+                                      if(!isNaN(calleenumber) && (calleeNumber[0]!='8' &&  calleeNumber[0]!='9' ||  calleeNumber.slice(0,2)=='80' || calleeNumber.slice(0,2)=='96' || calleeNumber.slice(0,2)=='99' ))
                                       this.deviceStatus[calleeNumber][callerNumber] = channelCallState
-                                      console.log(this.deviceStatus)
+                                      if (this.currentLoginUser.userID == callerNumber || this.currentLoginUser.userID == calleeNumber) {
+                                          let currentLoginUser = this.currentLoginUser
+                                          currentLoginUser.deviceState = channelCallState
+                                          this.$store.dispatch('setCurrentLoginUser', currentLoginUser)
+                                      }
                                       this.$store.dispatch('setDeviceList',deviceList)
                                       }) // 遍历启动的channel
                                     
@@ -917,7 +940,7 @@
 
                                }
                   else {
-                        for(let index in deviceList){
+                            for(let index in deviceList){
                                 if(this.usermap.hasOwnProperty(deviceList[index].userid)){
                                   deviceList[index].groupid =  this.usermap[deviceList[index].userID].list
                                   deviceList[index].type =  this.usermap[deviceList[index].userID].type
@@ -1054,7 +1077,7 @@
                                                                       method: 'get',
                                                                       url: '/organization/'+ this.orgid,
                                                                   }).then((res)=>{
-                                                                      if(deviceCode!=res.data.watcherid)
+                                                                      if(deviceCode!=res.data.right_watcher)
                                                                 {
                                                                       arr.forEach((de)=>{
                                                                 if(de.caller_id_number!=this.verto)
@@ -1090,7 +1113,6 @@
                                         })
                                         }
                                         let channelCallState = ""
-                                        console.log(item)
                                         let callerNumber = item["cid_num"]   //主叫号码
                                         let calleeNumber = item["callee_num"]; 
                                         let deviceList = this.$store.getters.deviceList
@@ -1129,11 +1151,15 @@
                                       }) //deviceList
                                       let callernumber = parseInt(callerNumber)
                                       let calleenumber = parseInt(calleeNumber)
-                                      if(!isNaN(callernumber) && (callerNumber[0]!='8' &&  callerNumber[0]!='9' || callerNumber.slice(0,2)=='80' || callerNumber.slice(0,2)=='96' ))
+                                      if(!isNaN(callernumber) && (callerNumber[0]!='8' &&  callerNumber[0]!='9' || callerNumber.slice(0,2)=='80' || callerNumber.slice(0,2)=='96' ||  callerNumber.slice(0,2)=='99'))
                                       this.deviceStatus[callerNumber][calleeNumber] = channelCallState
-                                      if(!isNaN(calleenumber) && (calleeNumber[0]!='8' &&  calleeNumber[0]!='9' ||  calleeNumber.slice(0,2)=='80' || calleeNumber.slice(0,2)=='96' ))
+                                      if(!isNaN(calleenumber) && (calleeNumber[0]!='8' &&  calleeNumber[0]!='9' ||  calleeNumber.slice(0,2)=='80' || calleeNumber.slice(0,2)=='96' || calleeNumber.slice(0,2)=='99'))
                                       this.deviceStatus[calleeNumber][callerNumber] = channelCallState
-                                      console.log(this.deviceStatus)
+                                      if (this.currentLoginUser.userID == callerNumber || this.currentLoginUser.userID == calleeNumber) {
+                                          let currentLoginUser = this.currentLoginUser
+                                          currentLoginUser.deviceState = channelCallState
+                                          this.$store.dispatch('setCurrentLoginUser', currentLoginUser)
+                                      }
                                       this.$store.dispatch('setDeviceList',deviceList)
                                       }) // 遍历启动的channel
                                     
@@ -1149,7 +1175,6 @@
                 })
           if(this.flag==false)
           this.$store.dispatch('setDeviceList',deviceList)
-           console.log("testtesttest",this.deviceStatus)
           }.bind(this),function(data) {
             console.log("error:"+data)
           }.bind(this))
@@ -1258,7 +1283,7 @@
         
         if (channelCallState == "RINGING" || channelCallState == "EARLY" || channelCallState == "RING_WAIT") {
           channelCallState = "ringing";
-        } else if (channelCallState == "ACTIVE"){
+        } else if (channelCallState == "ACTIVE"){ 
           channelCallState = "active";
 	        let time_add = 1 
           users.forEach(function(user) {
@@ -1296,14 +1321,17 @@
                   flag = true
               }
               channelCallState = "hungup"
+	      console.log(users)
               users.forEach((user) => {
-              if((e.data.hasOwnProperty("Channel-Presence-ID") && user.userID == e.data["Channel-Presence-ID"].slice(0,e.data["Channel-Presence-ID"].indexOf('@'))) || (!e.data.hasOwnProperty("Channel-Presence-ID") && user.userID == e.data["Channel-Name"].slice(15,e.data["Channel-Name"].indexOf('@'))) || (!e.data.hasOwnProperty("Channel-Presence-ID") && (e.data["Channel-Name"].slice(0,8)=="loopback")&& (e.data["Channel-Name"].slice(9,13)==user.userID)) || flag && (user.userID == e.data["Caller-Destination-Number"] ) ) {
+              //if(user.userID == e.data["Caller-Caller-ID-Number"] || (e.data.hasOwnProperty("Channel-Presence-ID") && user.userID == e.data["Channel-Presence-ID"].slice(0,e.data["Channel-Presence-ID"].indexOf('@'))) || (!e.data.hasOwnProperty("Channel-Presence-ID") && user.userID == e.data["Channel-Name"].slice(15,e.data["Channel-Name"].indexOf('@'))) || (!e.data.hasOwnProperty("Channel-Presence-ID") && (e.data["Channel-Name"].slice(0,8)=="loopback")&& (e.data["Channel-Name"].slice(9,13)==user.userID)) || flag && (user.userID == e.data["Caller-Destination-Number"] ) ) {
+	       if(user.userID == callerNumber || user.userID ==calleeNumber || e.data["Channel-Name"].slice(0,8)=="loopback" && user.userID == e.data["Channel-Name"].slice(9,13) ){ 
               let numbers = [callerNumber,calleeNumber]
-              let other_number = user.userID == numbers[0] ? numbers[1]:numbers[0]
+              let other_number = user.userID == numbers[0]?numbers[1]:numbers[0]
+	      console.log(user.userID,other_number,this.deviceStatus[user.userID])
               let queue = this.deviceStatus[user.userID]
               let flag = false
               for(let call in queue){
-                if( (queue[call]=="active" || queue[call]=="ringing") && call != user.userID &&call != other_number){
+                if( (queue[call]=="active" || queue[call]=="ringing") && (call != other_number)){
                   flag = true
                   break
                 }
@@ -1330,15 +1358,15 @@
           let callernumber = parseInt(callerNumber)
           let calleenumber = parseInt(calleeNumber)
           if(channelCallState!="hungup"){
-            if(!isNaN(callernumber) && (callerNumber[0]!='8' &&  callerNumber[0]!='9' || callerNumber.slice(0,2)=='80' || callerNumber.slice(0,2)=='96' ))
+            if(!isNaN(callernumber) && (callerNumber[0]!='8' &&  callerNumber[0]!='9' || callerNumber.slice(0,2)=='80' || callerNumber.slice(0,2)=='96' || callerNumber.slice(0,2)=='99'))
             this.deviceStatus[callerNumber][calleeNumber] = channelCallState
-            if(!isNaN(calleenumber) && (calleeNumber[0]!='8' &&  calleeNumber[0]!='9' ||  calleeNumber.slice(0,2)=='80' || calleeNumber.slice(0,2)=='96' ))
+            if(!isNaN(calleenumber) && (calleeNumber[0]!='8' &&  calleeNumber[0]!='9' ||  calleeNumber.slice(0,2)=='80' || calleeNumber.slice(0,2)=='96' || calleeNumber.slice(0,2)=='99' ))
             this.deviceStatus[calleeNumber][callerNumber] = channelCallState
           }
           else{
-            if(!isNaN(callernumber) && (callerNumber[0]!='8' &&  callerNumber[0]!='9' ||  callerNumber.slice(0,2)=='80' || callerNumber.slice(0,2)=='96' ))
+            if(!isNaN(callernumber) && (callerNumber[0]!='8' &&  callerNumber[0]!='9' ||  callerNumber.slice(0,2)=='80' || callerNumber.slice(0,2)=='96' || callerNumber.slice(0,2)=='99'))
             delete this.deviceStatus[callerNumber][calleeNumber]
-            if(!isNaN(calleenumber) && (calleeNumber[0]!='8' &&  calleeNumber[0]!='9' ||  calleeNumber.slice(0,2)=='80' || calleeNumber.slice(0,2)=='96' ))
+            if(!isNaN(calleenumber) && (calleeNumber[0]!='8' &&  calleeNumber[0]!='9' ||  calleeNumber.slice(0,2)=='80' || calleeNumber.slice(0,2)=='96' || calleeNumber.slice(0,2)=='99'))
             delete this.deviceStatus[calleeNumber][callerNumber]
           }
           if(channelCallState!="hungup"){
@@ -1397,7 +1425,9 @@
             callee_calling = ""
           }
         ///////////////////////////////////////////////////////////
+	
         ///////////////////////////////////////////////////////////
+	console.log(currentLoginUser.userID,callDirection,callerNumber, caller_status,calleeNumber,callee_status)
 
         if (callDirection == "inbound") { 
 
@@ -1420,7 +1450,7 @@
               }
             })
           }
-          if (callerNumber == currentLoginUser.userID) {
+          if (currentLoginUser.userID == callerNumber ) {
             currentLoginUser.deviceState = caller_status
             currentLoginUser.channelUUID = channelUUID;
             currentLoginUser.callDirection = callDirection;
@@ -1475,6 +1505,7 @@
             })
           }
         }
+	console.log( currentLoginUser)
         if (currentLoginUserChanged) this.$store.dispatch('setCurrentLoginUser', currentLoginUser);
         if (usersChanged) this.$store.dispatch('setDeviceList',users)
         }

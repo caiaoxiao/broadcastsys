@@ -38,6 +38,7 @@ import 'assets/js/effect.js'
 import BScroll from 'better-scroll'
 // 5.引入verto相关js
 import 'jquery-json'
+import 'verto/src/vendor/adapter-latest.js'
 import verto from 'verto/src/jquery.verto.js'
 import 'utils/verto.js'
 import 'verto/src/jquery.FSRTC.js'

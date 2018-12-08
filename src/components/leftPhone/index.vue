@@ -309,22 +309,30 @@
           else 
             return 'fa fa-circle orange'
       },
-      toggle_enter(){
+       toggle_enter(){
+          this.instance({url:"organization/" + this.organizationid,method:"get"})
+          .then((res)=>{
+	  let left_watcher = res.data.left_watcher
+	  let right_watcher = res.data.right_watcher
           if(this.conf.length>0)
-          this.fsAPI('conference',this.confname.num+"-scc.ieyeplus.com"+" "+"pause_play"+" " +this.conf[0].conf_id) 
+          this.fsAPI('conference',this.confname.num+"-scc.ieyeplus.com"+" "+"pause_play"+" " +this.conf[0].conf_id)
                 let _this = this
           if(this.flag_conf==true)
           {
                 this.conf.forEach((item,index,array)=>{
-                  if(item.caller_id_number == this.verto)
+                  if(_this.confname.num!=this.alarm && item.caller_id_number == (res.data.enable_left_watcher==true?res.data.left_watcher:this.verto))
+                    this.fsAPI('conference',this.confname.num+"-scc.ieyeplus.com"+" "+"hup"+" "+item.conf_id)
+		  else if(_this.confname.num==this.alarm && item.caller_id_number == (res.data.enable_right_watcher==true?res.data.right_watcher:this.verto))
                     this.fsAPI('conference',this.confname.num+"-scc.ieyeplus.com"+" "+"hup"+" "+item.conf_id)
               if(_this.confname.num==this.alarm){
             this.fsAPI('conference',this.confname.num+"-scc.ieyeplus.com"+" "+"mute"+" "+item.conf_id)
             this.fsAPI('conference',this.confname.num+"-scc.ieyeplus.com"+" "+"deaf"+" "+item.conf_id)}
                 })
           }
-              else			
-          {           
+              else
+		{
+		      if(_this.confname.num==this.alarm){
+                     if(res.data.enable_left_watcher==false){
                       this.vertoHandle.hangup()
                       this.vertoHandle.newCall({
                       destination_number: this.confname.num,
@@ -341,11 +349,40 @@
                         useCamera: "any"
                       }
                     })
-          if(this.confname.num!=this.alarm){
+                    }
+                        else{
+                         _this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" bgdial user/"+res.data.right_watcher)
+                    }
+		    }
+		    else{
+		    if(res.data.enable_left_watcher==false){
+                      this.vertoHandle.hangup()
+                      this.vertoHandle.newCall({
+                      destination_number: this.confname.num,
+                        caller_id_name: "LegalHigh",
+                      caller_id_number: this.verto,
+                      outgoingBandwidth: "default",
+                      incomingBandwidth: "default",
+                      useStereo: true,
+                      dedEnc: false,
+                      tag: "video-container",
+                      deviceParams: {
+                        useMic: "any",
+                        useSpeak: "any",
+                        useCamera: "any"
+                      }
+                    })
+                    }
+                        else{
+                         _this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" bgdial user/"+res.data.left_watcher)
+                    }
+                    }
+          if(this.confname.num==this.voice){
           _this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"unmute"+" "+_this.conf[0].conf_id)
           _this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" "+"undeaf"+" "+_this.conf[0].conf_id)
             }
           }
+        })
       },
       fsAPI(cmd, arg, success_cb, failed_cb) {
         this.vertoHandle.sendMethod("jsapi", {

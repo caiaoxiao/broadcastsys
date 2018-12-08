@@ -1,6 +1,9 @@
 <template>
   <div>
     <left-phone  :select-phone="selectPhone" @reset = "reset" ></left-phone>
+    <div id="media">
+      <video width=800 id="webcam" autoplay="autoplay" hidden="true"></video>
+    </div> 
     <div class="middleCon">
 	<div class="module">
           <ul class="nav nav-justified choose" data-name="title">

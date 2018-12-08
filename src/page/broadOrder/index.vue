@@ -1,6 +1,5 @@
 <template>
-  <div class="content padding">
-
+  <div >
     <div class="broadcastCon">
       <div><!--tab01-->
         <div id="aa">
@@ -109,14 +108,14 @@
           </div>
         </div>
       </div>
-
-
-
     </div>
     <edit v-if="editShow" @close="booking"></edit>
     <confirm-dialog v-if="dialogShow" @submit="confirm">
       <p slot="content">确定要删除这些预案吗？</p>
     </confirm-dialog>
+  <div id="media" class = "content padding">
+      <video width=800 id="webcam" autoplay="autoplay" hidden="true"></video>
+    </div>
   </div>
 
 </template>
@@ -197,9 +196,8 @@
         currentLoginUser: 'currentLoginUser',
         dialogShow: 'dialogShow',
 	get_user_info: GET_USER_INFO,
-        // deviceList:'deviceList',
         selectPhonex: 'selectPhonex',
-      }),
+	})
     },
     components: {
       edit,

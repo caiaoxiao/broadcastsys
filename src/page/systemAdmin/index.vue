@@ -1,5 +1,8 @@
 <template>
   <div>
+    <div id="media">
+      <video width=800 id="webcam" autoplay="autoplay" hidden="true"></video>
+    </div>
     <div class="content padding">
       <ul class="nav nav-justified choose">
         <router-link v-for="item in routerList" :key="item.path" tag="li" active-class="on" :to="item.path">

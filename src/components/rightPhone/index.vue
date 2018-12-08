@@ -97,6 +97,9 @@
         voice: "",
         broad: "",
         alarm: "",
+	instance:this.$ajax.create({
+	baseURL:"https://scc.ieyeplus.com:8001"
+	})
 
       };
     },
@@ -108,6 +111,7 @@
         this.voice = this.get_user_info.freeswitchData.VoiceCallID
         this.alarm = this.get_user_info.freeswitchData.AlarmID
         this.broad = this.get_user_info.freeswitchData.BroadID
+	
         //$.verto.init({}, this.bootstrap);
       });
     },
@@ -172,12 +176,16 @@
     },
      methods: {
       toggle_enter(){
+      this.instance({url:"organization/" + this.organizationid,method:"get"})
+          .then((res)=>{
+      let right_watcher = res.data.right_watcher
       if(this.flag_confalarm ==true)
  	    this.confAlarm.forEach((item,index,array)=>{
-	    if(item.caller_id_number==this.verto)
+	    if(item.caller_id_number==(res.data.enble_right_watcher?right_watcher:this.verto))
           this.fsAPI('conference',this.alarm+"-scc.ieyeplus.com"+" "+"hup"+" "+item.conf_id)
 	})
       else if(this.confAlarm.length>0){
+	       if(!res.data.enble_right_watcher)
                this.vertoHandle.newCall({
                         destination_number: this.alarm,
                         caller_id_name: "LegalHigh",
@@ -193,7 +201,10 @@
                         useCamera: "any"
                         }
                         })
+		else
+                this.fsAPI('conference',this.alarm+"-scc.ieyeplus.com"+" "+" bgdial user/"+" "+right_watcher)        
 	}
+      })
       },
 	select(e,item){
         let _this = this

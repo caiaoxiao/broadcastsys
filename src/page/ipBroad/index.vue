@@ -1,6 +1,9 @@
 <template>
   <div >
  <left-phone  :select-phone="selectPhone" @reset='reset'></left-phone>
+   <div id="media">
+      <video width=800 id="webcam" autoplay="autoplay" hidden="true"></video>
+    </div>
     <div class="middleCon">
 
       <div class="module">
@@ -157,7 +160,7 @@
         this.broad = this.get_user_info.freeswitchData.BroadID
         this.name = this.broad + '-' + window.location.hostname
         this.refresh()
-        this.reFresh()
+        this.reFresh()  
       })
     },
     /* watch: {

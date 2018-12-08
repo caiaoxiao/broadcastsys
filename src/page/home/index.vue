@@ -446,11 +446,11 @@
                   res.data.forEach( re => {
                   let parsed = JSON.parse(re.details).groups_name
                   if((re.mode == "idle" || re.mode == "stop" ) && parsed.slice(1,parsed.length-1).split(',').some((item)=>{return item == '"' + deviceCode + '"'}))
-                  axios.push(_this.$ajax.get("https://scc.ieyeplus.com:8432/" + apiKey + "/monitor/" + groupKey + "/" + re.mid +"/start"))
+                  axios.push(_this.$ajax.get("https://scc.ieyeplus.com:8432/" + apiKey + "/monitor/" + groupKey + "/" + re.mid +"/start" + "/10"))
                   })
                   _this.$ajax.all(axios).then((res)=>{
                     res.forEach(element => {
-                      console.log("aaaaaaaaaaaaaaaaaaaaa",element)
+
                     })
                   })
                   }
@@ -828,11 +828,11 @@
                                                                 res.data.forEach( re => {
                                                                   let parsed = JSON.parse(re.details).groups_name
                                                                   if((re.mode == "idle" || re.mode == "stop" ) && parsed.slice(1,parsed.length-1).split(',').some((item)=>{return item == '"' + groupName + '"'}))
-                                                                  axios.push(this.$ajax.get("https://scc.ieyeplus.com:8432/" + apiKey + "/monitor/" + groupKey + "/" + re.mid +"/start"))
+                                                                  axios.push(this.$ajax.get("https://scc.ieyeplus.com:8432/" + apiKey + "/monitor/" + groupKey + "/" + re.mid +"/start/10"))
                                                                 })
                                                                 this.$ajax.all(axios).then((res)=>{
                                                                   res.forEach(element => {
-                                                                    console.log("aaaaaaaaaaaaaaaaaaaaa",element)
+                                                                    
                                                                   })
                                                                 })
                                                                 }
@@ -1059,11 +1059,11 @@
                                                                 res.data.forEach( re => {
                                                                 let parsed = JSON.parse(re.details).groups_name
                                                                   if((re.mode == "idle" || re.mode == "stop" ) && parsed.slice(1,parsed.length-1).split(',').some((item)=>{return item == '"' + groupName + '"'}))
-                                                                  axios.push(this.$ajax.get("https://scc.ieyeplus.com:8432/" + apiKey + "/monitor/" + groupKey + "/" + re.mid +"/start"))
+                                                                  axios.push(this.$ajax.get("https://scc.ieyeplus.com:8432/" + apiKey + "/monitor/" + groupKey + "/" + re.mid +"/start/10"))
                                                                 })
                                                                 this.$ajax.all(axios).then((res)=>{
                                                                   res.forEach(element => {
-                                                                    console.log("aaaaaaaaaaaaaaaaaaaaa",element)
+                                                                    
                                                                   })
                                                                 })
                                                                 }

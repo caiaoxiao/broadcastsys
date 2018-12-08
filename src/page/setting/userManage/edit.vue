@@ -140,14 +140,13 @@ export default {
     userEdit () {
        if (this.modolType!=-2) {
        let axios = []
-       let flag = this.formData.devicename == this.formData.devicecode?true:false
        let range = this.range==''?1:parseInt(this.range)
        for(let i = 0;i < range;i++){
 	      if(this.formData.type!=2){
           let temp = new Object()
           temp.devicecode = String(parseInt(this.formData.devicecode)+i)
-          temp.devicename =  flag == true ? temp.devicecode : (range==1?this.formData.devicename:(this.formData.devicename+'-'+String(i)))
-          temp.password = this.formData.password == ''?this.formData.devicecode:this.formData.password
+          temp.devicename =  this.formData.devicename == '' ? temp.devicecode : (i==0?this.formData.devicename:(this.formData.devicename+'-'+String(i)))
+          temp.password = this.formData.password == ''?temp.devicecode:this.formData.password
           temp.type = this.formData.type
           temp.devicevedios = this.formData.devicevedios
           temp.feature = this.formData.feature

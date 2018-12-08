@@ -145,7 +145,7 @@ export default {
 	      if(this.formData.type!=2){
           let temp = new Object()
           temp.devicecode = String(parseInt(this.formData.devicecode)+i)
-          temp.devicename =  this.formData.devicename == '' ? temp.devicecode : (i==0?this.formData.devicename:(this.formData.devicename+'-'+String(i)))
+          temp.devicename =  this.formData.devicename == '' ? temp.devicecode : (range==1?this.formData.devicename:(this.formData.devicename+String(i+1)))
           temp.password = this.formData.password == ''?temp.devicecode:this.formData.password
           temp.type = this.formData.type
           temp.devicevedios = this.formData.devicevedios

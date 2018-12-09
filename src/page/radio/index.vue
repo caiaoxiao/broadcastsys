@@ -14,7 +14,7 @@
             <div class="moduleList" id = "height01" >
               <div class="singleM" v-for="item in deviceList">
 		<div class="moduleStyle" :class="returnClass(item.deviceState,item.type)" @click.stop="itemClick($event, item)">
-                <div class="moduleNum"><i class="fa fa-video-camera" aria-hidden="true"></i>{{item.userID + " " + (item.name==null?"":item.name)}}</div>
+                <div class="moduleNum" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"><i class="fa fa-video-camera" aria-hidden="true"></i>{{item.userID + " " + (item.name==null?"":item.name)}}</div>
 		<div class="moduleKind">{{returnType(item.type)}}
                         <i class="fa fa-user" v-if = "item.deviceState=='active' || item.deviceState=='ringing'"></i>
                         {{(item.calling==null?"":item.calling)}}

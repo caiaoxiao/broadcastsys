@@ -66,7 +66,7 @@
             <div class="selectedList" id="height04">
               <div class="singleFlies"
                    :class="device.selected ? 'selected' : ''"
-		   v-if="device.deviceState == 'registered'|| device.deviceState=='registeredM'"
+		   v-if="device.deviceState != 'unregistered'"
                    v-for="device in deviceList"
                    @click="selectItem(device)">{{device.userID}}</div>
             </div>

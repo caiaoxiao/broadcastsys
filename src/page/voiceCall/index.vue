@@ -340,7 +340,7 @@ export default {
           url: '/organization/'+ this.organizationid,
                         })
       if(result.data.enable_left_watcher){
-         this.fsAPI("originate","user/"+result.data.left_watcher+" 9801"+select.channelUUID+" XML default");
+         this.fsAPI("originate","{origination_caller_id_number="+select.userID + "}user/"+result.data.left_watcher+" 9801"+select.channelUUID+" XML default");
        }else {
          this.vertoHandle.newCall({
            destination_number: '9801' + select.channelUUID,
@@ -387,7 +387,7 @@ export default {
           url: '/organization/'+ this.organizationid,
                         })
       if(result.data.enable_left_watcher){
-         this.fsAPI("originate","user/"+result.data.left_watcher+" 9803"+select.channelUUID+" XML default");
+         this.fsAPI("originate","{origination_caller_id_number="+select.userID + "}user/"+result.data.left_watcher+" 9803"+select.channelUUID+" XML default");
        }else {
          this.vertoHandle.newCall({
            destination_number: '9803' + select.channelUUID,
@@ -417,7 +417,7 @@ export default {
           url: '/organization/'+ this.organizationid,
                         })
       if(result.data.enable_left_watcher){
-         this.fsAPI("originate","user/"+result.data.left_watcher+" 9802"+select.channelUUID+" XML default");
+         this.fsAPI("originate","{origination_caller_id_number="+select.userID +"}user/"+result.data.left_watcher+" 9802"+select.channelUUID+" XML default");
        }else {
          this.vertoHandle.newCall({
            destination_number: '9802' + select.channelUUID,
@@ -448,8 +448,14 @@ export default {
                         method: 'get',
           url: '/organization/'+ this.organizationid,
                         })
+	
+      let main_userid 
+      if(select.oppoChannelUUID == select.channelUUID) 
+	main_userid = select.userID
+      else
+	main_userid = select.calling
       if(result.data.enable_left_watcher){
-         this.fsAPI("originate","user/"+result.data.left_watcher+" 9804"+this.selectRingCall[0].oppoChannelUUID+" XML default");
+         this.fsAPI("originate","{origination_caller_id_number="+ main_userid + "}user/"+result.data.left_watcher+" 9804"+this.selectRingCall[0].oppoChannelUUID+" XML default");
        }else {
          this.vertoHandle.newCall({
            destination_number: '9804' + this.selectRingCall[0].oppoChannelUUID,
@@ -486,7 +492,7 @@ export default {
           url: '/organization/'+ this.organizationid,
                         })
        if(result.data.enable_left_watcher){
-         this.fsAPI("originate","user/"+result.data.left_watcher+" "+this.selectPhone[0].userID+" XML default");    
+         this.fsAPI("originate","{origination_caller_id_number="+this.selectPhone[0].userID+"}user/"+result.data.left_watcher+" "+this.selectPhone[0].userID+" XML default");    
        }else {
          this.vertoHandle.newCall({
            destination_number : this.selectPhone[0].userID,

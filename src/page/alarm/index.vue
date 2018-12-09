@@ -10,7 +10,7 @@
     <div class="functionMenu">
         <ul class="nav nav-justified menuList">
           <li id="a1" @click="clear" @mousedown="$btnMousedown" @mouseup="$btnMouseup" @touchend = "$btnMouseup" @touchstart = "$btnMousedown">
-            <i class="fa fa-phone fa-2x" aria-hidden="true"></i>
+            <i class="fa fa-window-close-o fa-2x" aria-hidden="true"></i>
             <span>清空</span>
           </li>
         </ul>

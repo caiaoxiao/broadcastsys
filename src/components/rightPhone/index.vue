@@ -188,7 +188,7 @@
 	       if(!res.data.enble_right_watcher)
                this.vertoHandle.newCall({
                         destination_number: this.alarm,
-                        caller_id_name: "LegalHigh",
+                        caller_id_name: this.verto,
                         caller_id_number: this.verto,
                         outgoingBandwidth: "default",
                         incomingBandwidth: "default",
@@ -202,7 +202,7 @@
                         }
                         })
 		else
-                this.fsAPI('conference',this.alarm+"-scc.ieyeplus.com"+" "+" bgdial user/"+" "+right_watcher)        
+                this.fsAPI('conference',this.alarm+"-scc.ieyeplus.com"+" "+" bgdial user/"+" "+right_watcher + " " + this.alarm)        
 	}
       })
       },

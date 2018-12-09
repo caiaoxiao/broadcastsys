@@ -462,7 +462,7 @@
 								let alarm_devices  = [] 
 							        _this.instance({
         								method: 'get',
-        								url: '/organization/'+ _this.orgid,
+        								url: 'organization/'+ _this.orgid,
     								}).then((res)=>{
         								if(deviceCode!=res.data.right_watcher)
 									{
@@ -479,7 +479,7 @@
 								}
 								_this.instance({
                     method: 'get',
-                    url: '/alarm_control/'+ _this.orgid,
+                    url: 'alarm_control/'+ _this.orgid,
                 }).then((res)=>{
 								let url = "https://scc.ieyeplus.com:8432/"+ basic_id + alarm_devices.join('|')
 								if(res.data.alarm_control == 'popup'){
@@ -498,7 +498,13 @@
 					})//device获取videourl
 		}//liveArrayObj.name =='9110-scc.ieyeplus.com'i && args.data[1]!='9000'
 			if((liveArrayObj.name ==_this.voice+'-scc.ieyeplus.com')  && (args.data[1]!=_this.verto) && (args.data[2] == args.data[1])){ 
+			_this.instance({
+                              method: 'get',
+                              url: 'organization/'+ _this.orgid,
+                         }).then((res)=>{
+			 if(res.data.enable_left_watcher!=true)
 			_this.fsAPI('conference',liveArrayObj.name+' '+'play'+' '+'/usr/local/freeswitch/sounds/music/8000/danza-espanola-op-37-h-142-xii-arabesca.wav'+ ' '+ parseInt(args.data[0]).toString()) 
+			})
 			}
                         break;
 
@@ -849,7 +855,7 @@
                                                               let alarm_devices  = [] 
                                                                     this.instance({
                                                                       method: 'get',
-                                                                      url: '/organization/'+ this.orgid,
+                                                                      url: 'organization/'+ this.orgid,
                                                                   }).then((res)=>{
                                                                       if(deviceCode!=res.data.right_watcher)
                                                                 {
@@ -866,7 +872,7 @@
                                                               }
                                                               this.instance({
                                                                   method: 'get',
-                                                                  url: '/alarm_control/'+ this.orgid,
+                                                                  url: 'alarm_control/'+ this.orgid,
                                                               }).then((res)=>{
                                                               let url = "https://scc.ieyeplus.com:8432/"+ basic_id + alarm_devices.join('|')
                                                               if(res.data.alarm_control == 'popup'){
@@ -1080,7 +1086,7 @@
                                                               let alarm_devices  = [] 
                                                                     this.instance({
                                                                       method: 'get',
-                                                                      url: '/organization/'+ this.orgid,
+                                                                      url: 'organization/'+ this.orgid,
                                                                   }).then((res)=>{
                                                                       if(deviceCode!=res.data.right_watcher)
                                                                 {
@@ -1097,7 +1103,7 @@
                                                               }
                                                               this.instance({
                                                                   method: 'get',
-                                                                  url: '/alarm_control/'+ this.orgid,
+                                                                  url: 'alarm_control/'+ this.orgid,
                                                               }).then((res)=>{
                                                               let url = "https://scc.ieyeplus.com:8432/"+ basic_id + alarm_devices.join('|')
                                                               if(res.data.alarm_control == 'popup'){
@@ -1327,8 +1333,9 @@
 	      console.log(user.userID,other_number,this.deviceStatus[user.userID])
               let queue = this.deviceStatus[user.userID]
               let flag = false
+	      if(e.data["Caller-Unique-ID"] == e.data["Channel-Call-UUID"])
               for(let call in queue){
-                if( (queue[call]=="active" || queue[call]=="ringing") && (call != other_number)){
+                if(call!="" &&  (queue[call]=="active" || queue[call]=="ringing") && (call != other_number)){
                   flag = true
                   break
                 }

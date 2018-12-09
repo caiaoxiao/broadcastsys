@@ -69,12 +69,12 @@ const routes = [
                         name: '呼叫管理',
                         component: _import('systemAdmin/recordManage/index')
                     },
-                    {
+                    /*{
                         path: '/playManage',
                         name: '播放记录',
                         component: _import('systemAdmin/playManage/index')
                     }
-                    /*{
+                    {
                         path: '/callManage',
                         name: '呼叫记录',
                         component: _import('systemAdmin/callManage/index')

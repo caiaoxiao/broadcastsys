@@ -351,7 +351,7 @@
                     })
                     }
                         else{
-                         _this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" bgdial user/"+res.data.right_watcher)
+                         _this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" bgdial user/"+res.data.right_watcher+ " " + _this.confname.num)
                     }
 		    }
 		    else{
@@ -359,7 +359,7 @@
                       this.vertoHandle.hangup()
                       this.vertoHandle.newCall({
                       destination_number: this.confname.num,
-                        caller_id_name: "LegalHigh",
+                        caller_id_name: this.verto,
                       caller_id_number: this.verto,
                       outgoingBandwidth: "default",
                       incomingBandwidth: "default",
@@ -374,7 +374,7 @@
                     })
                     }
                         else{
-                         _this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" bgdial user/"+res.data.left_watcher)
+                         _this.fsAPI('conference',_this.confname.num+"-scc.ieyeplus.com"+" bgdial user/"+res.data.left_watcher + " " + _this.confname.num)
                     }
                     }
           if(this.confname.num==this.voice){

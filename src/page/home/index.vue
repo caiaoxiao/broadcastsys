@@ -595,6 +595,11 @@
                   // Fired when the server has finished re-attaching any active sessions.
                   // data.reattached_sessions contains an array of session IDs for all
                   // sessions that were re-attached.
+                  _this.vertoHandle.subscribe("FSevent.custom::sofia::expire",{handler: this.handleExpire.bind(this)});
+                  _this.vertoHandle.subscribe("FSevent.custom::sofia::register", {handler: this.handleFSEventRegister.bind(this)});
+                  _this.vertoHandle.subscribe("FSevent.custom::sofia::unregister", {handler: this.handleFSEventRegister.bind(this)});
+                  _this.vertoHandle.subscribe("FSevent.channel_callstate", {handler: this.handleFSEventChannel.bind(this)});
+                  _this.vertoHandle.subscribe("FSevent.custom::conference::maintenance", {handler: this.closeMeeting.bind(this)});
                   initLiveArray(verto, dialog, data,"conference-liveArray."+_this.voice+"-scc.ieyeplus.com@scc.ieyeplus.com",_this.voice+"-scc.ieyeplus.com");
                   initLiveArray(verto, dialog, data,"conference-liveArray."+_this.alarm+"-scc.ieyeplus.com@scc.ieyeplus.com",_this.alarm+"-scc.ieyeplus.com");
                   initLiveArray(verto, dialog, data,"conference-liveArray."+_this.broad+"-scc.ieyeplus.com@scc.ieyeplus.com",_this.broad+"-scc.ieyeplus.com");

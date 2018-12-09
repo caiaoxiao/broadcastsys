@@ -48,7 +48,6 @@ export default {
       getHeight()
       getHeights()
       this.height = this.$refs.conf.offsetHeight
-      console.log(this.vertoHandle)
       this.verto = this.get_user_info.freeswitchData.VertoID
       this.refresh()
     })
@@ -91,7 +90,6 @@ export default {
             })
             this.$ajax.all(axios).then((res)=>{
                 res.forEach(element => {
-                console.log("aaaaaaaaaaaaaaaaaaaaa",element)
                 })
             })
         }

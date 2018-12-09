@@ -25,11 +25,6 @@
             <label>被叫号码</label>
             <input type="text" v-model.number="formData.calleenumber" class="form-control" style="width:70px;">
           </div>
-          <div class="form-group" @click="typeSwitch">
-            <label>文件类型</label>
-            <span :class="fileType == '通话录音' ? 'selected' : ''">通话录音</span>
-            <span :class="fileType == '会议录音' ? 'selected' : ''">会议录音</span>
-          </div>
           <button @click="queryRecord()" class="btn btn-info"><i class="fa fa-search" aria-hidden="true"></i>查询</button>
         </form>
       </div>
@@ -124,7 +119,6 @@
         this.$ajax.post('CallRecord/List', this.formData)
           .then(function(res) {
             if(res.data.code == 1) {
-              console.log(res.data.result)
               this.dataAll = res.data.result
               this.pageData.total = res.data.total
             }
@@ -223,15 +217,10 @@
             if(new RegExp("("+ k +")").test(format)) format = format.replace(RegExp.$1,RegExp.$1.length==1 ? o[k] : ("00"+ o[k]).substr((""+ o[k]).length));    
           return format;
         }
-        // if(this.formData.time != null && typeof(this.formData.time) != 'string') this.formData.time = this.formData.time.format('yyyy-MM-dd') 
         this.formData.BeginTime = this.value[0].format('yyyy-MM-dd hh:mm:ss')   
         this.formData.EndTime = this.value[1].format('yyyy-MM-dd hh:mm:ss') 
         this.refresh()
       },   
-      typeSwitch(e) {
-        this.fileType = e.target.innerText
-      },
-
     }
   }
 </script>

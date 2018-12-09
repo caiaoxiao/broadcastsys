@@ -243,7 +243,6 @@
             if(res.data.code == 1 ) {
               if(res.data.result!=null && res.data.result.length>0) {
                 console.log("success");
-                console.log(res.data.result);
                 this.showPlanData = []
                 this.showPlanData = res.data.result
                 this.showPlanData = this.showPlanData.reverse()

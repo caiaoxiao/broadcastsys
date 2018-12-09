@@ -141,17 +141,9 @@ export default {
       this.verto = this.get_user_info.freeswitchData.VertoID
       this.organizationid = this.get_user_info.user.organizationid
       //this.initData()
-      console.log(this.vertoHandle);
       this.refresh()
     })
   },
-  /*  watch: {
-    vertoHandle: {
-      vertox() {
-       console.log("111111")
-      }
-    }
-  }, */ 
   computed: {
 
     ...mapGetters({
@@ -237,10 +229,7 @@ export default {
       }
     },
     refresh (item) {
-      console.log(this.organizationid)  
       this.$store.dispatch('setSelectPhonex',null)
-      console.log("111")
-      console.log(this.selectPhonex)
       this.userGroup.forEach((r, i) => {
               r.selected = false
             })
@@ -252,7 +241,6 @@ export default {
       this.groupShow = ""
     },
     itemClick (e, row) {
-      console.log(row)
       let target = e.currentTarget
       let _this = this
       let ifAdd = 0
@@ -275,7 +263,6 @@ export default {
           }
         }
       }
-      console.log(this.selectPhonex)
      if ($(target).hasClass('online')) {
         if ($(target).hasClass("onlineSelected")) {
           $(target).removeClass("onlineSelected")
@@ -344,7 +331,6 @@ export default {
 
     // 实现管理员和指定话机的强行通话
     async strongCall () {
-      console.log(this.organizationid)
       let users = this.deviceList
       let userChanged = false
       let select = this.selectNowCall[0]
@@ -353,8 +339,8 @@ export default {
                         method: 'get',
           url: '/organization/'+ this.organizationid,
                         })
-      if(result.data.enable_watcher){
-         this.fsAPI("originate","user/"+result.data.watcher+" 9801"+select.channelUUID+" XML default");
+      if(result.data.enable_left_watcher){
+         this.fsAPI("originate","user/"+result.data.left_watcher+" 9801"+select.channelUUID+" XML default");
        }else {
          this.vertoHandle.newCall({
            destination_number: '9801' + select.channelUUID,
@@ -400,8 +386,8 @@ export default {
                         method: 'get',
           url: '/organization/'+ this.organizationid,
                         })
-      if(result.data.enable_watcher){
-         this.fsAPI("originate","user/"+result.data.watcher+" 9803"+select.channelUUID+" XML default");
+      if(result.data.enable_left_watcher){
+         this.fsAPI("originate","user/"+result.data.left_watcher+" 9803"+select.channelUUID+" XML default");
        }else {
          this.vertoHandle.newCall({
            destination_number: '9803' + select.channelUUID,
@@ -430,8 +416,8 @@ export default {
                         method: 'get',
           url: '/organization/'+ this.organizationid,
                         })
-      if(result.data.enable_watcher){
-         this.fsAPI("originate","user/"+result.data.watcher+" 9802"+select.channelUUID+" XML default");
+      if(result.data.enable_left_watcher){
+         this.fsAPI("originate","user/"+result.data.left_watcher+" 9802"+select.channelUUID+" XML default");
        }else {
          this.vertoHandle.newCall({
            destination_number: '9802' + select.channelUUID,
@@ -462,8 +448,8 @@ export default {
                         method: 'get',
           url: '/organization/'+ this.organizationid,
                         })
-      if(result.data.enable_watcher){
-         this.fsAPI("originate","user/"+result.data.watcher+" 9804"+this.selectRingCall[0].oppoChannelUUID+" XML default");
+      if(result.data.enable_left_watcher){
+         this.fsAPI("originate","user/"+result.data.left_watcher+" 9804"+this.selectRingCall[0].oppoChannelUUID+" XML default");
        }else {
          this.vertoHandle.newCall({
            destination_number: '9804' + this.selectRingCall[0].oppoChannelUUID,
@@ -499,8 +485,8 @@ export default {
                         method: 'get',
           url: '/organization/'+ this.organizationid,
                         })
-       if(result.data.enable_watcher){
-         this.fsAPI("originate","user/"+result.data.watcher+" "+this.selectPhone[0].userID+" XML default");    
+       if(result.data.enable_left_watcher){
+         this.fsAPI("originate","user/"+result.data.left_watcher+" "+this.selectPhone[0].userID+" XML default");    
        }else {
          this.vertoHandle.newCall({
            destination_number : this.selectPhone[0].userID,
@@ -522,9 +508,7 @@ export default {
              useCamera: "any",
            }
          })
-         // this.$store.dispatch('setVertoInit',this.vertoHandle)
        }
-       console.log(this.vertoHandle);
        this.selectPhone = [];
        $('.onlineSelected').removeClass('onlineSelected').addClass('online')
     },

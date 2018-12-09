@@ -205,7 +205,6 @@
               if(_this.flag_router != 1){
                   _this.refresh()
               }
-	      
               console.log('onWSLogin', success);
             },
             onWSClose(verto, success) {

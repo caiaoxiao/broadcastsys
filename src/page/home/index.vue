@@ -146,7 +146,7 @@
           incomingBandwidth: "default",
           useStereo: true,
           dedEnc: false,
-          tag: "video-container",
+          tag: "webcam",
           deviceParams: {
             useMic: "any",
             useSpeak: "any",
@@ -205,6 +205,13 @@
               if(_this.flag_router != 1){
                   _this.refresh()
               }
+	      else{
+	_this.vertoHandle.subscribe("FSevent.custom::sofia::expire",{handler: this.handleExpire.bind(this)});
+        _this.vertoHandle.subscribe("FSevent.custom::sofia::register", {handler: this.handleFSEventRegister.bind(this)});
+        _this.vertoHandle.subscribe("FSevent.custom::sofia::unregister", {handler: this.handleFSEventRegister.bind(this)});
+        _this.vertoHandle.subscribe("FSevent.channel_callstate", {handler: this.handleFSEventChannel.bind(this)});
+        _this.vertoHandle.subscribe("FSevent.custom::conference::maintenance", {handler: this.closeMeeting.bind(this)});
+	      }
               console.log('onWSLogin', success);
             },
             onWSClose(verto, success) {
@@ -1185,7 +1192,7 @@
         // 订阅取消注册事件
         this.vertoHandle.subscribe("FSevent.custom::sofia::unregister", {handler: this.handleFSEventRegister.bind(this)});
         this.vertoHandle.subscribe("FSevent.channel_callstate", {handler: this.handleFSEventChannel.bind(this)});
-        //this.vertoHandle.subscribe("FSevent.custom::conference::maintenance", {handler: this.closeMeeting.bind(this)});
+        this.vertoHandle.subscribe("FSevent.custom::conference::maintenance", {handler: this.closeMeeting.bind(this)});
       },
       // 注册事件 和 取消注册事件
       handleExpire(v,e){

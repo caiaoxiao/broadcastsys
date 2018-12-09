@@ -205,13 +205,7 @@
               if(_this.flag_router != 1){
                   _this.refresh()
               }
-	      else{
-	_this.vertoHandle.subscribe("FSevent.custom::sofia::expire",{handler: this.handleExpire.bind(this)});
-        _this.vertoHandle.subscribe("FSevent.custom::sofia::register", {handler: this.handleFSEventRegister.bind(this)});
-        _this.vertoHandle.subscribe("FSevent.custom::sofia::unregister", {handler: this.handleFSEventRegister.bind(this)});
-        _this.vertoHandle.subscribe("FSevent.channel_callstate", {handler: this.handleFSEventChannel.bind(this)});
-        _this.vertoHandle.subscribe("FSevent.custom::conference::maintenance", {handler: this.closeMeeting.bind(this)});
-	      }
+	      
               console.log('onWSLogin', success);
             },
             onWSClose(verto, success) {
@@ -595,11 +589,11 @@
                   // Fired when the server has finished re-attaching any active sessions.
                   // data.reattached_sessions contains an array of session IDs for all
                   // sessions that were re-attached.
-                  _this.vertoHandle.subscribe("FSevent.custom::sofia::expire",{handler: this.handleExpire.bind(this)});
-                  _this.vertoHandle.subscribe("FSevent.custom::sofia::register", {handler: this.handleFSEventRegister.bind(this)});
-                  _this.vertoHandle.subscribe("FSevent.custom::sofia::unregister", {handler: this.handleFSEventRegister.bind(this)});
-                  _this.vertoHandle.subscribe("FSevent.channel_callstate", {handler: this.handleFSEventChannel.bind(this)});
-                  _this.vertoHandle.subscribe("FSevent.custom::conference::maintenance", {handler: this.closeMeeting.bind(this)});
+                  _this.vertoHandle.subscribe("FSevent.custom::sofia::expire",{handler: _this.handleExpire.bind(_this)});
+                  _this.vertoHandle.subscribe("FSevent.custom::sofia::register", {handler: _this.handleFSEventRegister.bind(_this)});
+                  _this.vertoHandle.subscribe("FSevent.custom::sofia::unregister", {handler: _this.handleFSEventRegister.bind(_this)});
+                  _this.vertoHandle.subscribe("FSevent.channel_callstate", {handler: _this.handleFSEventChannel.bind(_this)});
+                  _this.vertoHandle.subscribe("FSevent.custom::conference::maintenance", {handler: _this.closeMeeting.bind(_this)});
                   initLiveArray(verto, dialog, data,"conference-liveArray."+_this.voice+"-scc.ieyeplus.com@scc.ieyeplus.com",_this.voice+"-scc.ieyeplus.com");
                   initLiveArray(verto, dialog, data,"conference-liveArray."+_this.alarm+"-scc.ieyeplus.com@scc.ieyeplus.com",_this.alarm+"-scc.ieyeplus.com");
                   initLiveArray(verto, dialog, data,"conference-liveArray."+_this.broad+"-scc.ieyeplus.com@scc.ieyeplus.com",_this.broad+"-scc.ieyeplus.com");
@@ -1190,14 +1184,6 @@
           }.bind(this),function(data) {
             console.log("error:"+data)
           }.bind(this))
-
-        // 订阅注册事件
-        this.vertoHandle.subscribe("FSevent.custom::sofia::expire",{handler: this.handleExpire.bind(this)});
-        this.vertoHandle.subscribe("FSevent.custom::sofia::register", {handler: this.handleFSEventRegister.bind(this)});
-        // 订阅取消注册事件
-        this.vertoHandle.subscribe("FSevent.custom::sofia::unregister", {handler: this.handleFSEventRegister.bind(this)});
-        this.vertoHandle.subscribe("FSevent.channel_callstate", {handler: this.handleFSEventChannel.bind(this)});
-        this.vertoHandle.subscribe("FSevent.custom::conference::maintenance", {handler: this.closeMeeting.bind(this)});
       },
       // 注册事件 和 取消注册事件
       handleExpire(v,e){

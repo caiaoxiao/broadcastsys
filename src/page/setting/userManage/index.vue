@@ -411,6 +411,8 @@ export default {
                         url: '/alarm_control/'+ this.transferdata.targetMenuId,
                         }).then((res)=>{
                         this.alarm_control = res.data.alarm_control 
+			if(this.alarm_control == "")
+			this.alarm_control = "router"
                 })
           }
       })

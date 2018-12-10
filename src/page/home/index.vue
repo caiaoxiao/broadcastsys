@@ -1330,10 +1330,10 @@
 	       if(user.userID == callerNumber || user.userID ==calleeNumber || e.data["Channel-Name"].slice(0,8)=="loopback" && user.userID == e.data["Channel-Name"].slice(9,13) ){ 
               let numbers = [callerNumber,calleeNumber]
               let other_number = user.userID == numbers[0]?numbers[1]:numbers[0]
+              let queue = this.deviceStatus[user.userID]
 	      console.log(user.userID,other_number,this.deviceStatus[user.userID])
 	      if(e.data.hasOwnProperty("Caller-RDNIS") && queue.hasOwnProperty(e.data["Caller-RDNIS"]))
 		delete queue[e.data["Caller-RDNIS"]]
-              let queue = this.deviceStatus[user.userID]
               let flag = false
 	      if(e.data["Caller-Unique-ID"] == e.data["Channel-Call-UUID"])
               for(let call in queue){

@@ -357,7 +357,7 @@
                       case "add":
                       if (_this.currentLoginUser.userID == args.data[1] ) {
                         let currentLoginUser = _this.currentLoginUser
-                        currentLoginUser.deviceState = channelCallState
+                        currentLoginUser.deviceState = "active" 
                         _this.$store.dispatch('setCurrentLoginUser', currentLoginUser)
                       }
 	     console.log(args)

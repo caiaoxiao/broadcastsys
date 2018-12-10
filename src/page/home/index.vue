@@ -1331,7 +1331,7 @@
               let numbers = [callerNumber,calleeNumber]
               let other_number = user.userID == numbers[0]?numbers[1]:numbers[0]
 	      console.log(user.userID,other_number,this.deviceStatus[user.userID])
-	      if(e.data.hasOwnProperty("Caller-RDNIS") && queue.hasOwnProperty(e.data["Caller-RDNIS"])
+	      if(e.data.hasOwnProperty("Caller-RDNIS") && queue.hasOwnProperty(e.data["Caller-RDNIS"]))
 		delete queue[e.data["Caller-RDNIS"]]
               let queue = this.deviceStatus[user.userID]
               let flag = false

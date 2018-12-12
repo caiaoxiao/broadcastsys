@@ -624,7 +624,6 @@
         //let xuiUsername = localStorage.getItem('xui.username')
 	//this.$ajax.post('Role/Create',{roleName:"湖北监控中心",childData:0})
         let xuiUsername = this.verto // 过滤掉登陆者
-        this.deviceStatus[this.verto] = {}
         this.$store.dispatch('setCurrentLoginUser',{
           deviceState: "registered",
           userID: xuiUsername,
@@ -934,9 +933,9 @@
                                       }) //deviceList
                                       let callernumber = parseInt(callerNumber)
                                       let calleenumber = parseInt(calleeNumber)
-                                      if(!isNaN(callernumber) && (callerNumber[0]!='8' &&  callerNumber[0]!='9' || callerNumber.slice(0,2)=='80' || callerNumber.slice(0,2)=='96' || callerNumber.slice(0,2)=='99' ))
+                                      if(this.deviceStatus.hasOwnProperty(callernumber) && !isNaN(callernumber) && (callerNumber[0]!='8' &&  callerNumber[0]!='9' || callerNumber.slice(0,2)=='80' || callerNumber.slice(0,2)=='96' || callerNumber.slice(0,2)=='99' ))
                                       this.deviceStatus[callerNumber][calleeNumber] = channelCallState
-                                      if(!isNaN(calleenumber) && (calleeNumber[0]!='8' &&  calleeNumber[0]!='9' ||  calleeNumber.slice(0,2)=='80' || calleeNumber.slice(0,2)=='96' || calleeNumber.slice(0,2)=='99' ))
+                                      if(this.deviceStatus.hasOwnProperty(calleenumber) && !isNaN(calleenumber) && (calleeNumber[0]!='8' &&  calleeNumber[0]!='9' ||  calleeNumber.slice(0,2)=='80' || calleeNumber.slice(0,2)=='96' || calleeNumber.slice(0,2)=='99' ))
                                       this.deviceStatus[calleeNumber][callerNumber] = channelCallState
                                       if (this.currentLoginUser.userID == callerNumber || this.currentLoginUser.userID == calleeNumber) {
                                           let currentLoginUser = this.currentLoginUser
@@ -1165,9 +1164,9 @@
                                       }) //deviceList
                                       let callernumber = parseInt(callerNumber)
                                       let calleenumber = parseInt(calleeNumber)
-                                      if(!isNaN(callernumber) && (callerNumber[0]!='8' &&  callerNumber[0]!='9' || callerNumber.slice(0,2)=='80' || callerNumber.slice(0,2)=='96' ||  callerNumber.slice(0,2)=='99'))
+                                      if(this.deviceStatus.hasOwnProperty(callernumber)&& !isNaN(callernumber) && (callerNumber[0]!='8' &&  callerNumber[0]!='9' || callerNumber.slice(0,2)=='80' || callerNumber.slice(0,2)=='96' ||  callerNumber.slice(0,2)=='99'))
                                       this.deviceStatus[callerNumber][calleeNumber] = channelCallState
-                                      if(!isNaN(calleenumber) && (calleeNumber[0]!='8' &&  calleeNumber[0]!='9' ||  calleeNumber.slice(0,2)=='80' || calleeNumber.slice(0,2)=='96' || calleeNumber.slice(0,2)=='99'))
+                                      if(this.deviceStatus.hasOwnProperty(calleenumber) && !isNaN(calleenumber) && (calleeNumber[0]!='8' &&  calleeNumber[0]!='9' ||  calleeNumber.slice(0,2)=='80' || calleeNumber.slice(0,2)=='96' || calleeNumber.slice(0,2)=='99'))
                                       this.deviceStatus[calleeNumber][callerNumber] = channelCallState
                                       if (this.currentLoginUser.userID == callerNumber || this.currentLoginUser.userID == calleeNumber) {
                                           let currentLoginUser = this.currentLoginUser
@@ -1367,15 +1366,15 @@
           let callernumber = parseInt(callerNumber)
           let calleenumber = parseInt(calleeNumber)
           if(channelCallState!="hungup"){
-            if(!isNaN(callernumber) && (callerNumber[0]!='8' &&  callerNumber[0]!='9' || callerNumber.slice(0,2)=='80' || callerNumber.slice(0,2)=='96' || callerNumber.slice(0,2)=='99'))
+            if(this.deviceStatus.hasOwnProperty(callernumber) &&  !isNaN(callernumber) && (callerNumber[0]!='8' &&  callerNumber[0]!='9' || callerNumber.slice(0,2)=='80' || callerNumber.slice(0,2)=='96' || callerNumber.slice(0,2)=='99'))
             this.deviceStatus[callerNumber][calleeNumber] = channelCallState
-            if(!isNaN(calleenumber) && (calleeNumber[0]!='8' &&  calleeNumber[0]!='9' ||  calleeNumber.slice(0,2)=='80' || calleeNumber.slice(0,2)=='96' || calleeNumber.slice(0,2)=='99' ))
+            if(this.deviceStatus.hasOwnProperty(calleenumber) &&  !isNaN(calleenumber) && (calleeNumber[0]!='8' &&  calleeNumber[0]!='9' ||  calleeNumber.slice(0,2)=='80' || calleeNumber.slice(0,2)=='96' || calleeNumber.slice(0,2)=='99' ))
             this.deviceStatus[calleeNumber][callerNumber] = channelCallState
           }
           else{
-            if(!isNaN(callernumber) && (callerNumber[0]!='8' &&  callerNumber[0]!='9' ||  callerNumber.slice(0,2)=='80' || callerNumber.slice(0,2)=='96' || callerNumber.slice(0,2)=='99'))
+            if(this.deviceStatus.hasOwnProperty(callernumber) && !isNaN(callernumber) && (callerNumber[0]!='8' &&  callerNumber[0]!='9' ||  callerNumber.slice(0,2)=='80' || callerNumber.slice(0,2)=='96' || callerNumber.slice(0,2)=='99'))
             delete this.deviceStatus[callerNumber][calleeNumber]
-            if(!isNaN(calleenumber) && (calleeNumber[0]!='8' &&  calleeNumber[0]!='9' ||  calleeNumber.slice(0,2)=='80' || calleeNumber.slice(0,2)=='96' || calleeNumber.slice(0,2)=='99'))
+            if(this.deviceStatus.hasOwnProperty(calleenumber) && !isNaN(calleenumber) && (calleeNumber[0]!='8' &&  calleeNumber[0]!='9' ||  calleeNumber.slice(0,2)=='80' || calleeNumber.slice(0,2)=='96' || calleeNumber.slice(0,2)=='99'))
             delete this.deviceStatus[calleeNumber][callerNumber]
           }
           if(channelCallState!="hungup"){

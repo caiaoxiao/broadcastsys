@@ -73,7 +73,7 @@
           this.flag_router = true
           if(this.currentLoginUser.deviceState != "registered"){
             this.vertoHandle.logout()
-		        $.verto.init({}, this.initVertoHandle)
+	       $.verto.init({}, this.initVertoHandle)
           }
           
 	})
@@ -103,32 +103,33 @@
       }),
     },
     watch: { 
-      /*
       'choosenConfLeft': function(conf) {
         if(conf!="" && conf!=undefined){
         this.voice = conf
-        this.vertoHandle.logout()
+        //this.vertoHandle.logout()
         this.flag = true
-        $.verto.init({}, this.initVertoHandle)
+	this.refresh()
+        //$.verto.init({}, this.initVertoHandle)
         }
       },
       'choosenConfMeeting' :function(conf) {
         if(conf!="" && conf!=undefined){
         this.meeting  = conf
-        this.vertoHandle.logout()
+        //this.vertoHandle.logout()
         this.flag = true
-        $.verto.init({}, this.initVertoHandle)
+	this.refresh()
+        //$.verto.init({}, this.initVertoHandle)
       }
       },
       'choosenConfIpboard' :function(conf){
         if(conf!="" && conf!=undefined){
         this.broad = conf
-        this.vertoHandle.logout()
+        //this.vertoHandle.logout()
         this.flag = true
-        $.verto.init({}, this.initVertoHandle)
+        this.refresh()
+        //$.verto.init({}, this.initVertoHandle)
       }
       },
-      */
       'TreeData':function(data){if(this.vertoHandle) this.refresh() },
       'callQueue':function(conf) { 
 	},
@@ -798,6 +799,7 @@
                                             arr = this.$store.getters.confMeeting
                                             break
                                             }
+					  console.log(data.message)
                                           let conferences = data.message.split('\n')
                                           conferences.forEach( (element,index) => {
 
@@ -1032,6 +1034,7 @@
                                             arr = this.$store.getters.confMeeting
                                             break
                                             }
+					  console.log(data.message)
                                           let conferences = data.message.split('\n')
                                           conferences.forEach( (element,index) => {
                                           if( element!= ""){

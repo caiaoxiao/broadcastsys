@@ -10,7 +10,7 @@ export default {
   pageData: {
     total: 0,
     pageIndex: 1,
-    pageSize: 10
+    pageSize: 15 
   },
   // 按钮权限
   btns:  cookieStorage.get('btns'),

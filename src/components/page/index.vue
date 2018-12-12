@@ -23,7 +23,7 @@
       this.$store.state.pageData = {
         total: 0,
         pageIndex: 1,
-        pageSize: 10
+        pageSize: 15 
       }
     },
     methods: {

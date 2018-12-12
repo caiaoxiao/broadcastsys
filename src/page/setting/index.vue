@@ -43,7 +43,7 @@
     methods: {
       returnSystem() {
         this.$router.push('/');
-	window.location.reload()
+	//window.location.reload()
       },
     }
   }

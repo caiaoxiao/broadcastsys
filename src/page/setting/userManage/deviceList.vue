@@ -102,12 +102,27 @@ export default {
       device.selected = !device.selected
     },
     confirmAdd () {
-      
+      if(this.newDeviceGroupType == ''){ 
+	this.$message.success("请勾选分组类型!")
+	return
+      }
+      else if(this.newDeviceGroupName == ''){
+	this.$message.success("请填写分组名称!")
+        return
+      }
       if (this.deviceList.length !== 0 && this.selectDevice.length !== 0) {
         this.$emit('transferData', this.selectDevice,this.newDeviceGroupName,this.newDeviceGroupType)
       }
     },
     confirmAddAll () {
+      if(this.newDeviceGroupType == ''){
+        this.$message.success("请勾选分组类型!")
+        return
+      }
+      else if(this.newDeviceGroupName == ''){
+        this.$message.success("请填写分组名称!")
+        return
+      }
       if (this.deviceList.length !== 0) {
         this.$emit('transferData', this.deviceList,this.newDeviceGroupName,this.newDeviceGroupType)
       }

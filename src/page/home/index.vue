@@ -1330,6 +1330,16 @@
               users.forEach((user) => {
               //if(user.userID == e.data["Caller-Caller-ID-Number"] || (e.data.hasOwnProperty("Channel-Presence-ID") && user.userID == e.data["Channel-Presence-ID"].slice(0,e.data["Channel-Presence-ID"].indexOf('@'))) || (!e.data.hasOwnProperty("Channel-Presence-ID") && user.userID == e.data["Channel-Name"].slice(15,e.data["Channel-Name"].indexOf('@'))) || (!e.data.hasOwnProperty("Channel-Presence-ID") && (e.data["Channel-Name"].slice(0,8)=="loopback")&& (e.data["Channel-Name"].slice(9,13)==user.userID)) || flag && (user.userID == e.data["Caller-Destination-Number"] ) ) {
 	       if(user.userID == callerNumber || user.userID ==calleeNumber || e.data["Channel-Name"].slice(0,8)=="loopback" && user.userID == e.data["Channel-Name"].slice(9,13) ){ 
+              let temp_a = this.deviceList.find((device)=>{
+            	return device.userID == callerNumber
+          	})
+              let temp_b = this.deviceList.find((device)=>{
+            	return device.userID == calleeNumber
+                })
+	      if(temp_a!=undefined && temp_a.deviceState == "unregistered" && user.userID == callerNumber ||  e.data["Channel-Name"].slice(0,8)=="loopback" && user.userID == e.data["Channel-Name"].slice(9,13))
+		return
+	      if(temp_b!= undefined && temp_b.deviceState == "unregistered" && user.userID == calleeNumber ||  e.data["Channel-Name"].slice(0,8)=="loopback" && user.userID == e.data["Channel-Name"].slice(9,13))
+                return
               let numbers = [callerNumber,calleeNumber]
               let other_number = user.userID == numbers[0]?numbers[1]:numbers[0]
               let queue = this.deviceStatus[user.userID]
@@ -1377,8 +1387,7 @@
             if(this.deviceStatus.hasOwnProperty(calleenumber) && !isNaN(calleenumber) && (calleeNumber[0]!='8' &&  calleeNumber[0]!='9' ||  calleeNumber.slice(0,2)=='80' || calleeNumber.slice(0,2)=='96' || calleeNumber.slice(0,2)=='99'))
             delete this.deviceStatus[calleeNumber][callerNumber]
           }
-          if(channelCallState!="hungup"){
-          let temp_a = this.deviceList.find((device)=>{
+	  let temp_a = this.deviceList.find((device)=>{
             return device.userID == callerNumber
           })
           let temp_b = this.deviceList.find((device)=>{
@@ -1386,13 +1395,16 @@
           })
           let caller_type
           let callee_type
-          if(caller_type!=undefined)
+          if(temp_a!=undefined)
            caller_type = temp_a.type
-          if(callee_type!=undefined)
-          callee_type= temp_b.type
+          if(temp_b!=undefined)
+           callee_type= temp_b.type
+	  if(channelCallState!="hungup"){
           ///////////////////////////////////////////////////////////
           ///////////////////////////////////////////////////////////
           ///////////////对于caller一方的处理，先判断是active，再判断ringring，否则就是hungup
+	  if(temp_a!=undefined &&  temp_a.deviceState != "unregistered")
+	  {
           for(let ce in caller_queue){
             if(caller_queue[ce]=="active"){
                 caller_status = "active"
@@ -1411,9 +1423,14 @@
             caller_status = caller_type == 2?"registeredM":"registered"
             caller_calling = ""
           }
+	}
+	  else
+	  caller_status = "unregistered"
         ///////////////////////////////////////////////////////////
         ///////////////////////////////////////////////////////////
         //////对于callee一方的处理
+	if(temp_b!=undefined &&  temp_b.deviceState != "unregistered")
+	{
         for(let ce in callee_queue){
             if(callee_queue[ce]=="active"){
                 callee_status = "active"
@@ -1432,6 +1449,9 @@
             callee_status = callee_type == 2?"registeredM":"registered"
             callee_calling = ""
           }
+	}
+	  else
+          callee_status = "unregistered"
         ///////////////////////////////////////////////////////////
 	
         ///////////////////////////////////////////////////////////

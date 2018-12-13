@@ -217,8 +217,14 @@
             if(new RegExp("("+ k +")").test(format)) format = format.replace(RegExp.$1,RegExp.$1.length==1 ? o[k] : ("00"+ o[k]).substr((""+ o[k]).length));    
           return format;
         }
-        this.formData.BeginTime = this.value[0].format('yyyy-MM-dd hh:mm:ss')   
-        this.formData.EndTime = this.value[1].format('yyyy-MM-dd hh:mm:ss') 
+        if (typeof(this.value[0]) != "undefined") {
+          this.formData.BeginTime = this.value[0].format('yyyy-MM-dd hh:mm:ss') 
+        } 
+        if (typeof(this.value[1]) != "undefined") {
+          this.formData.EndTime = this.value[1].format('yyyy-MM-dd hh:mm:ss')  
+        } 
+        // this.formData.BeginTime = this.value[0].format('yyyy-MM-dd hh:mm:ss')   
+        // this.formData.EndTime = this.value[1].format('yyyy-MM-dd hh:mm:ss') 
         this.refresh()
       },   
     }
